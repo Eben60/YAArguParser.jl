@@ -1,7 +1,7 @@
 module SimpleArgParse
 
 export ArgumentParser, add_argument!, add_example!, generate_usage, help, parse_args!, 
-    get_value, set_value!, has_key, get_key, colorize, 
+    get_value, set_value!, colorize, 
     colorprint, args_pairs, PromptedParser, 
     keys
 
@@ -102,7 +102,6 @@ function add_argument!(parser::ArgumentParser, arg_short::String="", arg_long::S
     :ArgumentParser
 
     args::Arguments = Arguments(arg_short, arg_long)
-    # prefer stripped long argument for higher entropy
     arg::String = !isempty(arg_long) ? arg_long : !isempty(arg_short) ? arg_short : ""
     isempty(arg) && error("Argument(s) missing. See usage examples.")
     parser.lng += 1
@@ -223,24 +222,6 @@ function get_value(parser::ArgumentParser, arg::AbstractString)
     key::UInt16 = parser.arg_store[argkey]
     value::Any = haskey(parser.kv_store, key) ? parser.kv_store[key].value : nothing
     return value
-end
-
-"Check if argument key exists in store."
-function has_key(parser::ArgumentParser, arg::AbstractString)
-    :Bool
-    argkey::String = arg2key(arg)
-    result::Bool = haskey(parser.arg_store, argkey) ? true : false
-    return result
-end
-
-Base.keys(parser::ArgumentParser) = [arg2key(v.args.long) for v in values(parser.kv_store)]
-
-"Get argument key from parser."
-function get_key(parser::ArgumentParser, arg::AbstractString)
-    :Union
-    argkey::String = arg2key(arg)
-    key::Union{UInt16,Nothing} = haskey(parser.arg_store, argkey) ? parser.arg_store[argkey] : nothing
-    return key
 end
 
 "Prepend hyphenation back onto argument after stripping it for the argument-store key."
