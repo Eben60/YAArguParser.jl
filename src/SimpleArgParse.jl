@@ -365,7 +365,7 @@ function args_pairs(args::ArgumentParser)
 end
 
 @kwdef mutable struct PromptedParser
-    parser::ArgumentParser = ArgumentParser()
+    parser::ArgumentParser = ArgumentParser(; return_err=true)
     color::String = "default"
     introduction::String = ""
     prompt::String = "> "
