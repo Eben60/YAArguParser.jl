@@ -30,5 +30,4 @@ lcov.info
 
 src/tmp*
 tmp*
-test*
 src/olds/*
