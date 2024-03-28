@@ -2,8 +2,7 @@ module SimpleArgParse
 
 export ArgumentParser, add_argument!, add_example!, generate_usage, help, parse_args!, 
     get_value, set_value!, colorize, 
-    colorprint, args_pairs, PromptedParser, 
-    keys
+    colorprint, args_pairs, PromptedParser
 
 using OrderedCollections: OrderedDict
 
@@ -26,27 +25,27 @@ abstract type AbstractValidator end
     start_w::Vector{String} = []
 end
 
-function validate(s::AbstractString, vl::StrValidator)
+function validate(v::AbstractString, vl::StrValidator)
     ok = true
     if !vl.case_sens 
-        s = uppercase(s)
+        v = uppercase(v)
         v_list = vl.val_list .|> uppercase
         sw_list = vl.start_w  .|> uppercase
     else
         v_list = vl.val_list
         sw_list = vl.start_w 
     end
-    s in v_list && return (; ok, s)
-    any(occursin.(vl.reg_ex, Ref(s))) && return (; ok, s)
+    v in v_list && return (; ok, v)
+    any(occursin.(vl.reg_ex, Ref(v))) && return (; ok, v)
     for sw in sw_list
-        startswith(sw, s) && return (; ok, s=sw) # return full word
+        startswith(sw, v) && return (; ok, v=sw) # return full word
     end
-    return (; ok=false, s=nothing)
+    return (; ok=false, v=nothing)
 end
 
-validate(s, ::Nothing) = (; ok=true, s)
+validate(v, ::Nothing) = (; ok=true, v)
 
-validate(s, ::StrValidator) = (; ok=true, s) # only Strings are validated
+validate(v, ::StrValidator) = (; ok=true, v) # only Strings are validated
 
 "Command-line argument values."
 @kwdef struct ArgumentValues

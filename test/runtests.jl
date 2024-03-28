@@ -67,11 +67,11 @@ using Test
         v2 = StrValidator(; start_w=["yes", "no"])
         v3 = StrValidator(; case_sens=true, reg_ex=[r"^ab[cd]$"])
 
-        @test validate("Aaa", v1) == (; ok=true, s="AAA")
-        @test validate("Aaa", v1c) == (; ok=false, s=nothing) 
-        @test validate("ye", v2) == (; ok=true, s="YES")
-        @test validate("abc", v3) == (; ok=true, s="abc")
-        @test validate("Abc", v3) == (; ok=false, s=nothing)
+        @test validate("Aaa", v1) == (; ok=true, v="AAA")
+        @test validate("Aaa", v1c) == (; ok=false, v=nothing) 
+        @test validate("ye", v2) == (; ok=true, v="YES")
+        @test validate("abc", v3) == (; ok=true, v="abc")
+        @test validate("Abc", v3) == (; ok=false, v=nothing)
 
         p = ArgumentParser()
         @test_throws ErrorException add_argument!(p, "-f", "--foo", type=String, default="bar", validator=v1)
