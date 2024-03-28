@@ -238,7 +238,12 @@ function parse_args!(parser::ArgumentParser; cli_args=ARGS)
         # extract default value and update given an argument value
         values::ArgumentValues = parser.kv_store[key]
         # type cast value into tuple index 1
-        value = values.type == Any ? value : _parse(values.type, value)
+        value = try
+            value = values.type == Any ? value : _parse(values.type, value)
+        catch e
+            e isa ArgumentError && error("cannot parse $value into $(values.type)")
+        end
+
         parser.kv_store[key] = ArgumentValues(values.args, value, 
             values.type, values.required, values.description, values.validator)
     end
