@@ -5,8 +5,6 @@ export ArgumentParser, add_argument!, add_example!, generate_usage, help, parse_
     colorprint, args_pairs, PromptedParser, 
     keys
 
-# using Base
-# using SHA: sha256
 using OrderedCollections: OrderedDict
 
 ###
@@ -309,8 +307,10 @@ end
 
 argpair(s, args) = Symbol(s) => get_value(args, s)
 
+_keys(parser::ArgumentParser) = [arg2key(v.args.long) for v in values(parser.kv_store)]
+
 function args_pairs(args::ArgumentParser)
-    allkeys = keys(args)
+    allkeys = _keys(args)
     filter!(x -> !(x in ["help", "abort"]), allkeys)
     ps = [argpair(k, args) for k in allkeys]
     filter!(p -> !isnothing(p[2]) , ps)
