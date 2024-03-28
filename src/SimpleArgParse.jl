@@ -11,19 +11,51 @@ using OrderedCollections: OrderedDict
 ### Data Structures
 ###
 
-"Command-line argments."
+"Command-line arguments."
 struct Arguments
     short::String
     long::String
 end
 
-"Command-line argment values."
-struct ArgumentValues
+abstract type AbstractValidator end
+
+@kwdef struct StrValidator <: AbstractValidator
+    case_sens::Bool = false
+    val_list::Vector{String} = []
+    reg_ex::Vector{Regex} = []
+    start_w::Vector{String} = []
+end
+
+function validate(s::AbstractString, vl::StrValidator)
+    ok = true
+    if !vl.case_sens 
+        s = uppercase(s)
+        v_list = vl.val_list .|> uppercase
+        sw_list = vl.start_w  .|> uppercase
+    else
+        v_list = vl.val_list
+        sw_list = vl.start_w 
+    end
+    s in v_list && return (; ok, s)
+    any(occursin.(vl.reg_ex, Ref(s))) && return (; ok, s)
+    for sw in sw_list
+        startswith(sw, s) && return (; ok, s=sw) # return full word
+    end
+    return (; ok=false, s=nothing)
+end
+
+validate(s, ::Nothing) = (; ok=true, s)
+
+validate(s, ::StrValidator) = (; ok=true, s) # only Strings are validated
+
+"Command-line argument values."
+@kwdef struct ArgumentValues
     args::Arguments
     value::Any
-    type::Type
-    required::Bool
-    description::String
+    type::Type = Any
+    required::Bool = false
+    description::String = ""
+    validator::Union{AbstractValidator, Nothing} = nothing
 end
 
 "Command-line argument parser with key-value stores and attributes."
@@ -83,7 +115,7 @@ end
 
 "Add command-line argument to ArgumentParser object instance."
 function add_argument!(parser::ArgumentParser, arg_short::String="", arg_long::String="";
-    type::Type=Any, required::Bool=false, default::Any=nothing, description::String="")
+    type::Type=Any, required::Bool=false, default=nothing, description::String="", validator=nothing)
     """
     # Arguments
     _Mandatory_
@@ -108,7 +140,8 @@ function add_argument!(parser::ArgumentParser, arg_short::String="", arg_long::S
     !isempty(arg_short) && (parser.arg_store[arg2key(arg_short)] = key)
     !isempty(arg_long)  && (parser.arg_store[arg2key(arg_long)]  = key)
     default = (type == Any) | isnothing(default) ? default : convert(type, default)
-    values::ArgumentValues = ArgumentValues(args, default, type, required, description)
+    values::ArgumentValues = ArgumentValues(args, default, type, required, description, validator)
+    validate(default, validator).ok || error("invalid default value $default")
     parser.kv_store[key] = values
     return parser
 end
@@ -207,7 +240,8 @@ function parse_args!(parser::ArgumentParser; cli_args=ARGS)
         values::ArgumentValues = parser.kv_store[key]
         # type cast value into tuple index 1
         value = values.type == Any ? value : _parse(values.type, value)
-        parser.kv_store[key] = ArgumentValues(values.args, value, values.type, values.required, values.description)
+        parser.kv_store[key] = ArgumentValues(values.args, value, 
+            values.type, values.required, values.description, values.validator)
     end
     return parser
 end
@@ -238,8 +272,12 @@ function set_value!(parser::ArgumentParser, arg::AbstractString, value::Any)
     key::UInt16 = parser.arg_store[argkey]
     !haskey(parser.kv_store, key) && error("Key not found in store.")
     values::ArgumentValues = parser.kv_store[key]
+    vld = values.validator
     value = convert(values.type, value)
-    parser.kv_store[key] = ArgumentValues(values.args, value, values.type, values.required, values.description)
+    (ok, value) = validate(value, vld)
+    ok || error("$value is not a valid argument value")
+
+    parser.kv_store[key] = ArgumentValues(values.args, value, values.type, values.required, values.description, values.validator)
     return parser
 end
 
@@ -331,6 +369,5 @@ parse_args!(p::PromptedParser, cli_args) = parse_args!(p.parser; cli_args)
 add_example!(p::PromptedParser, example) = add_example!(p.parser, example) 
 help(p::PromptedParser; color=p.color) = help(p.parser; color)
 get_value(p::PromptedParser, arg) = get_value(p.parser, arg)
-
 
 end # module SimpleArgParse
