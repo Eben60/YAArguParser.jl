@@ -42,7 +42,7 @@ using Test
         @test "bar" == get_value(p, "--foo")
         @test "bar" == get_value(p, "-f")
         @test "bar" == get_value(p, "f")
-        @test_throws ErrorException add_argument!(p, "", "", type=String, default="bar", description="baz")
+        @test_throws ArgumentError add_argument!(p, "", "", type=String, default="bar", description="baz")
     end
 
     @testset "Testset get_value" begin
@@ -75,11 +75,11 @@ using Test
         @test validate("Abc", v3) == (; ok=false, v=nothing)
 
         p = ArgumentParser()
-        @test_throws ErrorException add_argument!(p, "-f", "--foo", type=String, default="bar", validator=v1)
+        @test_throws ArgumentError add_argument!(p, "-f", "--foo", type=String, default="bar", validator=v1)
         add_argument!(p, "-f", "--foo", type=String, validator=v1)
         set_value!(p, "--foo", "aaa")
         @test get_value(p, "--foo") == "AAA"
-        @test_throws ErrorException set_value!(p, "--foo", "abc")
+        @test_throws ArgumentError set_value!(p, "--foo", "abc")
     end
 
     @testset "Testset parse_args!" begin
@@ -92,10 +92,23 @@ using Test
         @test get_value(p, "--foo") == "Ffff"
         @test get_value(p, "--goo") == "Gggg"
         @test get_value(p, "--int") == 1
-        @test_throws ErrorException get_value(p, "--bar")
-        @test_throws ErrorException parse_args!(p; cli_args=["-i", "1.5"])
+        @test_throws ArgumentError get_value(p, "--bar")
+        @test_throws ArgumentError parse_args!(p; cli_args=["-i", "1.5"])
     end
 
-
+    @testset "Testset return Exception" begin
+        p = ArgumentParser(; return_err = true)
+        add_argument!(p, "-f", "--foo", type=String, default="fff", description="Fff")
+        add_argument!(p, "-g", "--goo", type=String, default="ggg", description="Ggg")
+        add_argument!(p, "-i", "--int", type=Int, default=0, description="integer")
+        cli_args = ["-goo", "Gggg", "-f", "Ffff", "-i", "1"]
+        parse_args!(p; cli_args)
+        @test get_value(p, "--foo") == "Ffff"
+        @test get_value(p, "--goo") == "Gggg"
+        @test get_value(p, "--int") == 1
+        @test get_value(p, "--bar") isa ArgumentError
+        @test parse_args!(p; cli_args=["-i", "1.5"]) isa ArgumentError
+    end
 
 end
+;
