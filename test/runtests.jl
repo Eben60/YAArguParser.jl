@@ -1,6 +1,6 @@
 using SimpleArgParse: ArgumentParser, add_argument!, add_example!, generate_usage, help, parse_args!, get_value, set_value! 
 
-using SimpleArgParse: StrValidator, validate
+using SimpleArgParse: StrValidator, validate, RealValidator
 
 using Test
 
@@ -67,6 +67,7 @@ using Test
         v1c = StrValidator(; case_sens=true, val_list=["aaa", "BBB"])
         v2 = StrValidator(; start_w=["yes", "no"])
         v3 = StrValidator(; case_sens=true, reg_ex=[r"^ab[cd]$"])
+        @test_throws ErrorException StrValidator(; case_sens=true)
 
         @test validate("Aaa", v1) == (; ok=true, v="AAA")
         @test validate("Aaa", v1c) == (; ok=false, v=nothing) 
@@ -81,6 +82,29 @@ using Test
         @test get_value(p, "--foo") == "AAA"
         @test_throws ArgumentError set_value!(p, "--foo", "abc")
     end
+
+    @testset "RealValidator" begin
+        @test_throws ErrorException RealValidator()
+        rvl = RealValidator(;excl_vals=[1, 2], excl_ivls=[(10, 15), (20, 25)], incl_vals=[3, 4, 11], incl_ivls=[(100, Inf)])
+        @test !validate(1, rvl).ok # == (; ok=false, v=nothing) 
+        @test validate(11, rvl) == (; ok=false, v=nothing) 
+        @test validate(50, rvl) == (; ok=false, v=nothing) 
+        @test validate(3, rvl) == (; ok=true, v=3)  
+        @test validate(111, rvl) == (; ok=true, v=111) 
+        rv1 = RealValidator(;incl_ivls=[(10, 20), (30, 40), (100, Inf)])
+        @test validate(111, rv1) == (; ok=true, v=111)
+        @test validate(15, rv1) == (; ok=true, v=15)
+        @test validate(25, rv1) == (; ok=false, v=nothing) 
+        @test_throws ErrorException validate("25", rv1)
+
+        p = ArgumentParser()
+        @test_throws ArgumentError add_argument!(p, "-i", "--int", type=Int, default=1, validator=rvl)
+        add_argument!(p, "-i", "--int", type=Int, validator=rvl)
+        set_value!(p, "-i", 3)
+        @test get_value(p, "--int") == 3
+        @test_throws ArgumentError set_value!(p, "--foo", "abc")
+    end
+
 
     @testset "Testset parse_args!" begin
         p = ArgumentParser()
