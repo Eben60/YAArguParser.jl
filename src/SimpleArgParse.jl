@@ -134,7 +134,7 @@ function add_argument!(parser::ArgumentParser, arg_short::String="", arg_long::S
 
     args::Arguments = Arguments(arg_short, arg_long)
     arg::String = !isempty(arg_long) ? arg_long : !isempty(arg_short) ? arg_short : ""
-    isempty(arg) && return _error(Val(parser.return_err), "Argument(s) missing. See usage examples.")
+    isempty(arg) && return _error(parser.return_err, "Argument(s) missing. See usage examples.")
     parser.lng += 1
     key::UInt16 = parser.lng
     # map both argument names to the same key
@@ -142,7 +142,7 @@ function add_argument!(parser::ArgumentParser, arg_short::String="", arg_long::S
     !isempty(arg_long)  && (parser.arg_store[arg2key(arg_long)]  = key)
     default = (type == Any) | isnothing(default) ? default : convert(type, default)
     values::ArgumentValues = ArgumentValues(args, default, type, required, description, validator)
-    validate(default, validator).ok || return _error(Val(parser.return_err), "invalid default value $default")
+    validate(default, validator).ok || return _error(parser.return_err, "invalid default value $default")
     parser.kv_store[key] = values
     return parser
 end
@@ -221,9 +221,9 @@ function parse_args!(parser::ArgumentParser; cli_args=ARGS)
         arg::String = cli_args[i]
         argkey::String = arg2key(arg)
         if startswith(arg, "-")
-            !haskey(parser.arg_store, argkey) && return _error(Val(parser.return_err), "Argument not found: $(arg). Call `add_argument` before parsing.")
+            !haskey(parser.arg_store, argkey) && return _error(parser.return_err, "Argument not found: $(arg). Call `add_argument` before parsing.")
             key::UInt16 = parser.arg_store[argkey]
-            !haskey(parser.kv_store, key) && return _error(Val(parser.return_err), "Key not found for argument: $(arg)"; excp=ErrorException)
+            !haskey(parser.kv_store, key) && return _error(parser.return_err, "Key not found for argument: $(arg)"; excp=ErrorException)
         else
             continue
         end
@@ -235,7 +235,7 @@ function parse_args!(parser::ArgumentParser; cli_args=ARGS)
             value = cli_args[i+1]
             i += 1
         else
-            return _error(Val(parser.return_err), "Value failed to parse for arg: $(arg)")
+            return _error(parser.return_err, "Value failed to parse for arg: $(arg)")
         end
         # extract default value and update given an argument value
         values::ArgumentValues = parser.kv_store[key]
@@ -243,7 +243,7 @@ function parse_args!(parser::ArgumentParser; cli_args=ARGS)
         value = try
             value = values.type == Any ? value : _parse(values.type, value)
         catch e
-            e isa ArgumentError && return _error(Val(parser.return_err), "cannot parse $value into $(values.type)")
+            e isa ArgumentError && return _error(parser.return_err, "cannot parse $value into $(values.type)")
         end
 
         parser.kv_store[key] = ArgumentValues(values.args, value, 
@@ -256,7 +256,7 @@ end
 function get_value(parser::ArgumentParser, arg::AbstractString)
     :Any
     argkey::String = arg2key(arg)
-    !haskey(parser.arg_store, argkey) && return _error(Val(parser.return_err), "Argument not found: $(arg). Run `add_argument` first.")
+    !haskey(parser.arg_store, argkey) && return _error(parser.return_err, "Argument not found: $(arg). Run `add_argument` first.")
     key::UInt16 = parser.arg_store[argkey]
     value::Any = haskey(parser.kv_store, key) ? parser.kv_store[key].value : nothing
     return value
@@ -274,21 +274,20 @@ end
 function set_value!(parser::ArgumentParser, arg::AbstractString, value::Any)
     :ArgumentParser
     argkey::String = arg2key(arg)
-    !haskey(parser.arg_store, argkey) && return _error(Val(parser.return_err), "Argument not found in store.")
+    !haskey(parser.arg_store, argkey) && return _error(parser.return_err, "Argument not found in store.")
     key::UInt16 = parser.arg_store[argkey]
-    !haskey(parser.kv_store, key) && return _error(Val(parser.return_err), "Key not found in store.")
+    !haskey(parser.kv_store, key) && return _error(parser.return_err, "Key not found in store.")
     values::ArgumentValues = parser.kv_store[key]
     vld = values.validator
     value = convert(values.type, value)
     (ok, value) = validate(value, vld)
-    ok || return _error(Val(parser.return_err), "$value is not a valid argument value")
+    ok || return _error(parser.return_err, "$value is not a valid argument value")
 
     parser.kv_store[key] = ArgumentValues(values.args, value, values.type, values.required, values.description, values.validator)
     return parser
 end
 
-_error(::Val{false}, x; excp=ArgumentError) = throw(excp(x))
-_error(::Val{true}, x; excp=ArgumentError) = excp(x)
+_error(return_err, x; excp=ArgumentError) = return_err ? excp(x) : throw(excp(x)) 
 
 # Type conversion helper methods.
 _parse(x, y) = parse(x, y)
