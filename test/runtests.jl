@@ -135,14 +135,70 @@ using Test
     end
 
     @testset "Positional args" begin
-        p = ArgumentParser()
-        add_argument!(p, "-f", "--foo", type=String, default="fff", description="Fff")
-        add_argument!(p, "-g", "--goo", type=String, default="ggg", description="Ggg")
-        add_argument!(p, "-i", "--int", type=Int, default=0, description="integer")
-        add_argument!(p, "-a", "--abort", type=Bool, default=false, description="abort")
+        p0 = ArgumentParser()
+        add_argument!(p0, "-f", "--foo", type=String, default="fff", description="Fff")
+        add_argument!(p0, "-g", "--goo", type=String, default="ggg", description="Ggg")
+        add_argument!(p0, "-i", "--int", type=Int, default=0, description="integer")
+        add_argument!(p0, "-a", "--abort", type=Bool, default=false, description="abort")
+
+        p = deepcopy(p0)
         add_argument!(p, "", "--posn", type=Int, default=0, positional=true, description="integer")
+
         @test length(positional_args(p)) == 1
         @test length(args_pairs(p)) == 4
+
+        cli_args = ["3", "-goo", "Gggg", "-f", "Ffff", "-i", "1"]
+
+        parse_args!(p; cli_args)
+        @test get_value(p, "--foo") == "Ffff"
+        @test get_value(p, "--goo") == "Gggg"
+        @test get_value(p, "--int") == 1
+        @test get_value(p, "--abort") == false
+        @test get_value(p, "--posn") == 3                
+        @test_throws ErrorException add_argument!(p, "", "--pos2", type=Int, default=nothing, required=false, positional=true, description="integer2")
+
+        p = deepcopy(p0)
+        add_argument!(p, "", "--posn", type=Int, default=0, positional=true, description="integer")
+        cli_args = ["1.5", "-goo", "Gggg", "-f", "Ffff", "-i", "1"]
+        @test_throws ArgumentError parse_args!(p; cli_args)
+
+        p = deepcopy(p0)
+        rvl = RealValidator(;incl_vals=[3, 4, 6])
+        add_argument!(p, "", "--posn", type=Int, positional=true, required=true, description="integer", validator=rvl)
+        cli_args = ["2", "-goo", "Gggg", "-f", "Ffff", "-i", "1"]
+        @test_throws ArgumentError parse_args!(p; cli_args)
+        cli_args = ["3", "-goo", "Gggg", "-f", "Ffff", "-i", "1"]
+        parse_args!(p; cli_args)
+        @test get_value(p, "--posn") == 3 
+
+        p1 = deepcopy(p0)
+        add_argument!(p1, "", "--pos1", type=Int, default=0, positional=true, description="integer")
+        add_argument!(p1, "", "--pos2", type=Int, default=0, positional=true, description="integer")
+        add_argument!(p1, "", "--pos3", type=Int, default=0, positional=true, description="integer")
+
+        p = deepcopy(p1)
+        cli_args = ["1", "2", "3", "-goo", "Gggg", "-f", "Ffff", "-i", "1"]
+        parse_args!(p; cli_args)
+
+        @test get_value(p, "--foo") == "Ffff"
+        @test get_value(p, "--goo") == "Gggg"
+        @test get_value(p, "--int") == 1
+        @test get_value(p, "--abort") == false
+        @test get_value(p, "--pos1") == 1 
+        @test get_value(p, "--pos2") == 2 
+        @test get_value(p, "--pos3") == 3
+
+        p = deepcopy(p1)
+        cli_args = ["1", "-goo", "Gggg", "-f", "Ffff", "-i", "1"]
+        parse_args!(p; cli_args)
+
+        @test get_value(p, "--foo") == "Ffff"
+        @test get_value(p, "--goo") == "Gggg"
+        @test get_value(p, "--int") == 1
+        @test get_value(p, "--abort") == false
+        @test get_value(p, "--pos1") == 1 
+        @test get_value(p, "--pos2") == 0 
+        @test get_value(p, "--pos3") == 0
 
     end
 

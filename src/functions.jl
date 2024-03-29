@@ -42,6 +42,8 @@ function add_argument!(parser::ArgumentParser, arg_short::String="", arg_long::S
     args::ArgForms = ArgForms(arg_short, arg_long)
     arg::String = !isempty(arg_long) ? arg_long : !isempty(arg_short) ? arg_short : ""
     isempty(arg) && throw(ArgumentError("Argument(s) missing. See usage examples."))
+    isnothing(default) && positional && !required && 
+        error("Error adding argument for $arg_long, $arg_short. Optional positional argument must have a valid default value")
     parser.lng += 1
     key::UInt16 = parser.lng
     # map both argument names to the same key
@@ -115,16 +117,49 @@ function help(parser::ArgumentParser; color::AbstractString="default")
     return nothing
 end
 
+function update_val!(parser, key, value)
+    # extract default value and update given an argument value
+    vals::ArgumentValues = parser.kv_store[key]
+    # type cast value into tuple index 1
+    value = try
+        value = vals.type == Any ? value : _parse(vals.type, value)
+    catch e
+        e isa ArgumentError && return _error(parser.return_err, "cannot parse $value into $(vals.type)")
+    end
+
+    return set_value!(parser, key, value; return_err = parser.return_err)
+end
+
 "Parse command-line arguments."
 function parse_args!(parser::ArgumentParser; cli_args=ARGS)
     :ArgumentParser
+    cli_args = copy(cli_args)
     if parser.add_help
         parser = add_argument!(parser, "-h", "--help", type=Bool, default=false, description="Print the help message.")
         parser.usage = generate_usage(parser)
     end
     parser.filename = PROGRAM_FILE
     n::Int64 = length(cli_args)
-    for i::Int64 in eachindex(cli_args)
+    posargs = positional_args(parser)
+
+    nextarg = 1
+    posargs_exhausted = false
+
+    for (i, pa) in pairs(posargs)
+        posargs_exhausted || (value = cli_args[i])
+        if !startswith(value, '-')
+            argkey = canonicalname(pa)
+            key = parser.arg_store[argkey]
+            uv = update_val!(parser, key, value)
+            uv isa Exception && return uv
+            nextarg += 1
+        else
+            posargs_exhausted = true
+            (isnothing(pa.default) | pa.required) && return _error(parser.return_err, "Value for positional argument $argname not supplied")
+        end
+    end
+
+    for i::Int64 in nextarg:length(cli_args)
         arg::String = cli_args[i]
         argkey::String = arg2key(arg)
         if startswith(arg, "-")
@@ -144,16 +179,8 @@ function parse_args!(parser::ArgumentParser; cli_args=ARGS)
         else
             return _error(parser.return_err, "Value failed to parse for arg: $(arg)")
         end
-        # extract default value and update given an argument value
-        vals::ArgumentValues = parser.kv_store[key]
-        # type cast value into tuple index 1
-        value = try
-            value = vals.type == Any ? value : _parse(vals.type, value)
-        catch e
-            e isa ArgumentError && return _error(parser.return_err, "cannot parse $value into $(vals.type)")
-        end
-
-        parser.kv_store[key].value = value
+        uv = update_val!(parser, key, value)
+        uv isa Exception && return uv
     end
     return parser
 end
@@ -177,19 +204,24 @@ function hyphenate(arg::AbstractString)
 end
 
 "Set/update value of argument in parser."
-function set_value!(parser::ArgumentParser, arg::AbstractString, value::Any)
-    :ArgumentParser
-    argkey::String = arg2key(arg)
-    !haskey(parser.arg_store, argkey) && throw(ArgumentError("Argument not found in store."))
-    key::UInt16 = parser.arg_store[argkey]
-    !haskey(parser.kv_store, key) && throw(ArgumentError("Key not found in store."))
+
+function set_value!(parser::ArgumentParser, key::Integer, value::Any; return_err = false)
+    !haskey(parser.kv_store, key) && return _error(return_err, "Key not found in store.")
     vals::ArgumentValues = parser.kv_store[key]
     vld = vals.validator
     value = convert(vals.type, value)
     (ok, value) = validate(value, vld)
-    ok || throw(ArgumentError("$value is not a valid argument value"))
+    ok || return _error(return_err, "$value is not a valid argument value")
     parser.kv_store[key] = ArgumentValues(vals.args, value, vals.type, vals.required, vals.positional, vals.description, vals.validator)
     return parser
+end
+
+function set_value!(parser::ArgumentParser, arg::AbstractString, value::Any; return_err = false)
+    :ArgumentParser
+    argkey::String = arg2key(arg)
+    !haskey(parser.arg_store, argkey) && return _error(return_err, "Argument not found in store.")
+    key::UInt16 = parser.arg_store[argkey]
+    return set_value!(parser::ArgumentParser, key::Integer, value::Any)
 end
 
 _error(return_err, x; excp=ArgumentError) = return_err ? excp(x) : throw(excp(x)) 
