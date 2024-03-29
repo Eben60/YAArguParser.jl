@@ -135,13 +135,13 @@ using Test
     end
 
     @testset "Positional args" begin
-        p0 = ArgumentParser()
-        add_argument!(p0, "-f", "--foo", type=String, default="fff", description="Fff")
-        add_argument!(p0, "-g", "--goo", type=String, default="ggg", description="Ggg")
-        add_argument!(p0, "-i", "--int", type=Int, default=0, description="integer")
-        add_argument!(p0, "-a", "--abort", type=Bool, default=false, description="abort")
+        p0 = ArgumentParser();
+        add_argument!(p0, "-f", "--foo", type=String, default="fff", description="Fff");
+        add_argument!(p0, "-g", "--goo", type=String, default="ggg", description="Ggg");
+        add_argument!(p0, "-i", "--int", type=Int, default=0, description="integer");
+        add_argument!(p0, "-a", "--abort", type=Bool, default=false, description="abort");
 
-        p = deepcopy(p0)
+        p = deepcopy(p0);
         add_argument!(p, "", "--posn", type=Int, default=0, positional=true, description="integer")
 
         @test length(positional_args(p)) == 1
@@ -199,6 +199,15 @@ using Test
         @test get_value(p, "--pos1") == 1 
         @test get_value(p, "--pos2") == 0 
         @test get_value(p, "--pos3") == 0
+
+        p1 = deepcopy(p0);
+        add_argument!(p1, "", "--pos1", type=Int, default=0, positional=true, description="integer");
+        add_argument!(p1, "", "--pos2", type=Int, positional=true, required=true, description="integer");
+        add_argument!(p1, "", "--pos3", type=Int, positional=true, required=true, description="integer");
+
+        p = deepcopy(p1);
+        cli_args = ["1", "-goo", "Gggg", "-f", "Ffff", "-i", "1"];
+        @test_throws ArgumentError parse_args!(p; cli_args)
 
     end
 

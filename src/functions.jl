@@ -147,7 +147,7 @@ function parse_args!(parser::ArgumentParser; cli_args=ARGS)
 
     for (i, pa) in pairs(posargs)
         posargs_exhausted || (value = cli_args[i])
-        if !startswith(value, '-')
+        if (!posargs_exhausted && !startswith(value, '-'))
             argkey = canonicalname(pa)
             key = parser.arg_store[argkey]
             uv = update_val!(parser, key, value)
@@ -155,7 +155,7 @@ function parse_args!(parser::ArgumentParser; cli_args=ARGS)
             nextarg += 1
         else
             posargs_exhausted = true
-            (isnothing(pa.default) | pa.required) && return _error(parser.return_err, "Value for positional argument $argname not supplied")
+            (isnothing(pa.value) | pa.required) && return _error(parser.return_err, "Value for positional argument $(canonicalname(pa)) not supplied")
         end
     end
 
