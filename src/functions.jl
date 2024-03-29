@@ -50,8 +50,9 @@ function add_argument!(parser::ArgumentParser, arg_short::String="", arg_long::S
     !isempty(arg_short) && (parser.arg_store[arg2key(arg_short)] = key)
     !isempty(arg_long)  && (parser.arg_store[arg2key(arg_long)]  = key)
     default = (type == Any) | isnothing(default) ? default : convert(type, default)
+    (ok, default) = validate(default, validator)
+    ok || throw(ArgumentError("invalid default value $default"))
     vals::ArgumentValues = ArgumentValues(args, default, type, required, positional, description, validator)
-    validate(default, validator).ok || throw(ArgumentError("invalid default value $default"))
     parser.kv_store[key] = vals
     return parser
 end
@@ -146,6 +147,7 @@ function parse_args!(parser::ArgumentParser; cli_args=ARGS)
     posargs_exhausted = false
 
     for (i, pa) in pairs(posargs)
+        isempty(cli_args) && (posargs_exhausted = true)
         posargs_exhausted || (value = cli_args[i])
         if (!posargs_exhausted && !startswith(value, '-'))
             argkey = canonicalname(pa)

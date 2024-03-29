@@ -208,8 +208,22 @@ using Test
         p = deepcopy(p1);
         cli_args = ["1", "-goo", "Gggg", "-f", "Ffff", "-i", "1"];
         @test_throws ArgumentError parse_args!(p; cli_args)
-
     end
 
+    @testset "positional yes or no" begin
+        p0 = ArgumentParser();
+        vl = StrValidator(; start_w=["yes", "no"]);
+        add_argument!(p0, "", "--cont", type=String, default="no", positional=true, description="continue or not!", validator=vl);
+
+        p = deepcopy(p0)
+        cli_args = ["ye"];
+        parse_args!(p; cli_args)
+        @test get_value(p, "--cont") == "YES"
+
+        p = deepcopy(p0);
+        cli_args = [];
+        parse_args!(p; cli_args);
+        @test get_value(p, "--cont") == "NO"
+    end
 end
 ;
