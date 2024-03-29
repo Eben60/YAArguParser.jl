@@ -134,7 +134,7 @@ function add_argument!(parser::ArgumentParser, arg_short::String="", arg_long::S
 
     args::Arguments = Arguments(arg_short, arg_long)
     arg::String = !isempty(arg_long) ? arg_long : !isempty(arg_short) ? arg_short : ""
-    isempty(arg) && return _error(parser.return_err, "Argument(s) missing. See usage examples.")
+    isempty(arg) && throw(ArgumentError("Argument(s) missing. See usage examples."))
     parser.lng += 1
     key::UInt16 = parser.lng
     # map both argument names to the same key
@@ -142,7 +142,7 @@ function add_argument!(parser::ArgumentParser, arg_short::String="", arg_long::S
     !isempty(arg_long)  && (parser.arg_store[arg2key(arg_long)]  = key)
     default = (type == Any) | isnothing(default) ? default : convert(type, default)
     values::ArgumentValues = ArgumentValues(args, default, type, required, description, validator)
-    validate(default, validator).ok || return _error(parser.return_err, "invalid default value $default")
+    validate(default, validator).ok || throw(ArgumentError("invalid default value $default"))
     parser.kv_store[key] = values
     return parser
 end
@@ -274,15 +274,14 @@ end
 function set_value!(parser::ArgumentParser, arg::AbstractString, value::Any)
     :ArgumentParser
     argkey::String = arg2key(arg)
-    !haskey(parser.arg_store, argkey) && return _error(parser.return_err, "Argument not found in store.")
+    !haskey(parser.arg_store, argkey) && throw(ArgumentError("Argument not found in store."))
     key::UInt16 = parser.arg_store[argkey]
-    !haskey(parser.kv_store, key) && return _error(parser.return_err, "Key not found in store.")
+    !haskey(parser.kv_store, key) && throw(ArgumentError("Key not found in store."))
     values::ArgumentValues = parser.kv_store[key]
     vld = values.validator
     value = convert(values.type, value)
     (ok, value) = validate(value, vld)
-    ok || return _error(parser.return_err, "$value is not a valid argument value")
-
+    ok || throw(ArgumentError("$value is not a valid argument value"))
     parser.kv_store[key] = ArgumentValues(values.args, value, values.type, values.required, values.description, values.validator)
     return parser
 end
