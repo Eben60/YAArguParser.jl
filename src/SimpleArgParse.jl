@@ -11,7 +11,7 @@ using OrderedCollections: OrderedDict
 ###
 
 "Command-line arguments."
-struct Arguments
+struct ArgForms
     short::String
     long::String
 end
@@ -84,13 +84,14 @@ validate(v::Nothing, ::Nothing) = (; ok=true, v)
 validate(v::Nothing, ::Any) = (; ok=true, v) # nothing is generally a valid value
 
 "Command-line argument values."
-@kwdef struct ArgumentValues
-    args::Arguments
+@kwdef mutable struct ArgumentValues
+    const args::ArgForms
     value::Any
-    type::Type = Any
-    required::Bool = false
-    description::String = ""
-    validator::Union{AbstractValidator, Nothing} = nothing
+    const type::Type = Any
+    const required::Bool = false
+    const positional::Bool = false
+    const description::String = ""
+    const validator::Union{AbstractValidator, Nothing} = nothing
 end
 
 "Command-line argument parser with key-value stores and attributes."
@@ -130,7 +131,7 @@ end
 ###
 
 "Extract struct members to vector."
-function args2vec(args::Arguments)
+function args2vec(args::ArgForms)
     :Vector
     if isempty(args.short)
         if isempty(args.long)
@@ -152,7 +153,7 @@ end
 
 "Add command-line argument to ArgumentParser object instance."
 function add_argument!(parser::ArgumentParser, arg_short::String="", arg_long::String="";
-    type::Type=Any, required::Bool=false, default=nothing, description::String="", validator=nothing)
+    type::Type=Any, required=false, positional=false, default=nothing, description::String="", validator=nothing)
     """
     # Arguments
     _Mandatory_
@@ -168,7 +169,7 @@ function add_argument!(parser::ArgumentParser, arg_short::String="", arg_long::S
     """
     :ArgumentParser
 
-    args::Arguments = Arguments(arg_short, arg_long)
+    args::ArgForms = ArgForms(arg_short, arg_long)
     arg::String = !isempty(arg_long) ? arg_long : !isempty(arg_short) ? arg_short : ""
     isempty(arg) && throw(ArgumentError("Argument(s) missing. See usage examples."))
     parser.lng += 1
@@ -177,9 +178,9 @@ function add_argument!(parser::ArgumentParser, arg_short::String="", arg_long::S
     !isempty(arg_short) && (parser.arg_store[arg2key(arg_short)] = key)
     !isempty(arg_long)  && (parser.arg_store[arg2key(arg_long)]  = key)
     default = (type == Any) | isnothing(default) ? default : convert(type, default)
-    values::ArgumentValues = ArgumentValues(args, default, type, required, description, validator)
+    vals::ArgumentValues = ArgumentValues(args, default, type, required, positional, description, validator)
     validate(default, validator).ok || throw(ArgumentError("invalid default value $default"))
-    parser.kv_store[key] = values
+    parser.kv_store[key] = vals
     return parser
 end
 
@@ -274,16 +275,15 @@ function parse_args!(parser::ArgumentParser; cli_args=ARGS)
             return _error(parser.return_err, "Value failed to parse for arg: $(arg)")
         end
         # extract default value and update given an argument value
-        values::ArgumentValues = parser.kv_store[key]
+        vals::ArgumentValues = parser.kv_store[key]
         # type cast value into tuple index 1
         value = try
-            value = values.type == Any ? value : _parse(values.type, value)
+            value = vals.type == Any ? value : _parse(vals.type, value)
         catch e
-            e isa ArgumentError && return _error(parser.return_err, "cannot parse $value into $(values.type)")
+            e isa ArgumentError && return _error(parser.return_err, "cannot parse $value into $(vals.type)")
         end
 
-        parser.kv_store[key] = ArgumentValues(values.args, value, 
-            values.type, values.required, values.description, values.validator)
+        parser.kv_store[key].value = value
     end
     return parser
 end
@@ -313,12 +313,12 @@ function set_value!(parser::ArgumentParser, arg::AbstractString, value::Any)
     !haskey(parser.arg_store, argkey) && throw(ArgumentError("Argument not found in store."))
     key::UInt16 = parser.arg_store[argkey]
     !haskey(parser.kv_store, key) && throw(ArgumentError("Key not found in store."))
-    values::ArgumentValues = parser.kv_store[key]
-    vld = values.validator
-    value = convert(values.type, value)
+    vals::ArgumentValues = parser.kv_store[key]
+    vld = vals.validator
+    value = convert(vals.type, value)
     (ok, value) = validate(value, vld)
     ok || throw(ArgumentError("$value is not a valid argument value"))
-    parser.kv_store[key] = ArgumentValues(values.args, value, values.type, values.required, values.description, values.validator)
+    parser.kv_store[key] = ArgumentValues(vals.args, value, vals.type, vals.required, vals.positional, vals.description, vals.validator)
     return parser
 end
 
@@ -386,17 +386,22 @@ function colorprint(text, color="default", newline=true; background=false, brigh
     newline && println()
 end
 
-argpair(s, args) = Symbol(s) => get_value(args, s)
+argpair(s, parser) = Symbol(s) => get_value(parser, s)
 
 _keys(parser::ArgumentParser) = [arg2key(v.args.long) for v in values(parser.kv_store)]
 
-function args_pairs(args::ArgumentParser)
-    allkeys = _keys(args)
-    filter!(x -> !(x in ["help", "abort"]), allkeys)
-    ps = [argpair(k, args) for k in allkeys]
-    filter!(p -> !isnothing(p[2]) , ps)
-    return ps
+canonicalname(argf::ArgForms) = lstrip((isempty(argf.long) ? argf.short : argf.long), '-')
+canonicalname(argvs::ArgumentValues) = canonicalname(argvs.args)
+
+# probably later move out to GivEmExel
+function args_pairs(parser::ArgumentParser; excl=["help", "abort"])
+    args = collect(values(parser.kv_store))
+    filter!(x -> !isnothing(x.value), args)
+    filter!(x -> !(lstrip(x.args.long, '-') in excl) , args)
+    return [Symbol(canonicalname(a)) => a.value for a in args]
 end
+
+positional_args(parser::ArgumentParser)= [x for x in values(parser.kv_store) if x.positional]
 
 @kwdef mutable struct PromptedParser
     parser::ArgumentParser = ArgumentParser(; return_err=true)

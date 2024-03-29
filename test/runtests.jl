@@ -1,6 +1,6 @@
 using SimpleArgParse: ArgumentParser, add_argument!, add_example!, generate_usage, help, parse_args!, get_value, set_value! 
 
-using SimpleArgParse: StrValidator, validate, RealValidator
+using SimpleArgParse: StrValidator, validate, RealValidator, positional_args, args_pairs
 
 using Test
 
@@ -132,6 +132,18 @@ using Test
         @test get_value(p, "--int") == 1
         @test get_value(p, "--bar") isa ArgumentError
         @test parse_args!(p; cli_args=["-i", "1.5"]) isa ArgumentError
+    end
+
+    @testset "Positional args" begin
+        p = ArgumentParser()
+        add_argument!(p, "-f", "--foo", type=String, default="fff", description="Fff")
+        add_argument!(p, "-g", "--goo", type=String, default="ggg", description="Ggg")
+        add_argument!(p, "-i", "--int", type=Int, default=0, description="integer")
+        add_argument!(p, "-a", "--abort", type=Bool, default=false, description="abort")
+        add_argument!(p, "", "--posn", type=Int, default=0, positional=true, description="integer")
+        @test length(positional_args(p)) == 1
+        @test length(args_pairs(p)) == 4
+
     end
 
 end
