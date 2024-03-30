@@ -42,7 +42,13 @@ using Test
         @test "bar" == get_value(p, "--foo")
         @test "bar" == get_value(p, "-f")
         @test "bar" == get_value(p, "f")
+
+        # at least one of the argument forms must be non-empty
         @test_throws ArgumentError add_argument!(p, "", "", type=String, default="bar", description="baz")
+
+        # argument of that name already present
+        @test_throws ErrorException add_argument!(p, "-f", "", type=String, default="bar", description="baz")
+        @test_throws ErrorException add_argument!(p, "", "--foo", type=String, default="bar", description="baz")    
     end
 
     @testset "Testset get_value" begin
@@ -76,6 +82,7 @@ using Test
 
         p = ArgumentParser()
         @test_throws ArgumentError add_argument!(p, "-f", "--foo", type=String, default="bar", validator=v1)
+        p = ArgumentParser()
         add_argument!(p, "-f", "--foo", type=String, validator=v1)
         set_value!(p, "--foo", "aaa")
         @test get_value(p, "--foo") == "AAA"
@@ -98,6 +105,7 @@ using Test
 
         p = ArgumentParser()
         @test_throws ArgumentError add_argument!(p, "-i", "--int", type=Int, default=1, validator=rvl)
+        p = ArgumentParser()
         add_argument!(p, "-i", "--int", type=Int, validator=rvl)
         set_value!(p, "-i", 3)
         @test get_value(p, "--int") == 3

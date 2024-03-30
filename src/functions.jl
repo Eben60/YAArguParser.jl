@@ -41,9 +41,13 @@ function add_argument!(parser::ArgumentParser, arg_short::String="", arg_long::S
 
     args::ArgForms = ArgForms(arg_short, arg_long)
     arg::String = !isempty(arg_long) ? arg_long : !isempty(arg_short) ? arg_short : ""
-    isempty(arg) && throw(ArgumentError("Argument(s) missing. See usage examples."))
+        isempty(arg) && throw(ArgumentError("Argument(s) missing. See usage examples."))
     isnothing(default) && positional && !required && 
-        error("Error adding argument for $arg_long, $arg_short. Optional positional argument must have a valid default value")
+        error("Error adding argument for $arg_long, $arg_short. Optional positional argument must have a valid default value")    
+
+    haskey(parser.arg_store, arg2key(arg_short)) && error("Cannot add argument: Key $arg_short already present.")
+    haskey(parser.arg_store, arg2key(arg_long)) && error("Cannot add argument: Key $arg_short already present.")
+
     parser.lng += 1
     key::UInt16 = parser.lng
     # map both argument names to the same key
@@ -206,7 +210,6 @@ function hyphenate(arg::AbstractString)
 end
 
 "Set/update value of argument in parser."
-
 function set_value!(parser::ArgumentParser, key::Integer, value::Any; return_err = false)
     !haskey(parser.kv_store, key) && return _error(return_err, "Key not found in store.")
     vals::ArgumentValues = parser.kv_store[key]
