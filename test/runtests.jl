@@ -1,6 +1,6 @@
 using SimpleArgParse: ArgumentParser, add_argument!, add_example!, generate_usage, help, parse_args!, get_value, set_value! 
 
-using SimpleArgParse: StrValidator, validate, RealValidator, positional_args, args_pairs
+using SimpleArgParse: StrValidator, validate, RealValidator, positional_args, args_pairs #, StrV1
 
 using Test
 
@@ -63,11 +63,10 @@ using Test
     end
 
     @testset "StrValidator" begin
-        v1 = StrValidator(; val_list=["aaa", "BBB"])
-        v1c = StrValidator(; case_sens=true, val_list=["aaa", "BBB"])
-        v2 = StrValidator(; start_w=["yes", "no"])
-        v3 = StrValidator(; case_sens=true, reg_ex=[r"^ab[cd]$"])
-        @test_throws ErrorException StrValidator(; case_sens=true)
+        v1 = StrValidator(; upper_case=true, patterns=["aaa", "BBB"])
+        v1c = StrValidator(;  patterns=["aaa", "BBB"])
+        v2 = StrValidator(; upper_case=true, starts_with=true, patterns=["yes", "no"])
+        v3 = StrValidator(; patterns=[r"^ab[cd]$"])
 
         @test validate("Aaa", v1) == (; ok=true, v="AAA")
         @test validate("Aaa", v1c) == (; ok=false, v=nothing) 
@@ -188,6 +187,25 @@ using Test
         @test get_value(p, "--pos2") == 2 
         @test get_value(p, "--pos3") == 3
 
+        p1 = deepcopy(p0)
+        add_argument!(p1, "", "pos1", type=Int, default=0, positional=true, description="integer")
+        add_argument!(p1, "", "pos2", type=Int, default=0, positional=true, description="integer")
+        add_argument!(p1, "", "pos3", type=Int, default=0, positional=true, description="integer")
+
+        p = deepcopy(p1)
+        cli_args = ["1", "2", "3", "-goo", "Gggg", "-f", "Ffff", "-i", "1"]
+        parse_args!(p; cli_args)
+
+        @test get_value(p, "--foo") == "Ffff"
+        @test get_value(p, "--goo") == "Gggg"
+        @test get_value(p, "--int") == 1
+        @test get_value(p, "--abort") == false
+        @test get_value(p, "pos1") == 1 
+        @test get_value(p, "pos2") == 2 
+        @test get_value(p, "pos3") == 3
+
+        @test args_pairs(p) == [:foo => "Ffff", :goo => "Gggg", :int => 1, :pos1 => 1, :pos2 => 2, :pos3 => 3]
+
         p = deepcopy(p1)
         cli_args = ["1", "-goo", "Gggg", "-f", "Ffff", "-i", "1"]
         parse_args!(p; cli_args)
@@ -212,7 +230,7 @@ using Test
 
     @testset "positional yes or no" begin
         p0 = ArgumentParser();
-        vl = StrValidator(; start_w=["yes", "no"]);
+        vl = StrValidator(; upper_case=true, starts_with=true, patterns=["yes", "no"]);
         add_argument!(p0, "", "--cont", type=String, default="no", positional=true, description="continue or not!", validator=vl);
 
         p = deepcopy(p0)
@@ -225,5 +243,25 @@ using Test
         parse_args!(p; cli_args);
         @test get_value(p, "--cont") == "NO"
     end
+
+
+    # @testset "tmp strv1" begin
+
+
+    #     @test validate("Aaa", v1) == (; ok=true, v="AAA")
+    #     @test validate("Aaa", v1c) == (; ok=false, v=nothing) 
+    #     @test validate("ye", v2) == (; ok=true, v="YES")
+    #     @test validate("abc", v3) == (; ok=true, v="abc")
+    #     @test validate("Abc", v3) == (; ok=false, v=nothing)
+    # end
+
+
+
 end
+"""
+TODO
+check extant arg name on adding
+
+"""
+
 ;
