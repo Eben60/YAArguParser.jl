@@ -1,12 +1,32 @@
 
-"Command-line arguments."
+"""
+    ArgForms
+
+Command-line arguments, short and long forms.
+
+# Fields
+- `short::String`
+- `long::String`
+"""
 struct ArgForms
     short::String
     long::String
 end
 
+"""
+    ArgumentValues
 
-"Command-line argument values."
+Command-line argument values.
+
+# Fields
+- `const args::ArgForms`
+- `value::Any`
+- `const type::Type = Any`
+- `const required::Bool = false`
+- `const positional::Bool = false`
+- `const description::String = ""`
+- `const validator::Union{AbstractValidator, Nothing} = nothing`
+"""
 @kwdef mutable struct ArgumentValues
     const args::ArgForms
     value::Any
@@ -17,34 +37,41 @@ end
     const validator::Union{AbstractValidator, Nothing} = nothing
 end
 
-"Command-line argument parser with numkey-value stores and attributes."
+"""
+    ArgumentParser
+
+Command-line argument parser with numkey-value stores and attributes.
+
+# Fields
+## stores
+- `kv_store::OrderedDict{UInt16,ArgumentValues} = OrderedDict()`: `numkey => value` 
+    store: { numkey: ArgumentValues(value, type, required, help) }; up to 65,536 argument keys
+- `arg_store::OrderedDict{String,UInt16} = OrderedDict()`: numkey-value store: `arg => numkey`
+- `lng::UInt16 = 0`: counter of stored args
+## attributes
+- `filename::String = ""`: file name
+- `description::String = ""`: description
+- `authors::Vector{String} = String[]`: name of author(s): First Last <first.last@email.address>
+- `documentation::String = ""`: URL of documentations
+- `repository::String = ""`: URL of software repository
+- `license::String = ""`: name of license
+- `usage::String = ""`: usage/help message
+- `examples::Vector{String} = String[]`: usage examples
+- `add_help::Bool = false`: flag to automatically generate a help message
+- `throw_on_exception = true`: immediately throw on exception if true
+"""
 @kwdef mutable struct ArgumentParser
-    # stores
-    "numkey-value store: { numkey: ArgumentValues(value, type, required, help) }; up to 65,536 argument keys"
     kv_store::OrderedDict{UInt16,ArgumentValues} = OrderedDict()
-    "numkey-value store: { arg: numkey }"
     arg_store::OrderedDict{String,UInt16} = OrderedDict()
-    "number of stored args"
     lng::UInt16 = 0
-    # attributes
-    "file name"
     filename::String = ""
-    "description"
     description::String = ""
-    "name of author(s): First Last <first.last@email.address>"
     authors::Vector{String} = String[]
-    "URL of documentations"
     documentation::String = ""
-    "URL of software repository"
     repository::String = ""
-    "name of license"
     license::String = ""
-    "usage/help message"
     usage::String = ""
-    "usage examples"
     examples::Vector{String} = String[]
-    "flag to automatically generate a help message"
     add_help::Bool = false
-    "immediately throw on exception if false"
     throw_on_exception = true
 end

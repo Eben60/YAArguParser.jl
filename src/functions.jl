@@ -2,6 +2,7 @@
     args2vec(args::ArgForms) → ::Vector{String}
 
 Extract struct members to vector of length 1 or 2.
+
 Function `args2vec` is internal.
 """
 args2vec(args::ArgForms) = filter!(x -> !isempty(x), [args.short, args.long])
@@ -10,6 +11,7 @@ args2vec(args::ArgForms) = filter!(x -> !isempty(x), [args.short, args.long])
     arg2strkey(arg::AbstractString) → ::SubString
 
 Argument to argument-store string key conversion by removing hypenation from prefix.
+
 Function `arg2strkey` is internal.
 """
 arg2strkey(arg) = lstrip(arg, '-')
@@ -61,7 +63,7 @@ end
 """
     add_example!(parser::ArgumentParser, example::AbstractString) → parser
 
-Function `add_example!` is exported
+Function `add_example!` is exported.
 """
 function add_example!(parser::ArgumentParser, example::AbstractString)
     push!(parser.examples, example)
