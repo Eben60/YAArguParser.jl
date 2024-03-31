@@ -21,23 +21,26 @@ function arg2key(arg::AbstractString)
     return lstrip(arg, '-')
 end
 
-"Add command-line argument to ArgumentParser object instance."
+"""
+    add_argument!(parser::ArgumentParser, arg_short::String="", arg_long::String=""; kwargs...) → parser
+
+Function `add_argument!` is exported
+
+# Arguments
+- `parser::ArgumentParser`: ArgumentParser object instance.
+- `arg_short::String=""`: short argument flag.
+- `arg_long::String=""`: long argument flag.
+
+# Keywords
+- `type::Type=nothing`: type, the argument value to be parsed/converted into.
+- `default::Any=nothing`
+- `required::Bool=false`
+- `positional::Bool=false`
+- `description::String=nothing`
+- `validator::Union{AbstractValidator, Nothing}=nothing` 
+"""
 function add_argument!(parser::ArgumentParser, arg_short::String="", arg_long::String="";
     type::Type=Any, required=false, positional=false, default=nothing, description::String="", validator=nothing)
-    """
-    # Arguments
-    _Mandatory_
-    - `parser::ArgumentParser`: ArgumentParser object instance.
-    _Optional_
-    - `arg_short::String=nothing`: short argument flag.
-    - `arg_long::String=nothing`: long argument flag.
-    _Keyword_
-    - `type::Type=nothing`: argument type.
-    - `default::Any=nothing`: default argument value.
-    - `required::Bool=false`: whether argument is required.
-    - `description::String=nothing`: argument description.
-    """
-    :ArgumentParser
 
     args::ArgForms = ArgForms(arg_short, arg_long)
     arg::String = !isempty(arg_long) ? arg_long : !isempty(arg_short) ? arg_short : ""
@@ -61,31 +64,37 @@ function add_argument!(parser::ArgumentParser, arg_short::String="", arg_long::S
     return parser
 end
 
-"Add command-line usage example."
+"""
+    add_example!(parser::ArgumentParser, example::AbstractString) → parser
+
+Function `add_example!` is exported
+"""
 function add_example!(parser::ArgumentParser, example::AbstractString)
-    :ArgumentParser
     push!(parser.examples, example)
     return parser
 end
 
-"Usage/help message generator."
-function generate_usage(parser::ArgumentParser)
-    :String
-    """example:
-    Usage: main.jl --input <PATH> [--verbose] [--problem] [--help]
-    
-    A Julia script with command-line arguments.
-    
-    Options:
-      -i, --input <PATH>    Path to the input file.
-      -v, --verbose         Enable verbose message output.
-      -p, --problem         Print the problem statement.
-      -h, --help            Print this help message.
-    
-    Examples:
-      \$ julia main.jl --input dir/file.txt --verbose
-      \$ julia main.jl --help
-    """
+"""
+    generate_usage!(parser::ArgumentParser) → ::String
+
+Usage/help message generator.
+
+# Example of generated text
+Usage: main.jl --input <PATH> [--verbose] [--problem] [--help]
+
+A Julia script with command-line arguments.
+
+Options:
+  -i, --input <PATH>    Path to the input file.
+  -v, --verbose         Enable verbose message output.
+  -p, --problem         Print the problem statement.
+  -h, --help            Print this help message.
+
+Examples:
+  \$ julia main.jl --input dir/file.txt --verbose
+  \$ julia main.jl --help
+"""
+function generate_usage!(parser::ArgumentParser)
     usage::String = "Usage: $(parser.filename)"
     options::String = "Options:"
     for v::ArgumentValues in values(parser.kv_store)
@@ -115,13 +124,22 @@ function generate_usage(parser::ArgumentParser)
     return generated
 end
 
-"Helper function to print usage/help message."
+"""
+    help(parser::ArgumentParser; color::AbstractString="default") → nothing
+
+Prints usage/help message.
+"""
 function help(parser::ArgumentParser; color::AbstractString="default")
     :Nothing
     println(colorize(parser.usage, color=color))
     return nothing
 end
 
+"""
+    help(parser::ArgumentParser; color::AbstractString="default") → nothing
+
+Prints usage/help message.
+"""
 function update_val!(parser, key, value)
     # extract default value and update given an argument value
     vals::ArgumentValues = parser.kv_store[key]
@@ -141,7 +159,7 @@ function parse_args!(parser::ArgumentParser; cli_args=ARGS)
     cli_args = copy(cli_args)
     if parser.add_help
         parser = add_argument!(parser, "-h", "--help", type=Bool, default=false, description="Print the help message.")
-        parser.usage = generate_usage(parser)
+        parser.usage = generate_usage!(parser)
     end
     parser.filename = PROGRAM_FILE
     n::Int64 = length(cli_args)
