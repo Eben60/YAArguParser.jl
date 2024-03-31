@@ -244,7 +244,6 @@ function get_value(parser::ArgumentParser, arg::AbstractString)
     return value
 end
 
-
 """
     hyphenate(argname::AbstractString) → ::String
 

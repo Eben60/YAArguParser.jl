@@ -147,12 +147,13 @@ using Test
         add_argument!(p0, "-g", "--goo", type=String, default="ggg", description="Ggg");
         add_argument!(p0, "-i", "--int", type=Int, default=0, description="integer");
         add_argument!(p0, "-a", "--abort", type=Bool, default=false, description="abort");
+        generate_usage!(p0)
 
         p = deepcopy(p0);
         add_argument!(p, "", "--posn", type=Int, default=0, positional=true, description="integer")
 
         @test length(positional_args(p)) == 1
-        @test length(args_pairs(p)) == 4
+        @test length(args_pairs(p)) == 5
 
         cli_args = ["3", "-goo", "Gggg", "-f", "Ffff", "-i", "1"]
 
@@ -212,7 +213,7 @@ using Test
         @test get_value(p, "pos2") == 2 
         @test get_value(p, "pos3") == 3
 
-        @test args_pairs(p) == [:foo => "Ffff", :goo => "Gggg", :int => 1, :pos1 => 1, :pos2 => 2, :pos3 => 3]
+        @test args_pairs(p) == [:foo => "Ffff", :goo => "Gggg", :int => 1, :abort => false, :pos1 => 1, :pos2 => 2, :pos3 => 3]
 
         p = deepcopy(p1)
         cli_args = ["1", "-goo", "Gggg", "-f", "Ffff", "-i", "1"]
@@ -252,13 +253,10 @@ using Test
         @test get_value(p, "--cont") == "NO"
     end
 
-
     @testset "various internals" begin
         @test args2vec(ArgForms("-f", "--foo")) == ["-f", "--foo"]
         @test args2vec(ArgForms("", "--foo")) == ["--foo"]
     end
-
-
 
 end
 
