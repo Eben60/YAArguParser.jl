@@ -1,6 +1,6 @@
 
 @kwdef mutable struct PromptedParser
-    parser::ArgumentParser = ArgumentParser(; return_err=true)
+    parser::ArgumentParser = ArgumentParser(; throw_on_exception=false)
     color::String = "default"
     introduction::String = ""
     prompt::String = "> "

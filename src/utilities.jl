@@ -50,7 +50,7 @@ end
 
 argpair(s, parser) = Symbol(s) => get_value(parser, s)
 
-_keys(parser::ArgumentParser) = [arg2key(v.args.long) for v in values(parser.kv_store)]
+_keys(parser::ArgumentParser) = [arg2strkey(v.args.long) for v in values(parser.kv_store)]
 
 canonicalname(argf::ArgForms) = lstrip((isempty(argf.long) ? argf.short : argf.long), '-')
 canonicalname(argvs::ArgumentValues) = canonicalname(argvs.args)

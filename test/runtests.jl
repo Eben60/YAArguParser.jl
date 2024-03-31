@@ -1,6 +1,6 @@
-using SimpleArgParse: ArgumentParser, add_argument!, add_example!, generate_usage, help, parse_args!, get_value, set_value! 
+using SimpleArgParse: ArgumentParser, add_argument!, add_example!, generate_usage!, help, parse_args!, get_value, set_value! 
 
-using SimpleArgParse: StrValidator, validate, RealValidator, positional_args, args_pairs #, StrV1
+using SimpleArgParse: StrValidator, validate, RealValidator, positional_args, args_pairs, ArgForms, args2vec
 
 using Test
 
@@ -114,8 +114,8 @@ using Test
 
 
     @testset "Testset parse_args!" begin
-        p = ArgumentParser()
-        add_argument!(p, "-f", "--foo", type=String, default="fff", description="Fff")
+        p = ArgumentParser();
+        add_argument!(p, "-f", "--foo", type=String, default="fff", description="Fff");
         add_argument!(p, "-g", "--goo", type=String, default="ggg", description="Ggg")
         add_argument!(p, "-i", "--int", type=Int, default=0, description="integer")
         cli_args = ["-goo", "Gggg", "-f", "Ffff", "-i", "1"]
@@ -128,8 +128,8 @@ using Test
     end
 
     @testset "Testset return Exception" begin
-        p = ArgumentParser(; return_err = true)
-        add_argument!(p, "-f", "--foo", type=String, default="fff", description="Fff")
+        p = ArgumentParser(; throw_on_exception = false);
+        add_argument!(p, "-f", "--foo", type=String, default="fff", description="Fff");
         add_argument!(p, "-g", "--goo", type=String, default="ggg", description="Ggg")
         add_argument!(p, "-i", "--int", type=Int, default=0, description="integer")
         cli_args = ["-goo", "Gggg", "-f", "Ffff", "-i", "1"]
@@ -253,23 +253,13 @@ using Test
     end
 
 
-    # @testset "tmp strv1" begin
-
-
-    #     @test validate("Aaa", v1) == (; ok=true, v="AAA")
-    #     @test validate("Aaa", v1c) == (; ok=false, v=nothing) 
-    #     @test validate("ye", v2) == (; ok=true, v="YES")
-    #     @test validate("abc", v3) == (; ok=true, v="abc")
-    #     @test validate("Abc", v3) == (; ok=false, v=nothing)
-    # end
+    @testset "various internals" begin
+        @test args2vec(ArgForms("-f", "--foo")) == ["-f", "--foo"]
+        @test args2vec(ArgForms("", "--foo")) == ["--foo"]
+    end
 
 
 
 end
-"""
-TODO
-check extant arg name on adding
-
-"""
 
 ;

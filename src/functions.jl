@@ -1,25 +1,19 @@
+"""
+    args2vec(args::ArgForms) → ::Vector{String}
 
+Extract struct members to vector of length 1 or 2.
+Function `args2vec` is internal.
+"""
+args2vec(args::ArgForms) = filter!(x -> !isempty(x), [args.short, args.long])
 
-"Extract struct members to vector."
-function args2vec(args::ArgForms)
-    :Vector
-    if isempty(args.short)
-        if isempty(args.long)
-            return String[]
-        end
-        return String[args.long]
-    elseif isempty(args.long)
-        return String[args.short]
-    else
-        return String[args.short, args.long]
-    end
-end
+"""
+    arg2strkey(arg::AbstractString) → ::SubString
 
-"Argument to argument-store key conversion by removing hypenation from prefix."
-function arg2key(arg::AbstractString)
-    :String
-    return lstrip(arg, '-')
-end
+Argument to argument-store string key conversion by removing hypenation from prefix.
+Function `arg2strkey` is internal.
+"""
+arg2strkey(arg) = lstrip(arg, '-')
+
 
 """
     add_argument!(parser::ArgumentParser, arg_short::String="", arg_long::String=""; kwargs...) → parser
@@ -48,19 +42,19 @@ function add_argument!(parser::ArgumentParser, arg_short::String="", arg_long::S
     isnothing(default) && positional && !required && 
         error("Error adding argument for $arg_long, $arg_short. Optional positional argument must have a valid default value")    
 
-    haskey(parser.arg_store, arg2key(arg_short)) && error("Cannot add argument: Key $arg_short already present.")
-    haskey(parser.arg_store, arg2key(arg_long)) && error("Cannot add argument: Key $arg_short already present.")
+    haskey(parser.arg_store, arg2strkey(arg_short)) && error("Cannot add argument: Key $arg_short already present.")
+    haskey(parser.arg_store, arg2strkey(arg_long)) && error("Cannot add argument: Key $arg_short already present.")
 
     parser.lng += 1
-    key::UInt16 = parser.lng
-    # map both argument names to the same key
-    !isempty(arg_short) && (parser.arg_store[arg2key(arg_short)] = key)
-    !isempty(arg_long)  && (parser.arg_store[arg2key(arg_long)]  = key)
+    numkey::UInt16 = parser.lng
+    # map both argument names to the same numkey
+    !isempty(arg_short) && (parser.arg_store[arg2strkey(arg_short)] = numkey)
+    !isempty(arg_long)  && (parser.arg_store[arg2strkey(arg_long)]  = numkey)
     default = (type == Any) | isnothing(default) ? default : convert(type, default)
     (ok, default) = validate(default, validator)
     ok || throw(ArgumentError("invalid default value $default"))
     vals::ArgumentValues = ArgumentValues(args, default, type, required, positional, description, validator)
-    parser.kv_store[key] = vals
+    parser.kv_store[numkey] = vals
     return parser
 end
 
@@ -127,36 +121,50 @@ end
 """
     help(parser::ArgumentParser; color::AbstractString="default") → nothing
 
-Prints usage/help message.
+Print usage/help message.
 """
 function help(parser::ArgumentParser; color::AbstractString="default")
-    :Nothing
     println(colorize(parser.usage, color=color))
     return nothing
 end
 
 """
-    help(parser::ArgumentParser; color::AbstractString="default") → nothing
+    update_val!(parser::ArgumentParser, numkey::Integer, value) → parser
 
-Prints usage/help message.
+Function `update_val!` is internal
 """
-function update_val!(parser, key, value)
+function update_val!(parser, numkey, value)
     # extract default value and update given an argument value
-    vals::ArgumentValues = parser.kv_store[key]
+    vals::ArgumentValues = parser.kv_store[numkey]
     # type cast value into tuple index 1
     value = try
         value = vals.type == Any ? value : _parse(vals.type, value)
     catch e
-        e isa ArgumentError && return _error(parser.return_err, "cannot parse $value into $(vals.type)")
+        e isa ArgumentError && return _error(parser.throw_on_exception, "cannot parse $value into $(vals.type)")
     end
 
-    return set_value!(parser, key, value; return_err = parser.return_err)
+    return set_value!(parser, numkey, value; throw_on_exception = parser.throw_on_exception)
 end
 
-"Parse command-line arguments."
-function parse_args!(parser::ArgumentParser; cli_args=ARGS)
-    :ArgumentParser
-    cli_args = copy(cli_args)
+"""
+    parse_args!(parser::ArgumentParser; cli_args=nothing) → ::Union{ArgumentParser, Exception}
+
+Parses arguments, validates them and stores the updated values in the parser. 
+
+# Keywords
+- `cli_args::Union{Vector{AbstractString}, Nothing}=nothing`: if the `cli_args` not provided, 
+    parses the command line arguments `ARGS`. Otherwise accepts equivalent `Vector` of `String`s,
+    e.g. `["--foo", "FOO", "-i", "1"]`
+
+# Throws
+- `Exception`: depending on the value of `parser.throw_on_exception`, in case of non-valid 
+    args vector, the function will either throw imediately, or return `e <: Exception` to be 
+    processed downstream.
+
+Function `parse_args!` is exported.
+"""
+function parse_args!(parser::ArgumentParser; cli_args=nothing)
+    isnothing(cli_args) && (cli_args=ARGS)
     if parser.add_help
         parser = add_argument!(parser, "-h", "--help", type=Bool, default=false, description="Print the help message.")
         parser.usage = generate_usage!(parser)
@@ -173,23 +181,23 @@ function parse_args!(parser::ArgumentParser; cli_args=ARGS)
         posargs_exhausted || (value = cli_args[i])
         if (!posargs_exhausted && !startswith(value, '-'))
             argkey = canonicalname(pa)
-            key = parser.arg_store[argkey]
-            uv = update_val!(parser, key, value)
+            numkey = parser.arg_store[argkey]
+            uv = update_val!(parser, numkey, value)
             uv isa Exception && return uv
             nextarg += 1
         else
             posargs_exhausted = true
-            (isnothing(pa.value) | pa.required) && return _error(parser.return_err, "Value for positional argument $(canonicalname(pa)) not supplied")
+            (isnothing(pa.value) | pa.required) && return _error(parser.throw_on_exception, "Value for positional argument $(canonicalname(pa)) not supplied")
         end
     end
 
     for i::Int64 in nextarg:length(cli_args)
         arg::String = cli_args[i]
-        argkey::String = arg2key(arg)
+        argkey::String = arg2strkey(arg)
         if startswith(arg, "-")
-            !haskey(parser.arg_store, argkey) && return _error(parser.return_err, "Argument not found: $(arg). Call `add_argument` before parsing.")
-            key::UInt16 = parser.arg_store[argkey]
-            !haskey(parser.kv_store, key) && return _error(parser.return_err, "Key not found for argument: $(arg)"; excp=ErrorException)
+            !haskey(parser.arg_store, argkey) && return _error(parser.throw_on_exception, "Argument not found: $(arg). Call `add_argument` before parsing.")
+            numkey::UInt16 = parser.arg_store[argkey]
+            !haskey(parser.kv_store, numkey) && return _error(parser.throw_on_exception, "Key not found for argument: $(arg)"; excp=ErrorException)
         else
             continue
         end
@@ -201,53 +209,93 @@ function parse_args!(parser::ArgumentParser; cli_args=ARGS)
             value = cli_args[i+1]
             i += 1
         else
-            return _error(parser.return_err, "Value failed to parse for arg: $(arg)")
+            return _error(parser.throw_on_exception, "Value failed to parse for arg: $(arg)")
         end
-        uv = update_val!(parser, key, value)
+        uv = update_val!(parser, numkey, value)
         uv isa Exception && return uv
     end
     return parser
 end
 
-"Get argument value from parser."
+
+"""
+    get_value(parser, arg) → value::Any
+
+Get argument value from parser. 
+
+# Arguments
+- `parser::ArgumentParser`: ArgumentParser object instance.
+- `arg::AbstractString=""`: argument name, e.g. `"-f"`, `"--foo"`.
+
+# Throws
+- `Exception`: depending on the value of `parser.throw_on_exception`, if the argument not 
+    found, the function will either throw imediately, or return `e <: Exception` to be 
+    processed downstream.
+
+Function `get_value` is exported.
+"""
 function get_value(parser::ArgumentParser, arg::AbstractString)
-    :Any
-    argkey::String = arg2key(arg)
-    !haskey(parser.arg_store, argkey) && return _error(parser.return_err, "Argument not found: $(arg). Run `add_argument` first.")
-    key::UInt16 = parser.arg_store[argkey]
-    value::Any = haskey(parser.kv_store, key) ? parser.kv_store[key].value : nothing
+    argkey::String = arg2strkey(arg)
+    !haskey(parser.arg_store, argkey) && return _error(parser.throw_on_exception, "Argument not found: $(arg). Run `add_argument` first.")
+    numkey::UInt16 = parser.arg_store[argkey]
+    value::Any = haskey(parser.kv_store, numkey) ? parser.kv_store[numkey].value : nothing
     return value
 end
 
-"Prepend hyphenation back onto argument after stripping it for the argument-store key."
-function hyphenate(arg::AbstractString)
-    :String
-    argkey::String = arg2key(arg)  # supports "foo" or "--foo" argument form
-    result::String = length(argkey) == 1 ? "-" * argkey : "--" * argkey
+
+"""
+    hyphenate(argname::AbstractString) → ::String
+
+Prepend hyphenation back onto argument after stripping it for the argument-store numkey.
+
+Function `add_example!` is internal.
+"""
+function hyphenate(argname::AbstractString)
+    strkey::String = arg2strkey(argname)  # supports "foo" or "--foo" argument form
+    result::String = length(strkey) == 1 ? "-" * strkey : "--" * strkey
     return result
 end
 
-"Set/update value of argument in parser."
-function set_value!(parser::ArgumentParser, key::Integer, value::Any; return_err = false)
-    !haskey(parser.kv_store, key) && return _error(return_err, "Key not found in store.")
-    vals::ArgumentValues = parser.kv_store[key]
+"""
+    set_value!(parser::ArgumentParser, numkey::Integer, value::Any; throw_on_exception = true) → parser
+    set_value!(parser::ArgumentParser, argname::AbstractString, value::Any; throw_on_exception = true) → parser
+
+Set/update value of argument, validating it, as specified by `numkey` or `argname`, in parser.
+
+# Throws
+- `Exception`: depending on the value of `throw_on_exception` kwarg, if the argument not 
+    found, the function will either throw imediately, or return `e <: Exception` to be 
+    processed downstream.
+
+Function `set_value!` is exported.
+"""
+function set_value!(parser::ArgumentParser, numkey::Integer, value::Any; throw_on_exception = true)
+    !haskey(parser.kv_store, numkey) && return _error(throw_on_exception, "Key not found in store.")
+    vals::ArgumentValues = parser.kv_store[numkey]
     vld = vals.validator
     value = convert(vals.type, value)
     (ok, value) = validate(value, vld)
-    ok || return _error(return_err, "$value is not a valid argument value")
-    parser.kv_store[key] = ArgumentValues(vals.args, value, vals.type, vals.required, vals.positional, vals.description, vals.validator)
+    ok || return _error(throw_on_exception, "$value is not a valid argument value")
+    parser.kv_store[numkey] = ArgumentValues(vals.args, value, vals.type, vals.required, vals.positional, vals.description, vals.validator)
     return parser
 end
 
-function set_value!(parser::ArgumentParser, arg::AbstractString, value::Any; return_err = false)
-    :ArgumentParser
-    argkey::String = arg2key(arg)
-    !haskey(parser.arg_store, argkey) && return _error(return_err, "Argument not found in store.")
-    key::UInt16 = parser.arg_store[argkey]
-    return set_value!(parser::ArgumentParser, key::Integer, value::Any)
+function set_value!(parser::ArgumentParser, argname::AbstractString, value::Any; throw_on_exception = true)
+    strkey = arg2strkey(argname)
+    !haskey(parser.arg_store, strkey) && return _error(throw_on_exception, "Argument not found in store.")
+    numkey = parser.arg_store[strkey]
+    return set_value!(parser, numkey, value)
 end
 
-_error(return_err, x; excp=ArgumentError) = return_err ? excp(x) : throw(excp(x)) 
+"""
+    _error(throw_on_exception, msg::AbstractString; excp=ArgumentError) → ::Exception
+
+Depending on value of `throw_on_exception`, throw immediately, or return `Exception` to be 
+processed downstream.
+
+Function `_error` is internal.
+"""
+_error(throw_on_exception, msg; excp=ArgumentError) = throw_on_exception ? throw(excp(msg)) : excp(msg) 
 
 # Type conversion helper methods.
 _parse(x, y) = parse(x, y)

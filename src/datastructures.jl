@@ -17,12 +17,12 @@ end
     const validator::Union{AbstractValidator, Nothing} = nothing
 end
 
-"Command-line argument parser with key-value stores and attributes."
+"Command-line argument parser with numkey-value stores and attributes."
 @kwdef mutable struct ArgumentParser
     # stores
-    "key-value store: { key: ArgumentValues(value, type, required, help) }; up to 65,536 argument keys"
+    "numkey-value store: { numkey: ArgumentValues(value, type, required, help) }; up to 65,536 argument keys"
     kv_store::OrderedDict{UInt16,ArgumentValues} = OrderedDict()
-    "key-value store: { arg: key }"
+    "numkey-value store: { arg: numkey }"
     arg_store::OrderedDict{String,UInt16} = OrderedDict()
     "number of stored args"
     lng::UInt16 = 0
@@ -46,5 +46,5 @@ end
     "flag to automatically generate a help message"
     add_help::Bool = false
     "immediately throw on exception if false"
-    return_err = false
+    throw_on_exception = true
 end
