@@ -1,0 +1,6 @@
+[deps]
+Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+SimpleArgParse = "4c739d64-e22d-44e1-ada1-53a1c3c0e953"
+
+[compat]
+Documenter = "1"

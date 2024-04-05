@@ -230,7 +230,7 @@ Get argument value from parser.
 - `arg::AbstractString=""`: argument name, e.g. `"-f"`, `"--foo"`.
 
 # Throws
-- `Exception`: depending on the value of `parser.throw_on_exception`, if the argument not 
+- `Exception`: depending on the value of `parser.throw_on_exception::Bool`, if the argument not 
     found, the function will either throw imediately, or return `e <: Exception` to be 
     processed downstream.
 
@@ -249,7 +249,7 @@ end
 
 Prepend hyphenation back onto argument after stripping it for the argument-store numkey.
 
-Function `add_example!` is internal.
+Function `hyphenate` is internal.
 """
 function hyphenate(argname::AbstractString)
     strkey::String = arg2strkey(argname)  # supports "foo" or "--foo" argument form

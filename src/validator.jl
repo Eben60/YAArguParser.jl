@@ -69,7 +69,7 @@ end
     validate(v::Any, vl::AbstractValidator) → (;ok::Bool, v)
 
 Validate input v against validator vl, and returns named tuple with validation result `ok` 
-and (possibly canonicalized) input value `v` on success or `nothing` on validation failure.
+and (possibly canonicalized) input value `v` on success, or `nothing` on validation failure.
 For examples and specific information see documentation for the corresponding Validator,
 e.g. `StrValidator` or `RealValidator`.
 """
