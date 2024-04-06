@@ -58,7 +58,12 @@ Command-line argument parser with numkey-value stores and attributes.
 - `usage::String = ""`: usage/help message
 - `examples::Vector{String} = String[]`: usage examples
 - `add_help::Bool = false`: flag to automatically generate a help message
-- `throw_on_exception = true`: immediately throw on exception if true
+## interactive usage attributes
+- `throw_on_exception = true`: immediately throw on exception if `true`
+    set to `false` and process error downstream in interactive use
+- `color::String = "default"`: output color (see `colorize` function)
+- `introduction::String = ""`: explanation or introduction to be shown before prompt on a separate line
+- `prompt::String = "> "`
 """
 @kwdef mutable struct ArgumentParser
     kv_store::OrderedDict{UInt16,ArgumentValues} = OrderedDict()
@@ -74,4 +79,7 @@ Command-line argument parser with numkey-value stores and attributes.
     examples::Vector{String} = String[]
     add_help::Bool = false
     throw_on_exception = true
+    color::String = "default"
+    introduction::String = ""
+    prompt::String = "> "
 end

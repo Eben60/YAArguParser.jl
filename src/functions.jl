@@ -121,12 +121,13 @@ function generate_usage!(parser::ArgumentParser)
 end
 
 """
-    help(parser::ArgumentParser; color::AbstractString="default") → nothing
+    help(parser::ArgumentParser; color::Union{AbstractString, Nothing}) → nothing
 
 Print usage/help message.
 """
-function help(parser::ArgumentParser; color::AbstractString="default")
-    println(colorize(parser.usage, color=color))
+function help(parser::ArgumentParser; color=nothing)
+    isnothing(color) && (color = parser.color)
+    println(colorize(parser.usage; color))
     return nothing
 end
 
