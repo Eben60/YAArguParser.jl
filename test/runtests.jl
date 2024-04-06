@@ -115,6 +115,10 @@ using Test
         set_value!(p, "-i", 3)
         @test get_value(p, "--int") == 3
         @test_throws ArgumentError set_value!(p, "--foo", "abc")
+
+        rvl1 = RealValidator(;excl_vals=[1, 2])
+        @test validate(11, rvl1) == (; ok=true, v=11)        
+        @test validate(1, rvl1) == (; ok=false, v=nothing)    
     end
 
 

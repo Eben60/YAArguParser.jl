@@ -54,7 +54,7 @@ function add_argument!(parser::ArgumentParser, arg_short::String="", arg_long::S
     !isempty(arg_long)  && (parser.arg_store[arg2strkey(arg_long)]  = numkey)
     default = (type == Any) | isnothing(default) ? default : convert(type, default)
     (ok, default) = validate(default, validator)
-    ok || throw(ArgumentError("invalid default value $default"))
+    ok || throw(ArgumentError("invalid default value $default for arg $(canonicalname(args))")) 
     vals::ArgumentValues = ArgumentValues(args, default, type, required, positional, description, validator)
     parser.kv_store[numkey] = vals
     return parser
@@ -276,7 +276,7 @@ function set_value!(parser::ArgumentParser, numkey::Integer, value::Any; throw_o
     vld = vals.validator
     value = convert(vals.type, value)
     (ok, value) = validate(value, vld)
-    ok || return _error(throw_on_exception, "$value is not a valid argument value")
+    ok || return _error(throw_on_exception, "$value is not a valid value for arg $(canonicalname(vals.args))") 
     parser.kv_store[numkey] = ArgumentValues(vals.args, value, vals.type, vals.required, vals.positional, vals.description, vals.validator)
     return parser
 end

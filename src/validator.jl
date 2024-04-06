@@ -81,6 +81,9 @@ function validate(v::Real, vl::RealValidator)
     any(in_interval.(v, vl.excl_ivls)) && return (; ok, v=nothing)
 
     ok = true
+    # if no include criteria specified, anything not excluded considered OK
+    (isempty(vl.incl_ivls) && isempty(vl.incl_vals)) && return (; ok, v)  
+
     any([isapprox(v, x) for x in vl.incl_vals]) && return (; ok, v)
     any(in_interval.(v, vl.incl_ivls)) && return (; ok, v) 
     
