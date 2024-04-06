@@ -145,7 +145,7 @@ function update_val!(parser, numkey, value)
         e isa ArgumentError && return _error(parser.throw_on_exception, "cannot parse $value into $(vals.type)")
     end
 
-    return set_value!(parser, numkey, value; throw_on_exception = parser.throw_on_exception)
+    return set_value!(parser, numkey, value)
 end
 
 """
@@ -258,8 +258,8 @@ function hyphenate(argname::AbstractString)
 end
 
 """
-    set_value!(parser::ArgumentParser, numkey::Integer, value::Any; throw_on_exception = true) → parser
-    set_value!(parser::ArgumentParser, argname::AbstractString, value::Any; throw_on_exception = true) → parser
+    set_value!(parser::ArgumentParser, numkey::Integer, value::Any) → parser
+    set_value!(parser::ArgumentParser, argname::AbstractString, value::Any) → parser
 
 Set/update value of argument, validating it, as specified by `numkey` or `argname`, in parser.
 
@@ -270,7 +270,8 @@ Set/update value of argument, validating it, as specified by `numkey` or `argnam
 
 Function `set_value!` is exported.
 """
-function set_value!(parser::ArgumentParser, numkey::Integer, value::Any; throw_on_exception = true)
+function set_value!(parser::ArgumentParser, numkey::Integer, value::Any)
+    throw_on_exception = parser.throw_on_exception
     !haskey(parser.kv_store, numkey) && return _error(throw_on_exception, "Key not found in store.")
     vals::ArgumentValues = parser.kv_store[numkey]
     vld = vals.validator
@@ -281,7 +282,8 @@ function set_value!(parser::ArgumentParser, numkey::Integer, value::Any; throw_o
     return parser
 end
 
-function set_value!(parser::ArgumentParser, argname::AbstractString, value::Any; throw_on_exception = true)
+function set_value!(parser::ArgumentParser, argname::AbstractString, value::Any)
+    throw_on_exception = parser.throw_on_exception
     strkey = arg2strkey(argname)
     !haskey(parser.arg_store, strkey) && return _error(throw_on_exception, "Argument not found in store.")
     numkey = parser.arg_store[strkey]
