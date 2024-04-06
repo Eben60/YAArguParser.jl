@@ -1,6 +1,11 @@
+using SimpleArgParse
+
 using SimpleArgParse: ArgumentParser, add_argument!, add_example!, generate_usage!, help, parse_args!, get_value, set_value! 
 
 using SimpleArgParse: StrValidator, validate, RealValidator, positional_args, args_pairs, ArgForms, args2vec
+
+using Aqua
+Aqua.test_all(SimpleArgParse)
 
 using Test
 
