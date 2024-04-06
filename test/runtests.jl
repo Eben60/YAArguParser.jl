@@ -30,7 +30,11 @@ using Test
             repository="server/repo",
             license="license",
             usage="julia main.jl --arg val",
-            add_help=true
+            add_help=true,
+            throw_on_exception = false,
+            color = "magenta",
+            introduction = "story to tell",
+            prompt = "--/ ",
         )
         @test "test" == p.description
         @test ["first last <first.last@foo.bar>"] == p.authors
@@ -39,6 +43,10 @@ using Test
         @test "license" == p.license
         @test "julia main.jl --arg val" == p.usage
         @test p.add_help
+        @test !p.throw_on_exception
+        @test p.color == "magenta"
+        @test p.introduction == "story to tell"
+        @test p.prompt == "--/ "
     end
 
     @testset "Testset add_argument!" begin

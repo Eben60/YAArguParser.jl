@@ -127,7 +127,7 @@ Print usage/help message.
 """
 function help(parser::ArgumentParser; color=nothing)
     isnothing(color) && (color = parser.color)
-    println(colorize(parser.usage; color))
+    colorprint(parser.usage, color)
     return nothing
 end
 
