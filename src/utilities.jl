@@ -29,10 +29,10 @@ Colorize strings or backgrounds using ANSI codes and escape sequences.
 | Default  |        |  39  | 49        | 99         | 109               |
 
 # Arguments
-- `text::String`: the UTF-8/ASCII text to colorize.
+- `text::AbstractString`: the UTF-8/ASCII text to colorize.
 
 # Keywords
-- `color::String="default"`: the standard ANSI name of the color.
+- `color::AbstractString="default"`: the standard ANSI name of the color.
 - `background::Bool=false`: flag to select foreground or background color.
 - `bright::Bool=false`: flag to select normal or bright text.
 
@@ -86,4 +86,4 @@ positional_args(parser::ArgumentParser) = [x for x in values(parser.kv_store) if
 
 throw_on_exception(::Nothing) = true
 throw_on_exception(parser::ArgumentParser) = throw_on_exception(parser.interactive)
-throw_on_exception(iu::InteractiveUsage) = iu.throw_on_exception
+throw_on_exception(x::InteractiveUsage) = x.throw_on_exception

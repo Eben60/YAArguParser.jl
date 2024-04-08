@@ -20,8 +20,6 @@ arg2strkey(arg) = lstrip(arg, '-')
 """
     add_argument!(parser::ArgumentParser, arg_short::String="", arg_long::String=""; kwargs...) → parser
 
-Function `add_argument!` is exported
-
 # Arguments
 - `parser::ArgumentParser`: ArgumentParser object instance.
 - `arg_short::String=""`: short argument flag.
@@ -34,6 +32,8 @@ Function `add_argument!` is exported
 - `positional::Bool=false`
 - `description::String=nothing`
 - `validator::Union{AbstractValidator, Nothing}=nothing` 
+
+Function `add_argument!` is exported
 """
 function add_argument!(parser::ArgumentParser, arg_short::String="", arg_long::String="";
     type::Type=Any, required=false, positional=false, default=nothing, description::String="", validator=nothing)
