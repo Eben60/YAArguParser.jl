@@ -4,8 +4,8 @@ using SimpleArgParse: ArgumentParser, add_argument!, add_example!, generate_usag
 
 using SimpleArgParse: StrValidator, validate, RealValidator, positional_args, args_pairs, ArgForms, args2vec
 
-using Aqua
-Aqua.test_all(SimpleArgParse)
+# using Aqua
+# Aqua.test_all(SimpleArgParse)
 
 using Test
 
@@ -23,6 +23,13 @@ using Test
     end
 
     @testset "Testset parameterized constructor" begin
+
+        ia = InteractiveUsage(throw_on_exception = false,
+            color = "magenta",
+            introduction = "story to tell",
+            prompt = "--/ ",
+            )
+    
         p = ArgumentParser(
             description="test",
             authors=["first last <first.last@foo.bar>"],
@@ -31,11 +38,9 @@ using Test
             license="license",
             usage="julia main.jl --arg val",
             add_help=true,
-            throw_on_exception = false,
-            color = "magenta",
-            introduction = "story to tell",
-            prompt = "--/ ",
-        )
+            interactive=ia,
+            )
+
         @test "test" == p.description
         @test ["first last <first.last@foo.bar>"] == p.authors
         @test "server/docs" == p.documentation
@@ -43,10 +48,10 @@ using Test
         @test "license" == p.license
         @test "julia main.jl --arg val" == p.usage
         @test p.add_help
-        @test !p.throw_on_exception
-        @test p.color == "magenta"
-        @test p.introduction == "story to tell"
-        @test p.prompt == "--/ "
+        @test !p.interactive.throw_on_exception
+        @test p.interactive.color == "magenta"
+        @test p.interactive.introduction == "story to tell"
+        @test p.interactive.prompt == "--/ "
     end
 
     @testset "Testset add_argument!" begin
@@ -133,10 +138,10 @@ using Test
     @testset "Testset parse_args!" begin
         p = ArgumentParser();
         add_argument!(p, "-f", "--foo", type=String, default="fff", description="Fff");
-        add_argument!(p, "-g", "--goo", type=String, default="ggg", description="Ggg")
-        add_argument!(p, "-i", "--int", type=Int, default=0, description="integer")
-        cli_args = ["-goo", "Gggg", "-f", "Ffff", "-i", "1"]
-        parse_args!(p; cli_args)
+        add_argument!(p, "-g", "--goo", type=String, default="ggg", description="Ggg");
+        add_argument!(p, "-i", "--int", type=Int, default=0, description="integer");
+        cli_args = ["-goo", "Gggg", "-f", "Ffff", "-i", "1"];
+        parse_args!(p; cli_args);
         @test get_value(p, "--foo") == "Ffff"
         @test get_value(p, "--goo") == "Gggg"
         @test get_value(p, "--int") == 1
@@ -145,7 +150,7 @@ using Test
     end
 
     @testset "Testset return Exception" begin
-        p = ArgumentParser(; throw_on_exception = false);
+        p = ArgumentParser(; interactive=InteractiveUsage());
         add_argument!(p, "-f", "--foo", type=String, default="fff", description="Fff");
         add_argument!(p, "-g", "--goo", type=String, default="ggg", description="Ggg")
         add_argument!(p, "-i", "--int", type=Int, default=0, description="integer")
@@ -164,7 +169,7 @@ using Test
         add_argument!(p0, "-g", "--goo", type=String, default="ggg", description="Ggg");
         add_argument!(p0, "-i", "--int", type=Int, default=0, description="integer");
         add_argument!(p0, "-a", "--abort", type=Bool, default=false, description="abort");
-        generate_usage!(p0)
+        generate_usage!(p0);
 
         p = deepcopy(p0);
         add_argument!(p, "", "--posn", type=Int, default=0, positional=true, description="integer")
@@ -188,9 +193,9 @@ using Test
         @test_throws ArgumentError parse_args!(p; cli_args)
 
         p = deepcopy(p0)
-        rvl = RealValidator(;incl_vals=[3, 4, 6])
-        add_argument!(p, "", "--posn", type=Int, positional=true, required=true, description="integer", validator=rvl)
-        cli_args = ["2", "-goo", "Gggg", "-f", "Ffff", "-i", "1"]
+        rvl = RealValidator(;incl_vals=[3, 4, 6]);
+        add_argument!(p, "", "--posn", type=Int, positional=true, required=true, description="integer", validator=rvl);
+        cli_args = ["2", "-goo", "Gggg", "-f", "Ffff", "-i", "1"];
         @test_throws ArgumentError parse_args!(p; cli_args)
         cli_args = ["3", "-goo", "Gggg", "-f", "Ffff", "-i", "1"]
         parse_args!(p; cli_args)

@@ -38,6 +38,23 @@ Command-line argument values.
 end
 
 """
+    InteractiveUsage
+
+# Fields  
+- `throw_on_exception = false`: immediately throw on exception if `true`
+    set to `false` and process error downstream in interactive use
+- `color::String = "default"`: output color (see `colorize` function)
+- `introduction::String = ""`: explanation or introduction to be shown before prompt on a separate line
+- `prompt::String = "> "`
+"""
+@kwdef struct InteractiveUsage
+    throw_on_exception::Bool=false
+    color::String = "default"
+    introduction::String = ""
+    prompt::String = "> "
+end
+
+"""
     ArgumentParser
 
 Command-line argument parser with numkey-value stores and attributes.
@@ -78,8 +95,5 @@ Command-line argument parser with numkey-value stores and attributes.
     usage::String = ""
     examples::Vector{String} = String[]
     add_help::Bool = false
-    throw_on_exception = true
-    color::String = "default"
-    introduction::String = ""
-    prompt::String = "> "
+    interactive::Union{Nothing, InteractiveUsage} = nothing
 end

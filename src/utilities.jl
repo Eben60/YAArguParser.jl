@@ -82,4 +82,8 @@ function args_pairs(parser::ArgumentParser; excl=["help"])
     return [Symbol(canonicalname(a)) => a.value for a in args]
 end
 
-positional_args(parser::ArgumentParser)= [x for x in values(parser.kv_store) if x.positional]
+positional_args(parser::ArgumentParser) = [x for x in values(parser.kv_store) if x.positional]
+
+throw_on_exception(::Nothing) = true
+throw_on_exception(parser::ArgumentParser) = throw_on_exception(parser.interactive)
+throw_on_exception(iu::InteractiveUsage) = iu.throw_on_exception
