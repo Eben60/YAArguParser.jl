@@ -47,9 +47,24 @@ function colorize(text::AbstractString; color::AbstractString="default", backgro
 end
 
 """
-    colorprint(text, color="default", newline=true; background=false, bright=false) → nothing
+    getcolor(parser::ArgumentParser, color=nothing)  → color::String
 
-Print colored text into stdout. For color table, see help to internal `colorize` function.
+Returns `color` in case second arg is defined, otherwise the color defined in `parser`, or "default".
+
+Function `getcolor` is public, not exported.
+"""
+function getcolor(parser::ArgumentParser, color=nothing) 
+    !isnothing(color) && return color   
+    return (isnothing(parser.interactive) || isnothing(parser.interactive.color)) ? 
+        "default" : parser.interactive.color
+end
+
+"""
+    colorprint(text, color::AbstractString="default", newline=true; background=false, bright=false) → nothing
+    colorprint(text, parser::ArgumentParser, newline=true; background=false, bright=false) → nothing
+
+Print colored text into stdout. For color table, see help to internal `colorize` function. 
+If second arg is an `ArgumentParser`, uses color as defined within, if any, otherwise uses `default`.
 
 Function `colorprint` is exported.
 """
@@ -58,6 +73,9 @@ function colorprint(text, color="default", newline=true; background=false, brigh
     newline && println()
 end
 
+colorprint(text, parser::ArgumentParser, newline=true; background=false, bright=false) = 
+    colorprint(text, getcolor(parser), newline; background, bright)
+
 argpair(s, parser) = Symbol(s) => get_value(parser, s)
 
 _keys(parser::ArgumentParser) = [arg2strkey(v.args.long) for v in values(parser.kv_store)]
@@ -65,16 +83,16 @@ _keys(parser::ArgumentParser) = [arg2strkey(v.args.long) for v in values(parser.
 canonicalname(argf::ArgForms) = lstrip((isempty(argf.long) ? argf.short : argf.long), '-')
 canonicalname(argvs::ArgumentValues) = canonicalname(argvs.args)
 
-# """
-#     args_pairs(parser::ArgumentParser; excl=["help"]) → ::Vector{Pair{Symbol, Any}}
+"""
+    args_pairs(parser::ArgumentParser; excl=["help"]) → ::Vector{Pair{Symbol, Any}}
 
-# Return vector of pairs `argname => argvalue` for all arguments except listed in `excl`.
-#     If argument has both short and long forms, the long one is used. Returned value can 
-#     be e.g. passed as `kwargs...` to a function processing the parsed data, converted to 
-#     a `Dict` or `NamedTuple`.
+Return vector of pairs `argname => argvalue` for all arguments except listed in `excl`.
+    If argument has both short and long forms, the long one is used. Returned value can 
+    be e.g. passed as `kwargs...` to a function processing the parsed data, converted to 
+    a `Dict` or `NamedTuple`.
 
-# Function `args_pairs` is exported.
-# """
+Function `args_pairs` is exported.
+"""
 function args_pairs(parser::ArgumentParser; excl=["help"])
     args = collect(values(parser.kv_store))
     filter!(x -> !isnothing(x.value), args)
@@ -87,3 +105,6 @@ positional_args(parser::ArgumentParser) = [x for x in values(parser.kv_store) if
 throw_on_exception(::Nothing) = true
 throw_on_exception(parser::ArgumentParser) = throw_on_exception(parser.interactive)
 throw_on_exception(x::InteractiveUsage) = x.throw_on_exception
+
+Base.haskey(parser::ArgumentParser, key::AbstractString) = haskey(parser.arg_store, arg2strkey(key))   
+Base.haskey(parser::ArgumentParser, key::Integer) = haskey(parser.kv_store, key)
