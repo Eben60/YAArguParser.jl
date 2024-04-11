@@ -280,6 +280,15 @@ using Test
         @test args2vec(ArgForms("", "--foo")) == ["--foo"]
     end
 
+    @testset begin
+        @test shell_split("foo bar baz") == ["foo", "bar", "baz"]
+        @test shell_split("foo\\ bar baz") == ["foo bar", "baz"]
+        @test shell_split("'foo bar' baz") == ["foo bar", "baz"]
+        # "Over quoted"
+        @test shell_split("'foo\\ bar' baz") == ["foo\\ bar", "baz"]
+        @test shell_split("\"foo\\ bar\" baz") == ["foo\\ bar", "baz"]
+    end
+
 end
 
 ;
