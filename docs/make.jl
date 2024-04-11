@@ -20,7 +20,7 @@ makedocs(
 )
 ;
 
-# depoloyment done on the server anyway
+# deployment done on the server anyway
 # don't normally run deploydocs here
 # deploydocs(
 #     repo = "github.com/Eben60/SimpleArgParse.jl.git",
