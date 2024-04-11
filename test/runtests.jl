@@ -1,6 +1,6 @@
 using SimpleArgParse
 
-using SimpleArgParse: ArgumentParser, add_argument!, add_example!, generate_usage, help, parse_args!, get_value, set_value! 
+using SimpleArgParse: ArgumentParser, add_argument!, add_example!, generate_usage!, help, parse_args!, get_value, set_value! 
 
 using SimpleArgParse: StrValidator, validate, RealValidator, positional_args, args_pairs, ArgForms, args2vec, sort_args, canonicalname
 
@@ -171,7 +171,7 @@ using Test
         add_argument!(p0, "-g", "--goo", type=String, default="ggg", description="Ggg");
         add_argument!(p0, "-i", "--int", type=Int, default=0, description="integer");
         add_argument!(p0, "-a", "--abort", type=Bool, default=false, description="abort");
-        generate_usage(p0);
+        generate_usage!(p0);
 
         p = deepcopy(p0);
         add_argument!(p, "", "--posn", type=Int, default=0, positional=true, description="integer")
@@ -209,7 +209,7 @@ using Test
         add_argument!(p1, "", "--pos3", type=Int, default=0, positional=true, description="integer3");
         add_example!(p1, "1 2 3 -f \"string 1\" -int 4");
         add_example!(p1, "4 5 6 -goo \"string 2\" -i 7");
-        pu = generate_usage(p1);
+        pu = generate_usage!(p1);
         @test pu == generated_usage
 
 

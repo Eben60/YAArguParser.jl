@@ -101,7 +101,7 @@ function argument_usage(v)
 end
 
 """
-    generate_usage(parser::ArgumentParser) → ::String
+    generate_usage!(parser::ArgumentParser) → ::String
 
 Usage/help message generator.
 
@@ -120,7 +120,7 @@ Examples:
   \$ julia main.jl --input dir/file.txt --verbose
   \$ julia main.jl --help
 """
-function generate_usage(parser::ArgumentParser)
+function generate_usage!(parser::ArgumentParser)
     usage::String = "Usage: $(parser.filename)"
     options::String = "Options:"
 
@@ -143,7 +143,8 @@ function generate_usage(parser::ArgumentParser)
 
     $(examples)
     """
-    return generated
+    parser.usage = generated
+    return parser.usage
 end
 
 """
@@ -195,8 +196,8 @@ Function `parse_args!` is exported.
 function parse_args!(parser::ArgumentParser; cli_args=nothing)
     isnothing(cli_args) && (cli_args=ARGS)
     if parser.add_help && !haskey(parser, "help")
-        parser = add_argument!(parser, "-h", "--help", type=Bool, default=false, description="Print the help message.")
-        parser.usage = generate_usage(parser)
+        add_argument!(parser, "-h", "--help", type=Bool, default=false, description="Print the help message.")
+        generate_usage!(parser)
     end
     parser.filename = PROGRAM_FILE
     n::Int64 = length(cli_args)
