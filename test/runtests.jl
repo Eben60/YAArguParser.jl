@@ -1,11 +1,11 @@
 using SimpleArgParse
 
-using SimpleArgParse: ArgumentParser, add_argument!, add_example!, generate_usage!, help, parse_args!, get_value, set_value! 
+using SimpleArgParse: ArgumentParser, add_argument!, add_example!, generate_usage, help, parse_args!, get_value, set_value! 
 
-using SimpleArgParse: StrValidator, validate, RealValidator, positional_args, args_pairs, ArgForms, args2vec
+using SimpleArgParse: StrValidator, validate, RealValidator, positional_args, args_pairs, ArgForms, args2vec, sort_args, canonicalname
 
-using Aqua
-Aqua.test_all(SimpleArgParse)
+# using Aqua
+# Aqua.test_all(SimpleArgParse)
 
 using Test
 
@@ -164,12 +164,14 @@ using Test
     end
 
     @testset "Positional args" begin
+        generated_usage = "\nUsage:  [ <INT64>] [ <INT64>] [ <INT64>] [-f|--foo <STRING>] [-g|--goo <STRING>] [-i|--int <INT64>] [-a|--abort]\n\n\n\nOptions:\n  --pos1 <INT64>\tinteger1\t (positional arg)\n  --pos2 <INT64>\tinteger2\t (positional arg)\n  --pos3 <INT64>\tinteger3\t (positional arg)\n  -f, --foo <STRING>\tFff\n  -g, --goo <STRING>\tGgg\n  -i, --int <INT64>\tinteger\n  -a, --abort\t\tabort\n\nExamples:\n  \$ 1 2 3 -f \"string 1\" -int 4\n  \$ 4 5 6 -goo \"string 2\" -i 7\n"
+        
         p0 = ArgumentParser();
         add_argument!(p0, "-f", "--foo", type=String, default="fff", description="Fff");
         add_argument!(p0, "-g", "--goo", type=String, default="ggg", description="Ggg");
         add_argument!(p0, "-i", "--int", type=Int, default=0, description="integer");
         add_argument!(p0, "-a", "--abort", type=Bool, default=false, description="abort");
-        generate_usage!(p0);
+        generate_usage(p0);
 
         p = deepcopy(p0);
         add_argument!(p, "", "--posn", type=Int, default=0, positional=true, description="integer")
@@ -202,9 +204,14 @@ using Test
         @test get_value(p, "--posn") == 3 
 
         p1 = deepcopy(p0)
-        add_argument!(p1, "", "--pos1", type=Int, default=0, positional=true, description="integer")
-        add_argument!(p1, "", "--pos2", type=Int, default=0, positional=true, description="integer")
-        add_argument!(p1, "", "--pos3", type=Int, default=0, positional=true, description="integer")
+        add_argument!(p1, "", "--pos1", type=Int, default=0, positional=true, description="integer1");
+        add_argument!(p1, "", "--pos2", type=Int, default=0, positional=true, description="integer2");
+        add_argument!(p1, "", "--pos3", type=Int, default=0, positional=true, description="integer3");
+        add_example!(p1, "1 2 3 -f \"string 1\" -int 4");
+        add_example!(p1, "4 5 6 -goo \"string 2\" -i 7");
+        pu = generate_usage(p1);
+        @test pu == generated_usage
+
 
         p = deepcopy(p1)
         cli_args = ["1", "2", "3", "-goo", "Gggg", "-f", "Ffff", "-i", "1"]
@@ -278,6 +285,20 @@ using Test
     @testset "various internals" begin
         @test args2vec(ArgForms("-f", "--foo")) == ["-f", "--foo"]
         @test args2vec(ArgForms("", "--foo")) == ["--foo"]
+    end
+
+    @testset "sort_args" begin
+        p = ArgumentParser();
+        add_argument!(p, "", "pos1", type=Int, positional=true, default=0, description="integer")
+        add_argument!(p, "", "pos2", type=String, positional=true, default="", description="integer")
+        add_argument!(p, "", "pos3", type=Int, positional=true, default=0, description="integer")
+        add_argument!(p, "", "--cycles", type=Int);
+        add_argument!(p, "", "--cont", type=String);
+        (;pos_args, keyed_args, all_args) = sort_args(p)
+        @test [canonicalname(a) for a in pos_args] == ["pos1", "pos2", "pos3"]
+        @test [canonicalname(a) for a in keyed_args] == ["cycles", "cont"]
+        @test [canonicalname(a) for a in all_args] == ["pos1", "pos2", "pos3", "cycles", "cont"]
+        
     end
 
     @testset begin

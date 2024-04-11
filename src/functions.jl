@@ -70,8 +70,38 @@ function add_example!(parser::ArgumentParser, example::AbstractString)
     return parser
 end
 
+function sort_args(parser)
+    pos_args = ArgumentValues[]
+    keyed_args = ArgumentValues[]
+
+    for v in values(parser.kv_store)
+        if v.positional
+            push!(pos_args, v)
+        else
+            push!(keyed_args, v)
+        end      
+    end
+    all_args = [pos_args; keyed_args]
+    return (;pos_args, keyed_args, all_args)
+end
+
+function argument_usage(v)
+    args_vec::Vector{String} = args2vec(v.args)
+    # example: String -> "<STRING>"
+    type::String = v.type != Bool ? string(" ", join("<>", uppercase(string(v.type)))) : ""
+    # example: (i,input) -> "[-i|--input <STRING>]"
+    args_usage::String = v.positional ? type : string(join(hyphenate.(args_vec), "|"), type)
+    !v.required && (args_usage = join("[]", args_usage))
+    # example: (i,input) -> "-i, --input <STRING>"
+    tabs::String = v.type != Bool ? "\t" : "\t\t"
+    args_options::String = string("\n  ", join(hyphenate.(args_vec), ", "), type, tabs, v.description)
+    v.positional && (args_options *= "\t (positional arg)")
+    options = args_options
+    return (; u=args_usage, o=options)
+end
+
 """
-    generate_usage!(parser::ArgumentParser) → ::String
+    generate_usage(parser::ArgumentParser) → ::String
 
 Usage/help message generator.
 
@@ -90,22 +120,18 @@ Examples:
   \$ julia main.jl --input dir/file.txt --verbose
   \$ julia main.jl --help
 """
-function generate_usage!(parser::ArgumentParser)
+function generate_usage(parser::ArgumentParser)
     usage::String = "Usage: $(parser.filename)"
     options::String = "Options:"
-    for v::ArgumentValues in values(parser.kv_store)
-        args_vec::Vector{String} = args2vec(v.args)
-        # example: String -> "<STRING>"
-        type::String = v.type != Bool ? string(" ", join("<>", uppercase(string(v.type)))) : ""
-        # example: (i,input) -> "[-i|--input <STRING>]"
-        args_usage::String = string(join(hyphenate.(args_vec), "|"), type)
-        !v.required && (args_usage = join("[]", args_usage))
-        usage *= string(" ", args_usage)
-        # example: (i,input) -> "-i, --input <STRING>"
-        tabs::String = v.type != Bool ? "\t" : "\t\t"
-        args_options::String = string("\n  ", join(hyphenate.(args_vec), ", "), type, tabs, v.description)
-        options *= args_options
+
+    (;all_args) = sort_args(parser)
+
+    for v::ArgumentValues in all_args
+        (; u, o) = argument_usage(v)
+        usage *= " " * u
+        options *= o
     end
+
     examples::String = string("Examples:", join(string.("\n  \$ ", parser.examples)))
     generated::String = """
 
@@ -170,7 +196,7 @@ function parse_args!(parser::ArgumentParser; cli_args=nothing)
     isnothing(cli_args) && (cli_args=ARGS)
     if parser.add_help && !haskey(parser, "help")
         parser = add_argument!(parser, "-h", "--help", type=Bool, default=false, description="Print the help message.")
-        parser.usage = generate_usage!(parser)
+        parser.usage = generate_usage(parser)
     end
     parser.filename = PROGRAM_FILE
     n::Int64 = length(cli_args)
