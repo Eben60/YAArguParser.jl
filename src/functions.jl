@@ -28,7 +28,6 @@ arg2strkey(arg) = lstrip(arg, '-')
 # Keywords
 - `type::Type=nothing`: type, the argument value to be parsed/converted into.
 - `default::Any=nothing`
-- `required::Bool=false`
 - `positional::Bool=false`
 - `description::String=nothing`
 - `validator::Union{AbstractValidator, Nothing}=nothing` 
@@ -36,13 +35,11 @@ arg2strkey(arg) = lstrip(arg, '-')
 Function `add_argument!` is exported
 """
 function add_argument!(parser::ArgumentParser, arg_short::String="", arg_long::String="";
-    type::Type=Any, required=false, positional=false, default=nothing, description::String="", validator=nothing)
+    type::Type=Any, positional=false, default=nothing, description::String="", validator=nothing)
 
     args::ArgForms = ArgForms(arg_short, arg_long)
     arg::String = !isempty(arg_long) ? arg_long : !isempty(arg_short) ? arg_short : ""
-        isempty(arg) && throw(ArgumentError("Argument(s) missing. See usage examples."))
-    isnothing(default) && positional && !required && 
-        error("Error adding argument for $arg_long, $arg_short. Optional positional argument must have a valid default value")    
+        isempty(arg) && throw(ArgumentError("Argument(s) missing. See usage examples.")) 
 
     haskey(parser.arg_store, arg2strkey(arg_short)) && error("Cannot add argument: Key $arg_short already present.")
     haskey(parser.arg_store, arg2strkey(arg_long)) && error("Cannot add argument: Key $arg_short already present.")
@@ -55,7 +52,7 @@ function add_argument!(parser::ArgumentParser, arg_short::String="", arg_long::S
     default = (type == Any) | isnothing(default) ? default : convert(type, default)
     (ok, default) = validate(default, validator)
     ok || throw(ArgumentError("invalid default value $default for arg $(canonicalname(args))")) 
-    vals::ArgumentValues = ArgumentValues(args, default, type, required, positional, description, validator)
+    vals::ArgumentValues = ArgumentValues(args, default, type, positional, description, validator)
     parser.kv_store[numkey] = vals
     return parser
 end
@@ -86,12 +83,13 @@ function sort_args(parser)
 end
 
 function argument_usage(v)
+    isrequired = isnothing(v.value)
     args_vec::Vector{String} = args2vec(v.args)
     # example: String -> "<STRING>"
     type::String = v.type != Bool ? string(" ", join("<>", uppercase(string(v.type)))) : ""
     # example: (i,input) -> "[-i|--input <STRING>]"
     args_usage::String = v.positional ? type : string(join(hyphenate.(args_vec), "|"), type)
-    !v.required && (args_usage = join("[]", args_usage))
+    !isrequired && (args_usage = join("[]", args_usage))
     # example: (i,input) -> "-i, --input <STRING>"
     tabs::String = v.type != Bool ? "\t" : "\t\t"
     args_options::String = string("\n  ", join(hyphenate.(args_vec), ", "), type, tabs, v.description)
@@ -217,7 +215,7 @@ function parse_args!(parser::ArgumentParser; cli_args=nothing)
             nextarg += 1
         else
             posargs_exhausted = true
-            (isnothing(pa.value) | pa.required) && return _error(throw_on_exception(parser), "Value for positional argument $(canonicalname(pa)) not supplied")
+            isnothing(pa.value) && return _error(throw_on_exception(parser), "Value for positional argument $(canonicalname(pa)) not supplied")
         end
     end
 
@@ -306,7 +304,7 @@ function set_value!(parser::ArgumentParser, numkey::Integer, value::Any)
     value = convert(vals.type, value)
     (ok, value) = validate(value, vld)
     ok || return _error(thr_on_exc, "$value is not a valid value for arg $(canonicalname(vals.args))") 
-    parser.kv_store[numkey] = ArgumentValues(vals.args, value, vals.type, vals.required, vals.positional, vals.description, vals.validator)
+    parser.kv_store[numkey] = ArgumentValues(vals.args, value, vals.type, vals.positional, vals.description, vals.validator)
     return parser
 end
 

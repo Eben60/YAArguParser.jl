@@ -187,7 +187,6 @@ using Test
         @test get_value(p, "--int") == 1
         @test get_value(p, "--abort") == false
         @test get_value(p, "--posn") == 3                
-        @test_throws ErrorException add_argument!(p, "", "--pos2", type=Int, default=nothing, required=false, positional=true, description="integer2")
 
         p = deepcopy(p0)
         add_argument!(p, "", "--posn", type=Int, default=0, positional=true, description="integer")
@@ -196,7 +195,7 @@ using Test
 
         p = deepcopy(p0)
         rvl = RealValidator(;incl_vals=[3, 4, 6]);
-        add_argument!(p, "", "--posn", type=Int, positional=true, required=true, description="integer", validator=rvl);
+        add_argument!(p, "", "--posn", type=Int, positional=true, description="integer", validator=rvl);
         cli_args = ["2", "-goo", "Gggg", "-f", "Ffff", "-i", "1"];
         @test_throws ArgumentError parse_args!(p; cli_args)
         cli_args = ["3", "-goo", "Gggg", "-f", "Ffff", "-i", "1"]
@@ -258,8 +257,8 @@ using Test
 
         p1 = deepcopy(p0);
         add_argument!(p1, "", "--pos1", type=Int, default=0, positional=true, description="integer");
-        add_argument!(p1, "", "--pos2", type=Int, positional=true, required=true, description="integer");
-        add_argument!(p1, "", "--pos3", type=Int, positional=true, required=true, description="integer");
+        add_argument!(p1, "", "--pos2", type=Int, positional=true, description="integer");
+        add_argument!(p1, "", "--pos3", type=Int, positional=true, description="integer");
 
         p = deepcopy(p1);
         cli_args = ["1", "-goo", "Gggg", "-f", "Ffff", "-i", "1"];
