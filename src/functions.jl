@@ -67,6 +67,11 @@ function add_example!(parser::ArgumentParser, example::AbstractString)
     return parser
 end
 
+"""
+    sort_args(parser::ArgumentParser) → (;pos_args, keyed_args, all_args)
+
+Function `sort_args` is internal.
+"""
 function sort_args(parser)
     pos_args = ArgumentValues[]
     keyed_args = ArgumentValues[]
@@ -82,6 +87,11 @@ function sort_args(parser)
     return (;pos_args, keyed_args, all_args)
 end
 
+"""
+    argument_usage(v::ArgumentValues) → (; u=args_usage, o=options)
+
+Function `sort_args` is internal.
+"""
 function argument_usage(v)
     isrequired = isnothing(v.value)
     args_vec::Vector{String} = args2vec(v.args)
