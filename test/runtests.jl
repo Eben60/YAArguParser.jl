@@ -154,11 +154,13 @@ using Test
         add_argument!(p, "-f", "--foo", type=String, default="fff", description="Fff");
         add_argument!(p, "-g", "--goo", type=String, default="ggg", description="Ggg")
         add_argument!(p, "-i", "--int", type=Int, default=0, description="integer")
-        cli_args = ["-goo", "Gggg", "-f", "Ffff", "-i", "1"]
+        add_argument!(p, "-b", "--boolean", type=Bool, default=false, description="boolean")
+        cli_args = ["-goo", "Gggg", "-f", "Ffff", "-i", "1", "-b", "true"]
         parse_args!(p; cli_args)
         @test get_value(p, "--foo") == "Ffff"
         @test get_value(p, "--goo") == "Gggg"
         @test get_value(p, "--int") == 1
+        @test get_value(p, "-b")
         @test get_value(p, "--bar") isa ArgumentError
         @test parse_args!(p; cli_args=["-i", "1.5"]) isa ArgumentError
     end
@@ -300,13 +302,31 @@ using Test
         
     end
 
-    @testset begin
+    @testset "shell_split" begin
         @test shell_split("foo bar baz") == ["foo", "bar", "baz"]
         @test shell_split("foo\\ bar baz") == ["foo bar", "baz"]
         @test shell_split("'foo bar' baz") == ["foo bar", "baz"]
         # "Over quoted"
         @test shell_split("'foo\\ bar' baz") == ["foo\\ bar", "baz"]
         @test shell_split("\"foo\\ bar\" baz") == ["foo\\ bar", "baz"]
+
+        p = ArgumentParser();
+        add_argument!(p, "", "pos1", type=Int, positional=true, default=0, description="integer1")
+        add_argument!(p, "", "pos2", type=String, positional=true, default="", description="string2")
+        add_argument!(p, "", "pos3", type=Bool, positional=true, default=false, description="bool3")
+        add_argument!(p, "-i", "--int4", type=Int);
+        add_argument!(p, "-s", "--str5", type=String);
+        add_argument!(p, "-b", "--bool6", type=Bool);
+
+        cli_args = shell_split("1 s2 true -s s5 -int4 4 -b false")
+        parse_args!(p; cli_args);
+
+        @test get_value(p, "pos1") == 1
+        @test get_value(p, "pos2") == "s2"
+        @test get_value(p, "pos3")
+        @test get_value(p, "--int4") == 4 
+        @test get_value(p, "--str5") == "s5" 
+        @test !get_value(p, "-b")            
     end
 
 end

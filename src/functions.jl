@@ -330,17 +330,14 @@ Function `_error` is internal.
 """
 _error(thr_on_exc, msg; excp=ArgumentError) = thr_on_exc ? throw(excp(msg)) : excp(msg) 
 
-# Type conversion helper methods.
-# parse_arg(av.type, val_str, av.validator)
-
 """
-    parse_arg(t::Type, val_str::AbstractString, ::Union{Nothing, AbstractValidator}) → (; ok, v=parsed_value, msg=nothing)
+    parse_arg(t::Type, val_str::Union{AbstractString, Bool}, ::Union{Nothing, AbstractValidator}) → (; ok, v=parsed_value, msg=nothing)
 
 Tries to parse `val_str` to type `t`. For your custom types or custom parsing, provide your own methods.
 
 Function `parse_arg` is public, but not exported.
 """
-function parse_arg(t, val_str, ::Any) 
+function parse_arg(t::Type, val_str::AbstractString, ::Any) 
     v = try
         parse(t, val_str)
     catch e
@@ -349,4 +346,8 @@ function parse_arg(t, val_str, ::Any)
     return (; ok=true, v, msg=nothing)
 end
 
+# keyword Bool args do not have the "argument body" and converted explicitely. 
+# therefore this is a special case.
+# other arguments passed as Strings
+parse_arg(::Type{Bool}, v::Bool, ::Any) = (; ok=true, v, msg=nothing)
 parse_arg(::Type{String},   v::AbstractString, ::Any)  = (; ok=true, v, msg=nothing)
