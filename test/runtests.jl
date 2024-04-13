@@ -4,8 +4,8 @@ using SimpleArgParse: ArgumentParser, add_argument!, add_example!, generate_usag
 
 using SimpleArgParse: StrValidator, validate, RealValidator, positional_args, args_pairs, ArgForms, args2vec, sort_args, canonicalname
 
-# using Aqua
-# Aqua.test_all(SimpleArgParse)
+using Aqua
+Aqua.test_all(SimpleArgParse)
 
 using Test
 

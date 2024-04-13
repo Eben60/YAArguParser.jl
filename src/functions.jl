@@ -168,7 +168,7 @@ end
 """
     update_val!(parser::ArgumentParser, numkey::Integer, val_str::AbstractString) → parser
 
-Function `update_val!` is internal
+See also `set_value!`. Function `update_val!` is internal.
 """
 function update_val!(parser, numkey, val_str)
     av::ArgumentValues = parser.kv_store[numkey]
@@ -249,7 +249,6 @@ function parse_args!(parser::ArgumentParser; cli_args=nothing)
     end
     return parser
 end
-
 
 """
     get_value(parser, arg) → value::Any
