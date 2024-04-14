@@ -89,7 +89,7 @@ end
 """
     argument_usage(v::ArgumentValues) → (; u=args_usage, o=options)
 
-Function `sort_args` is internal.
+Function `argument_usage` is internal.
 """
 function argument_usage(v)
     isrequired = isnothing(v.value)
@@ -110,7 +110,7 @@ end
 """
     generate_usage!(parser::ArgumentParser) → ::String
 
-Usage/help message generator.
+Usage/help message generator. Function `generate_usage!` is public, not exported.
 
 # Example of generated text
 Usage: main.jl --input <PATH> [--verbose] [--problem] [--help]
@@ -157,7 +157,7 @@ end
 """
     help(parser::ArgumentParser; color::Union{AbstractString, Nothing}) → nothing
 
-Print usage/help message.
+Print usage/help message. Function `help` is exported.
 """
 function help(parser::ArgumentParser; color=nothing)
     color = getcolor(parser, color)
@@ -264,7 +264,7 @@ Get argument value from parser.
     found, the function will either throw imediately, or return `e <: Exception` to be 
     processed downstream.
 
-Function `get_value` is exported.
+Function `get_value` is public, not exported.
 """
 function get_value(parser::ArgumentParser, arg::AbstractString)
     argkey::String = arg2strkey(arg)
@@ -298,7 +298,7 @@ Set/update value of argument, validating it, as specified by `numkey` or `argnam
     found, the function will either throw imediately, or return `e <: Exception` to be 
     processed downstream.
 
-Function `set_value!` is exported.
+Function `set_value!` is public, not exported.
 """
 function set_value!(parser::ArgumentParser, numkey::Integer, value::Any)
     thr_on_exc = throw_on_exception(parser)

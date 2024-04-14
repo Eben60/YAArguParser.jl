@@ -1,4 +1,4 @@
-"Key-value store mapping from colors to ANSI codes."
+"Key-value store mapping from colors to ANSI codes. An internal constant."
 ANSICODES::Base.ImmutableDict{String,Int} = Base.ImmutableDict(
     "black"   => 30,
     "red"     => 31,
@@ -112,3 +112,22 @@ throw_on_exception(x::InteractiveUsage) = x.throw_on_exception
 """
 Base.haskey(parser::ArgumentParser, key::AbstractString) = haskey(parser.arg_store, arg2strkey(key))   
 Base.haskey(parser::ArgumentParser, key::Integer) = haskey(parser.kv_store, key)
+
+"""
+    shell_split(s::AbstractString) → String[]
+
+Split a string into a vector of args.
+
+`shell_split` is in internal function of `Base`. It is re-exported.
+
+# Examples
+```julia-repl
+julia> shell_split("--foo 3 -b bar")
+4-element Vector{String}:
+ "--foo"
+ "3"
+ "-b"
+ "bar"
+```
+"""
+function shell_split end

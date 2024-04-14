@@ -1,14 +1,20 @@
 module SimpleArgParse
 
 using OrderedCollections: OrderedDict
-using Base: shell_split
+import Base.shell_split
 
-export ArgumentParser, InteractiveUsage,
-    add_argument!, add_example!, generate_usage!, help, parse_args!, 
-    get_value, set_value!, colorize, getcolor, 
-    colorprint, args_pairs, 
-    validate, AbstractValidator, StrValidator, RealValidator,
-    shell_split
+# types
+export ArgForms, ArgumentParser, ArgumentValues, InteractiveUsage,
+    RealValidator, StrValidator
+
+# functions
+export shell_split, add_argument!, add_example!, args_pairs, colorprint, 
+    help, parse_args!, validate
+
+@static if VERSION ≥ v"1.11"
+    # therein declare public identifiers
+    include("public.jl")
+end
 
 include("validator.jl")
 include("datastructures.jl")

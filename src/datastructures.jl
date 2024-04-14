@@ -2,7 +2,7 @@
 """
     ArgForms
 
-Command-line arguments, short and long forms.
+Command-line arguments, short and long forms. Type `ArgForms` is exported.
 
 # Fields
 - `short::String`
@@ -16,7 +16,7 @@ end
 """
     ArgumentValues
 
-Command-line argument values.
+Command-line argument values. Type `ArgumentValues` is exported.
 
 # Fields
 - `const args::ArgForms`
@@ -38,6 +38,8 @@ end
 """
     InteractiveUsage
 
+Type `InteractiveUsage` is exported.
+
 # Fields  
 - `throw_on_exception = false`: immediately throw on exception if `true`, 
     or process error downstream if `false` (interactive use)
@@ -55,7 +57,7 @@ end
 """
     ArgumentParser
 
-Command-line argument parser with numkey-value stores and attributes.
+Command-line argument parser with numkey-value stores and attributes. Type `ArgumentParser` is exported.
 
 # Fields
 ## stores
