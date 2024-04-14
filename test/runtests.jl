@@ -108,14 +108,14 @@ using Test
     end
 
     @testset "RealValidator" begin
-        @test_throws ErrorException RealValidator()
-        rvl = RealValidator(;excl_vals=[1, 2], excl_ivls=[(10, 15), (20, 25)], incl_vals=[3, 4, 11], incl_ivls=[(100, Inf)])
+        @test_throws ErrorException RealValidator{Int}()
+        rvl = RealValidator{Int}(;excl_vals=[1, 2], excl_ivls=[(10, 15), (20, 25)], incl_vals=[3, 4, 11], incl_ivls=[(100, typemax(Int))])
         @test !validate(1, rvl).ok # == (; ok=false, v=nothing) 
         @test validate(11, rvl) == (; ok=false, v=nothing) 
         @test validate(50, rvl) == (; ok=false, v=nothing) 
         @test validate(3, rvl) == (; ok=true, v=3)  
         @test validate(111, rvl) == (; ok=true, v=111) 
-        rv1 = RealValidator(;incl_ivls=[(10, 20), (30, 40), (100, Inf)])
+        rv1 = RealValidator{Float64}(;incl_ivls=[(10, 20), (30, 40), (100, Inf)])
         @test validate(111, rv1) == (; ok=true, v=111)
         @test validate(15, rv1) == (; ok=true, v=15)
         @test validate(25, rv1) == (; ok=false, v=nothing) 
@@ -129,7 +129,7 @@ using Test
         @test get_value(p, "--int") == 3
         @test_throws ArgumentError set_value!(p, "--foo", "abc")
 
-        rvl1 = RealValidator(;excl_vals=[1, 2])
+        rvl1 = RealValidator{Int}(;excl_vals=[1, 2])
         @test validate(11, rvl1) == (; ok=true, v=11)        
         @test validate(1, rvl1) == (; ok=false, v=nothing)    
     end
@@ -196,7 +196,7 @@ using Test
         @test_throws ArgumentError parse_args!(p; cli_args)
 
         p = deepcopy(p0)
-        rvl = RealValidator(;incl_vals=[3, 4, 6]);
+        rvl = RealValidator{Int}(;incl_vals=[3, 4, 6]);
         add_argument!(p, "", "--posn", type=Int, positional=true, description="integer", validator=rvl);
         cli_args = ["2", "-goo", "Gggg", "-f", "Ffff", "-i", "1"];
         @test_throws ArgumentError parse_args!(p; cli_args)

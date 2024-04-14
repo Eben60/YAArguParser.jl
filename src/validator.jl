@@ -55,14 +55,14 @@ function validate(v::AbstractString, vl::StrValidator)
     return (; ok=false, v=nothing)
 end
 
-@kwdef struct RealValidator <: AbstractValidator
-    excl_vals::Vector{Real} = []
-    excl_ivls::Vector{Tuple{Real, Real}} = []
-    incl_vals::Vector{Real} = []
-    incl_ivls::Vector{Tuple{Real, Real}} = []
-    RealValidator(excl_vals, excl_ivls, incl_vals, incl_ivls) = all(isempty.([excl_vals, excl_ivls, incl_vals, incl_ivls])) ? 
+@kwdef struct RealValidator{T} <: AbstractValidator
+    excl_vals::Vector{T} = T[]
+    excl_ivls::Vector{Tuple{T, T}} = T[]
+    incl_vals::Vector{T} = T[]
+    incl_ivls::Vector{Tuple{T, T}} = T[]
+    RealValidator{T}(excl_vals, excl_ivls, incl_vals, incl_ivls) where {T} = all(isempty.([excl_vals, excl_ivls, incl_vals, incl_ivls])) ? 
         error("RealValidator init error: At least one criterium must be non-empty") :
-        new(excl_vals, excl_ivls, incl_vals, incl_ivls) 
+        new{T}(excl_vals, excl_ivls, incl_vals, incl_ivls) 
 end
 
 """
