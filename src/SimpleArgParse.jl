@@ -11,10 +11,10 @@ export ArgForms, ArgumentParser, ArgumentValues, InteractiveUsage,
 export shell_split, add_argument!, add_example!, args_pairs, colorprint, 
     help, parse_args!, validate
 
-@static if VERSION ≥ v"1.11"
-    # therein declare public identifiers
-    include("public.jl")
-end
+# @static if VERSION ≥ v"1.11"
+#     # therein declare public identifiers
+#     include("public.jl")
+# end
 
 include("validator.jl")
 include("datastructures.jl")
