@@ -84,7 +84,7 @@ canonicalname(argf::ArgForms) = lstrip((isempty(argf.long) ? argf.short : argf.l
 canonicalname(argvs::ArgumentValues) = canonicalname(argvs.args)
 
 """
-    args_pairs(parser::ArgumentParser; excl=["help"]) → ::Vector{Pair{Symbol, Any}}
+    args_pairs(parser::ArgumentParser; excl::Union{Nothing, Vector{String}}=nothing) → ::Vector{Pair{Symbol, Any}}
 
 Return vector of pairs `argname => argvalue` for all arguments except listed in `excl`.
     If argument has both short and long forms, the long one is used. Returned value can 
@@ -93,7 +93,8 @@ Return vector of pairs `argname => argvalue` for all arguments except listed in 
 
 Function `args_pairs` is exported.
 """
-function args_pairs(parser::ArgumentParser; excl=["help"])
+function args_pairs(parser::ArgumentParser; excl=nothing)
+    isnothing(excl) && (excl=[])
     args = collect(values(parser.kv_store))
     filter!(x -> !isnothing(x.value), args)
     filter!(x -> !(lstrip(x.args.long, '-') in excl) , args)

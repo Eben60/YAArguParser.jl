@@ -94,12 +94,12 @@ Function `argument_usage` is internal.
 function argument_usage(v)
     isrequired = isnothing(v.value)
     args_vec::Vector{String} = args2vec(v.args)
-    # example: String -> "<STRING>"
-    type::String = v.type != Bool ? string(" ", join("<>", uppercase(string(v.type)))) : ""
-    # example: (i,input) -> "[-i|--input <STRING>]"
+    # example: String -> "<String>"
+    type::String = v.type != Bool ? string(" ", join("<>", string(v.type))) : ""
+    # example: (i,input) -> "[-i|--input <String>]"
     args_usage::String = v.positional ? type : string(join(hyphenate.(args_vec), "|"), type)
     !isrequired && (args_usage = join("[]", args_usage))
-    # example: (i,input) -> "-i, --input <STRING>"
+    # example: (i,input) -> "-i, --input <String>"
     tabs::String = v.type != Bool ? "\t" : "\t\t"
     args_options::String = string("\n  ", join(hyphenate.(args_vec), ", "), type, tabs, v.description)
     v.positional && (args_options *= "\t (positional arg)")
