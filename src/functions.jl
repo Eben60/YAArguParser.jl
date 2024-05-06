@@ -252,6 +252,18 @@ function parse_args!(parser::ArgumentParser; cli_args=nothing)
     return parser
 end
 
+"""
+    check_missing_input(parser::ArgumentParser) → value::Any
+
+Checks if all required arguments were supplied. Required is an argument without a default value.  
+
+# Throws
+- `Exception`: depending on the value of `throw_on_exception(parser)`, if an argument is 
+    missing, the function will either throw imediately, or return `e <: Exception` to be 
+    processed downstream.
+
+Function `check_missing_input` is internal.
+"""
 function check_missing_input(parser)
     args = collect(values(parser.kv_store))
     for x in args
@@ -262,14 +274,6 @@ function check_missing_input(parser)
         end
     end
     return (;ok=false, err=nothing)
-end
-
-function args_pairs(parser::ArgumentParser; excl=nothing)
-    isnothing(excl) && (excl=[])
-    args = collect(values(parser.kv_store))
-    filter!(x -> !isnothing(x.value), args)
-    filter!(x -> !(lstrip(x.args.long, '-') in excl) , args)
-    return [Symbol(canonicalname(a)) => a.value for a in args]
 end
 
 """

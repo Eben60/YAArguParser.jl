@@ -4,7 +4,8 @@ using SimpleArgParse: ArgumentParser, add_argument!, add_example!, generate_usag
 
 using SimpleArgParse: StrValidator, validate, RealValidator, positional_args, args_pairs, ArgForms, args2vec, sort_args, canonicalname
 
-using Aqua
+using Aqua, Suppressor
+
 Aqua.test_all(SimpleArgParse)
 
 using Test
@@ -165,8 +166,24 @@ using Test
         @test parse_args!(p; cli_args=["-i", "1.5"]) isa ArgumentError
     end
 
-    @testset "Positional args" begin
-        generated_usage = "\nUsage:  [ <INT64>] [ <INT64>] [ <INT64>] [-f|--foo <STRING>] [-g|--goo <STRING>] [-i|--int <INT64>] [-a|--abort]\n\n\n\nOptions:\n  --pos1 <INT64>\tinteger1\t (positional arg)\n  --pos2 <INT64>\tinteger2\t (positional arg)\n  --pos3 <INT64>\tinteger3\t (positional arg)\n  -f, --foo <STRING>\tFff\n  -g, --goo <STRING>\tGgg\n  -i, --int <INT64>\tinteger\n  -a, --abort\t\tabort\n\nExamples:\n  \$ 1 2 3 -f \"string 1\" -int 4\n  \$ 4 5 6 -goo \"string 2\" -i 7\n"
+    @testset "nothing is an valid default value" begin
+        p = ArgumentParser();
+        add_argument!(p, "-f", "--foo", type=String, default=nothing, description="Fff");
+        add_argument!(p, "-i", "--int", type=Int, default=nothing, description="integer")
+        add_argument!(p, "-b", "--boolean", type=Bool, default=nothing, description="boolean")
+        parse_args!(p; cli_args=[])
+        @test isnothing(get_value(p, "--foo"))
+        @test isnothing(get_value(p, "--int"))
+        @test isnothing(get_value(p, "-b"))
+    end
+
+    @testset "Check missing arguments" begin
+        p = ArgumentParser();
+        add_argument!(p, "-f", "--foo", type=String, description="Required argument");
+        @test_throws ArgumentError parse_args!(p; cli_args=[]) 
+    end
+@testset "Positional args" begin
+        generated_usage = "\nUsage:  [ <Int64>] [ <Int64>] [ <Int64>] [-f|--foo <String>] [-g|--goo <String>] [-i|--int <Int64>] [-a|--abort]\n\n\n\nOptions:\n  --pos1 <Int64>\tinteger1\t (positional arg)\n  --pos2 <Int64>\tinteger2\t (positional arg)\n  --pos3 <Int64>\tinteger3\t (positional arg)\n  -f, --foo <String>\tFff\n  -g, --goo <String>\tGgg\n  -i, --int <Int64>\tinteger\n  -a, --abort\t\tabort\n\nExamples:\n  \$ 1 2 3 -f \"string 1\" -int 4\n  \$ 4 5 6 -goo \"string 2\" -i 7\n"
         
         p0 = ArgumentParser();
         add_argument!(p0, "-f", "--foo", type=String, default="fff", description="Fff");
@@ -212,7 +229,6 @@ using Test
         add_example!(p1, "4 5 6 -goo \"string 2\" -i 7");
         pu = generate_usage!(p1);
         @test pu == generated_usage
-
 
         p = deepcopy(p1)
         cli_args = ["1", "2", "3", "-goo", "Gggg", "-f", "Ffff", "-i", "1"]
@@ -264,7 +280,9 @@ using Test
 
         p = deepcopy(p1);
         cli_args = ["1", "-goo", "Gggg", "-f", "Ffff", "-i", "1"];
-        @test_throws ArgumentError parse_args!(p; cli_args)
+        @suppress_out begin
+            @test_throws ArgumentError parse_args!(p; cli_args)
+        end
     end
 
     @testset "positional yes or no" begin

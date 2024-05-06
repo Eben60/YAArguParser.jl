@@ -123,3 +123,4 @@ validate(v, ::Nothing) = (; ok=true, v)
 validate(v::Nothing, ::Nothing) = (; ok=true, v)
 validate(v::Nothing, ::Any) = (; ok=true, v) # nothing is generally a valid value
 validate(v::Missing, ::Any) = (; ok=true, v) # missing is generally a valid value
+validate(v::Missing, ::Nothing) = (; ok=true, v)
