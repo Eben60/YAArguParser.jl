@@ -91,7 +91,7 @@ end
 
 """
     validate(v::Any, ::Nothing) → (;ok=true, v)
-    validate(v::Nothing, ::Any) → (;ok=true, v)
+    validate(v::Missing, ::Any) → (;ok=true, v)
     validate(v::Any, vl::AbstractValidator) → (;ok::Bool, v)
 
 Validate input v against validator vl, and returns named tuple with validation result `ok` 
@@ -122,3 +122,4 @@ validate(v, vl) = error("no method defined for validate($(typeof(v)), $(typeof(v
 validate(v, ::Nothing) = (; ok=true, v)
 validate(v::Nothing, ::Nothing) = (; ok=true, v)
 validate(v::Nothing, ::Any) = (; ok=true, v) # nothing is generally a valid value
+validate(v::Missing, ::Any) = (; ok=true, v) # missing is generally a valid value
