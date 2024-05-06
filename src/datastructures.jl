@@ -49,7 +49,6 @@ Type `InteractiveUsage` is exported.
 """
 @kwdef struct InteractiveUsage
     throw_on_exception::Bool=false
-    color::String = "default"
     introduction::String = ""
     prompt::String = "> "
 end
@@ -89,5 +88,6 @@ Command-line argument parser with numkey-value stores and attributes. Type `Argu
     usage::String = ""
     examples::Vector{String} = String[]
     add_help::Bool = false
+    color::String = "default"
     interactive::Union{Nothing, InteractiveUsage} = nothing
 end

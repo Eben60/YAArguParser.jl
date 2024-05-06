@@ -18,10 +18,7 @@ function main()
     ap = ArgumentParser(; 
         description="Command line options parser", 
         add_help=true, 
-        interactive=InteractiveUsage(;
-            color = "cyan", 
-            throw_on_exception = true
-            ),
+        color = "cyan", 
         )
 
     add_argument!(ap, "-p", "--plotformat"; 
@@ -43,7 +40,7 @@ function main()
     add_example!(ap, "$fname -n 1")
     add_example!(ap, "$fname --help")
 
-    ap = parse_args!(ap)
+    parse_args!(ap)
 
     # get all arguments as NamedTuple
     args = NamedTuple(args_pairs(ap))

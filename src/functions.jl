@@ -254,7 +254,7 @@ function parse_args!(parser::ArgumentParser; cli_args=nothing)
 end
 
 """
-    check_missing_input(parser::ArgumentParser) → value::Any
+    check_missing_input(parser::ArgumentParser) → (;ok::Bool, err::Union{Nothing, Exception})
 
 Checks if all required arguments were supplied. Required is an argument without a default value.  
 

@@ -3,9 +3,20 @@
 
 ### Release 2.0.0
 
-- renamed functions
-- removed hash
-- ...
+#### Breaking changes
+
+- Renamed exported mutating functions, e.g. `add_example => add_example!` 
+- Limited the number of exported functions
+- Hashmap keys no more used, therefore `get_key` function removed
+- Removed `has_key` function - use `haskey` instead
+- Removed `required` field of ArgumentParser: If no default value provided, then argument is required, otherwise optional.
+- Anything forgotten? - Please open an issue  
+
+#### Other substantial changes
+
+- Validators
+- return pairs
+- etc...
 
 ### Release 1.1.0
 

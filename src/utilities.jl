@@ -55,8 +55,8 @@ Function `getcolor` is public, not exported.
 """
 function getcolor(parser::ArgumentParser, color=nothing) 
     !isnothing(color) && return color   
-    return (isnothing(parser.interactive) || isnothing(parser.interactive.color)) ? 
-        "default" : parser.interactive.color
+    return isnothing(parser.color) ? 
+        "default" : parser.color
 end
 
 """

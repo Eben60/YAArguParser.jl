@@ -16,4 +16,4 @@ Enjoy! 😎
 
 ## Preface to v.2
 
-Now, at nearly 600 LOC, divided into several files, the package grew but is still much smaller than `ArgParse`. The code has been somewhat refactored, and features for interactive use in console applications and an extensible input validator has been added. See [Changelog](@ref) for details.
+Now, at nearly 600 LOC, not counting tests, divided into several files, the package grew but is still much smaller than `ArgParse`. The code has been substantially refactored, and features for interactive use in console applications and an extensible input validator has been added. See [Changelog](@ref) for details.

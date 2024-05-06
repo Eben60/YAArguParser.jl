@@ -30,7 +30,7 @@ const usage = raw"""
 
 function main()
 
-    ap = ArgumentParser(description="SimpleArgParse example.", add_help=true)
+    ap = ArgumentParser(description="SimpleArgParse example.", add_help=true, color="cyan")
     add_argument!(ap, "-h", "--help", type=Bool, default=false, description="Help switch.")
     add_argument!(ap, "-i", "--input", type=String, default="filename.txt", description="Input file.")
     add_argument!(ap, "-n", "--number", type=Int, default=0, description="Integer number.")
@@ -41,16 +41,10 @@ function main()
     # add usage/help text from above
     ap.usage = usage
 
-    ap = parse_args!(ap)
+    parse_args!(ap)
 
-    # get all arguments as NamedTuple
-    args = NamedTuple(args_pairs(ap))
-
-    # print the usage/help message in magenta if asked for help
-    args.help && help(ap, color="magenta")
-
-    # display the arguments
-    println(args)
+    # print the usage/help message in color defined in ap
+    help(ap)
 
     # DO SOMETHING AMAZING
 

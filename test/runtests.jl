@@ -26,7 +26,6 @@ using Test
     @testset "Testset parameterized constructor" begin
 
         ia = InteractiveUsage(throw_on_exception = false,
-            color = "magenta",
             introduction = "story to tell",
             prompt = "--/ ",
             )
@@ -39,6 +38,7 @@ using Test
             license="license",
             usage="julia main.jl --arg val",
             add_help=true,
+            color = "magenta",
             interactive=ia,
             )
 
@@ -50,7 +50,7 @@ using Test
         @test "julia main.jl --arg val" == p.usage
         @test p.add_help
         @test !p.interactive.throw_on_exception
-        @test p.interactive.color == "magenta"
+        @test p.color == "magenta"
         @test p.interactive.introduction == "story to tell"
         @test p.interactive.prompt == "--/ "
     end
