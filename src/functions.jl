@@ -198,8 +198,9 @@ Function `parse_args!` is exported.
 """
 function parse_args!(parser::ArgumentParser; cli_args=nothing)
     isnothing(cli_args) && (cli_args=ARGS)
-    if parser.add_help && !haskey(parser, "help")
-        add_argument!(parser, "-h", "--help", type=Bool, default=false, description="Print the help message.")
+    if parser.add_help 
+        haskey(parser, "help") || 
+            add_argument!(parser, "-h", "--help", type=Bool, default=false, description="Print the help message.")
         generate_usage!(parser)
     end
     parser.filename = PROGRAM_FILE

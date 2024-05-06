@@ -22,9 +22,8 @@ function main()
     add_argument!(ap, "-v", "--verbose", type=Bool, default=false, description="Verbose mode switch.")
     add_example!(ap, "julia $fname --input dir/file.txt --number 10 --verbose")
     add_example!(ap, "julia $fname --help")
-    generate_usage!(ap)
 
-    ap = parse_args!(ap)
+    parse_args!(ap)
 
     # get all arguments as NamedTuple
     args = NamedTuple(args_pairs(ap))
@@ -40,4 +39,5 @@ function main()
     return 0
 end
 
-main();
+main()
+;
