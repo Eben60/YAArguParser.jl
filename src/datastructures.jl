@@ -28,7 +28,7 @@ Command-line argument values. Type `ArgumentValues` is exported.
 """
 @kwdef mutable struct ArgumentValues
     const args::ArgForms
-    value::Any
+    value::Any = missing
     const type::Type = Any
     const positional::Bool = false
     const description::String = ""

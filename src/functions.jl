@@ -35,7 +35,7 @@ arg2strkey(arg) = lstrip(arg, '-')
 Function `add_argument!` is exported
 """
 function add_argument!(parser::ArgumentParser, arg_short::String="", arg_long::String="";
-    type::Type=Any, positional=false, default=nothing, description::String="", validator=nothing)
+    type::Type=Any, positional=false, default=missing, description::String="", validator=nothing)
 
     args::ArgForms = ArgForms(arg_short, arg_long)
     arg::String = !isempty(arg_long) ? arg_long : !isempty(arg_short) ? arg_short : ""
@@ -247,7 +247,29 @@ function parse_args!(parser::ArgumentParser; cli_args=nothing)
         uv = update_val!(parser, numkey, value)
         uv isa Exception && return uv
     end
+    (;ok, err) = check_missing_input(parser)
+    ok || return err
     return parser
+end
+
+function check_missing_input(parser)
+    args = collect(values(parser.kv_store))
+    for x in args
+        if ismissing(x.value) 
+            # print help and return an error
+            help(parser)
+            return (;ok=false, err=_error(throw_on_exception(parser), "Required argument $(canonicalname(x)) is missing!"))
+        end
+    end
+    return (;ok=false, err=nothing)
+end
+
+function args_pairs(parser::ArgumentParser; excl=nothing)
+    isnothing(excl) && (excl=[])
+    args = collect(values(parser.kv_store))
+    filter!(x -> !isnothing(x.value), args)
+    filter!(x -> !(lstrip(x.args.long, '-') in excl) , args)
+    return [Symbol(canonicalname(a)) => a.value for a in args]
 end
 
 """
