@@ -21,4 +21,6 @@ include("datastructures.jl")
 include("functions.jl")
 include("utilities.jl")
 
+include("precompile.jl")
+
 end # module SimpleArgParse

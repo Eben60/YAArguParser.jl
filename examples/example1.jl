@@ -5,8 +5,8 @@
 using Pkg
 
 if ! haskey(Pkg.dependencies(), "SimpleArgParse")
-    simpleargparse__dir = dirname(@__DIR__)
-    Pkg.activate(simpleargparse__dir)
+    simpleargparse_dir = dirname(@__DIR__)
+    Pkg.activate(simpleargparse_dir)
 end
 
 fname = splitpath(@__FILE__)[end]

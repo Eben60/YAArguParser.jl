@@ -11,6 +11,8 @@ We approximate the [Microsoft command-line syntax](https://learn.microsoft.com/e
 
 ## Usage
 
+### Example 1 - common usage
+
 We first create an `ArgumentParser` object, then add and parse our command-line arguments. We will automagically generate a `usage` string from our key-value store of command-line arguments here, but is also possible to write your own help message instead. 
 
 ```julia
@@ -47,6 +49,8 @@ main()
 ```
 
 That is about as simple as it gets and closely follows Python's [`argparse`](https://docs.python.org/3/library/argparse.html). 
+
+### Example 2 - customized help
 
 Now let's define a customized help message:
 
@@ -89,6 +93,8 @@ end
 main();
 ```
 
+### Example 3 - validating arguments
+
 Now, with validating supplied arguments (read [Types](@ref) Docstrings section for Validator details):
 
 ```julia
@@ -123,6 +129,135 @@ function main()
     # DO SOMETHING AMAZING with args
 
     return nothing
+end
+
+main()
 ```
+
+### Example 4 - positional arguments, custom validator
+
+```julia
+using Dates
+using SimpleArgParse
+using SimpleArgParse: AbstractValidator
+import SimpleArgParse: validate
+
+@kwdef struct FullAgeValidator <: AbstractValidator
+    legal_age::Int = 18
+end
+
+function validate(v::Union{AbstractString, Date}, vl::FullAgeValidator)
+    birthdate = today()
+    try
+        birthdate = Date(v)
+    catch
+        return (; ok=false, v=nothing)
+    end
+
+    d = day(birthdate)
+    m = month(birthdate)
+    fullageyear = year(birthdate) + vl.legal_age
+
+    Date(fullageyear, m, d) > today() && return (; ok=false, v=nothing)
+
+    return (; ok=true, v=birthdate)
+end
+
+function askandget(pp; color=pp.color)
+    colorprint(pp.interactive.introduction, color)
+    colorprint(pp.interactive.prompt, color, false)
+    answer = readline()
+    cli_args = Base.shell_split(answer)
+    parse_args!(pp; cli_args)
+    r = NamedTuple(args_pairs(pp))
+    # needhelp = get(r, :help, false)
+    if r.help
+        help(pp)
+        exit()
+    end
+    r.abort && exit()
+    return r
+end
+
+function main()
+
+    color = "cyan"
+    prompt = "legal age check> "
+
+    ask_full_age  = let
+        pp = ArgumentParser(; 
+            description="Asking if one is of full age", 
+            add_help=true, 
+            color = color,
+            interactive=InteractiveUsage(;
+                throw_on_exception = true,
+                introduction="Are you of full legal age? Please type y[es] or n[o] and press <ENTER>",
+                prompt=prompt,
+                ),       
+            )
+
+        add_argument!(pp, "-y", "--yes_no"; 
+            type=String, 
+            positional=true,
+            description="Asking about legal age",
+            validator=StrValidator(; upper_case=true, starts_with=true, patterns=["yes", "no"]),
+            )
+    
+        add_argument!(pp, "-a", "--abort", 
+            type=Bool, 
+            default=false,
+            description="Abort?",
+            )   
+        
+        add_example!(pp, "$(pp.interactive.prompt) y")
+        add_example!(pp, "$(pp.interactive.prompt) --abort")
+        add_example!(pp, "$(pp.interactive.prompt) --help")
+        pp
+    end
+
+    check_full_age  = let
+        pp = ArgumentParser(; 
+            description="Checking if one is of full age", 
+            add_help=true, 
+            color=color, 
+            interactive=InteractiveUsage(;
+                throw_on_exception = true,
+                introduction="Please enter your birth date in the yyyy-mm-dd format",
+                prompt=prompt,
+                ),       
+            )
+
+        add_argument!(pp, "-d", "--birthdate"; 
+            type=Date, 
+            positional=true,
+            description="Asking about legal age",
+            validator=FullAgeValidator(),
+            )
+    
+        add_argument!(pp, "-a", "--abort", 
+            type=Bool, 
+            default=false, 
+            description="Abort?",
+            )   
+        
+        add_example!(pp, "$(pp.interactive.prompt) 2000-02-29")
+        add_example!(pp, "$(pp.interactive.prompt) --abort")
+        add_example!(pp, "$(pp.interactive.prompt) --help")
+        pp
+    end
+
+    (; yes_no ) = askandget(ask_full_age)
+    yes = yes_no == "YES"
+    yes || return false
+
+    (; birthdate) = askandget(check_full_age )
+    println("You appear to be of full age.")
+
+    return true
+end
+
+main()
+```
+
 
 See usage examples in the `./examples` folder as well the testsuite `./test/runtests.jl` .

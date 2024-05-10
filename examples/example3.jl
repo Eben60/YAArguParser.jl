@@ -1,12 +1,15 @@
 #!/usr/bin/env julia
 
+# Example for validating arguments
+
 # somehow we have to ensure that SimpleArgParse is installed in the current environment, 
 # otherwise try to switch the environment
+
 using Pkg
 
 if ! haskey(Pkg.dependencies(), "SimpleArgParse")
-    simpleargparse__dir = dirname(@__DIR__)
-    Pkg.activate(simpleargparse__dir)
+    simpleargparse_dir = dirname(@__DIR__)
+    Pkg.activate(simpleargparse_dir)
 end
 
 fname = splitpath(@__FILE__)[end]

@@ -9,7 +9,7 @@ using Documenter, SimpleArgParse
 # keep in mind .gitignore - deps/deps.jl
 makedocs(
     modules = [SimpleArgParse],
-    format = Documenter.HTML(; prettyurls = get(ENV, "CI", nothing) == "true"),
+    format = Documenter.HTML(; prettyurls = (get(ENV, "CI", nothing) == "true")),
     authors = "Adam Erickson <adam.michael.erickson@gmail.com>, Eben60",
     sitename = "SimpleArgParse.jl",
     pages = Any[

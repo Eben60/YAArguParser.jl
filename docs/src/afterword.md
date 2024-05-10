@@ -5,18 +5,30 @@
 
 #### Breaking changes
 
-- Renamed exported mutating functions, e.g. `add_example => add_example!` 
-- Limited the number of exported functions
-- Hashmap keys no more used, therefore `get_key` function removed
-- Removed `has_key` function - use `haskey` instead
-- Removed `required` field of ArgumentParser: If no default value provided, then argument is required, otherwise optional.
-- Anything forgotten? - Please open an issue  
+- Renamed exported mutating functions, e.g. `add_example => add_example!`.
+- Limited the number of exported functions.
+- Hashmap keys no more used, therefore `get_key` function removed.
+- Removed `has_key` function - use `haskey` instead.
+- Removed `required` field of ArgumentParser: If a default value provided, then argument is obviously optional, otherwise considered required.
+- Anything forgotten? - Please open an issue 🙂  
 
-#### Other substantial changes
+#### New features
 
-- Validators
-- return pairs
-- etc...
+- Support for (extensible) validators [(example)](@ref "Example 3 - validating arguments").
+- Support for positional arguments [(example)](@ref "Example 4 - positional arguments, custom validator").
+- Support for use from console apps [(example)](@ref "Example 4 - positional arguments, custom validator").
+- The added function [`args_pairs`](@ref SimpleArgParse.args_pairs) returns pairs `argname => argvalue` for all arguments at once.
+- etc?...
+
+
+#### Other changes
+
+- Precompile package using `PrecompileTools.jl` to improve startup time.
+- General code refactoring.
+- Made use of `public` keyword introduced in the coming `Julia v1.11`.
+- Test suite extended and now includes `Aqua.jl` testing, too.
+- Extensive `Documenter.jl`-based documentation you are reading now.
+- 
 
 ### Release 1.1.0
 

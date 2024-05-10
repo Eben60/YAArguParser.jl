@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Usage · SimpleArgParse.jl</title><meta name="title" content="Usage · SimpleArgParse.jl"/><meta property="og:title" content="Usage · SimpleArgParse.jl"/><meta property="twitter:title" content="Usage · SimpleArgParse.jl"/><meta name="description" content="Documentation for SimpleArgParse.jl."/><meta property="og:description" content="Documentation for SimpleArgParse.jl."/><meta property="twitter:description" content="Documentation for SimpleArgParse.jl."/><script data-outdated-warner src="assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="assets/documenter.js"></script><script src="search_index.js"></script><script src="siteinfo.js"></script><script src="../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="index.html">SimpleArgParse.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="index.html">Prefaces</a></li><li class="is-active"><a class="tocitem" href="usage.html">Usage</a><ul class="internal"><li><a class="tocitem" href="#Installation"><span>Installation</span></a></li><li><a class="tocitem" href="#Specification"><span>Specification</span></a></li><li><a class="tocitem" href="#Usage"><span>Usage</span></a></li></ul></li><li><a class="tocitem" href="afterword.html">Changelog, Licence</a></li><li><a class="tocitem" href="docstrings.html">Docstrings</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href="usage.html">Usage</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href="usage.html">Usage</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/Eben60/SimpleArgParse.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/Eben60/SimpleArgParse.jl/blob/maindev/docs/src/usage.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h2 id="Installation"><a class="docs-heading-anchor" href="#Installation">Installation</a><a id="Installation-1"></a><a class="docs-heading-anchor-permalink" href="#Installation" title="Permalink"></a></h2><p>As usual, e.g.</p><pre><code class="language-julia hljs">] add SimpleArgParse</code></pre><h2 id="Specification"><a class="docs-heading-anchor" href="#Specification">Specification</a><a id="Specification-1"></a><a class="docs-heading-anchor-permalink" href="#Specification" title="Permalink"></a></h2><p>We approximate the <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/command-line-syntax-key">Microsoft command-line syntax</a>. Optional arguments are surrounded by square brackets, values are surrounded by angle brackets (chevrons), and mutually exclusive items are separated by a vertical bar. Simple!</p><h2 id="Usage"><a class="docs-heading-anchor" href="#Usage">Usage</a><a id="Usage-1"></a><a class="docs-heading-anchor-permalink" href="#Usage" title="Permalink"></a></h2><p>We first create an <code>ArgumentParser</code> object, then add and parse our command-line arguments. We will automagically generate a <code>usage</code> string from our key-value store of command-line arguments here, but is also possible to write your own help message instead. </p><pre><code class="language-julia hljs">using SimpleArgParse: ArgumentParser, add_argument!, add_example!, help, parse_args!, args_pairs
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Usage · SimpleArgParse.jl</title><meta name="title" content="Usage · SimpleArgParse.jl"/><meta property="og:title" content="Usage · SimpleArgParse.jl"/><meta property="twitter:title" content="Usage · SimpleArgParse.jl"/><meta name="description" content="Documentation for SimpleArgParse.jl."/><meta property="og:description" content="Documentation for SimpleArgParse.jl."/><meta property="twitter:description" content="Documentation for SimpleArgParse.jl."/><script data-outdated-warner src="assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="assets/documenter.js"></script><script src="search_index.js"></script><script src="siteinfo.js"></script><script src="../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="index.html">SimpleArgParse.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="index.html">Prefaces</a></li><li class="is-active"><a class="tocitem" href="usage.html">Usage</a><ul class="internal"><li><a class="tocitem" href="#Installation"><span>Installation</span></a></li><li><a class="tocitem" href="#Specification"><span>Specification</span></a></li><li><a class="tocitem" href="#Usage"><span>Usage</span></a></li></ul></li><li><a class="tocitem" href="afterword.html">Changelog, Licence</a></li><li><a class="tocitem" href="docstrings.html">Docstrings</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href="usage.html">Usage</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href="usage.html">Usage</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/Eben60/SimpleArgParse.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/Eben60/SimpleArgParse.jl/blob/maindev/docs/src/usage.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h2 id="Installation"><a class="docs-heading-anchor" href="#Installation">Installation</a><a id="Installation-1"></a><a class="docs-heading-anchor-permalink" href="#Installation" title="Permalink"></a></h2><p>As usual, e.g.</p><pre><code class="language-julia hljs">] add SimpleArgParse</code></pre><h2 id="Specification"><a class="docs-heading-anchor" href="#Specification">Specification</a><a id="Specification-1"></a><a class="docs-heading-anchor-permalink" href="#Specification" title="Permalink"></a></h2><p>We approximate the <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/command-line-syntax-key">Microsoft command-line syntax</a>. Optional arguments are surrounded by square brackets, values are surrounded by angle brackets (chevrons), and mutually exclusive items are separated by a vertical bar. Simple!</p><h2 id="Usage"><a class="docs-heading-anchor" href="#Usage">Usage</a><a id="Usage-1"></a><a class="docs-heading-anchor-permalink" href="#Usage" title="Permalink"></a></h2><h3 id="Example-1-common-usage"><a class="docs-heading-anchor" href="#Example-1-common-usage">Example 1 - common usage</a><a id="Example-1-common-usage-1"></a><a class="docs-heading-anchor-permalink" href="#Example-1-common-usage" title="Permalink"></a></h3><p>We first create an <code>ArgumentParser</code> object, then add and parse our command-line arguments. We will automagically generate a <code>usage</code> string from our key-value store of command-line arguments here, but is also possible to write your own help message instead. </p><pre><code class="language-julia hljs">using SimpleArgParse: ArgumentParser, add_argument!, add_example!, help, parse_args!, args_pairs
 
 fname = splitpath(@__FILE__)[end]
 function main()
@@ -28,7 +28,7 @@ function main()
     return 0
 end
 
-main()</code></pre><p>That is about as simple as it gets and closely follows Python&#39;s <a href="https://docs.python.org/3/library/argparse.html"><code>argparse</code></a>. </p><p>Now let&#39;s define a customized help message:</p><pre><code class="language-julia hljs">const usage = raw&quot;&quot;&quot;
+main()</code></pre><p>That is about as simple as it gets and closely follows Python&#39;s <a href="https://docs.python.org/3/library/argparse.html"><code>argparse</code></a>. </p><h3 id="Example-2-customized-help"><a class="docs-heading-anchor" href="#Example-2-customized-help">Example 2 - customized help</a><a id="Example-2-customized-help-1"></a><a class="docs-heading-anchor-permalink" href="#Example-2-customized-help" title="Permalink"></a></h3><p>Now let&#39;s define a customized help message:</p><pre><code class="language-julia hljs">const usage = raw&quot;&quot;&quot;
   Usage: main.jl --input &lt;PATH&gt; [--verbose] [--problem] [--help]
 
   A Julia script with command-line arguments.
@@ -63,7 +63,7 @@ function main()
     return 0
 end
 
-main();</code></pre><p>Now, with validating supplied arguments (read <a href="docstrings.html#Types">Types</a> Docstrings section for Validator details):</p><pre><code class="language-julia hljs">
+main();</code></pre><h3 id="Example-3-validating-arguments"><a class="docs-heading-anchor" href="#Example-3-validating-arguments">Example 3 - validating arguments</a><a id="Example-3-validating-arguments-1"></a><a class="docs-heading-anchor-permalink" href="#Example-3-validating-arguments" title="Permalink"></a></h3><p>Now, with validating supplied arguments (read <a href="docstrings.html#Types">Types</a> Docstrings section for Validator details):</p><pre><code class="language-julia hljs">
 using SimpleArgParse
 
 function main()
@@ -93,4 +93,126 @@ function main()
 
     # DO SOMETHING AMAZING with args
 
-    return nothing</code></pre><p>See usage examples in the <code>./examples</code> folder as well the testsuite <code>./test/runtests.jl</code> .</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="index.html">« Prefaces</a><a class="docs-footer-nextpage" href="afterword.html">Changelog, Licence »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.4.0 on <span class="colophon-date" title="Monday 6 May 2024 16:30">Monday 6 May 2024</span>. Using Julia version 1.10.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+    return nothing
+end
+
+main()</code></pre><h3 id="Example-4-positional-arguments,-custom-validator"><a class="docs-heading-anchor" href="#Example-4-positional-arguments,-custom-validator">Example 4 - positional arguments, custom validator</a><a id="Example-4-positional-arguments,-custom-validator-1"></a><a class="docs-heading-anchor-permalink" href="#Example-4-positional-arguments,-custom-validator" title="Permalink"></a></h3><pre><code class="language-julia hljs">using Dates
+using SimpleArgParse
+using SimpleArgParse: AbstractValidator
+import SimpleArgParse: validate
+
+@kwdef struct FullAgeValidator &lt;: AbstractValidator
+    legal_age::Int = 18
+end
+
+function validate(v::Union{AbstractString, Date}, vl::FullAgeValidator)
+    birthdate = today()
+    try
+        birthdate = Date(v)
+    catch
+        return (; ok=false, v=nothing)
+    end
+
+    d = day(birthdate)
+    m = month(birthdate)
+    fullageyear = year(birthdate) + vl.legal_age
+
+    Date(fullageyear, m, d) &gt; today() &amp;&amp; return (; ok=false, v=nothing)
+
+    return (; ok=true, v=birthdate)
+end
+
+function askandget(pp; color=pp.color)
+    colorprint(pp.interactive.introduction, color)
+    colorprint(pp.interactive.prompt, color, false)
+    answer = readline()
+    cli_args = Base.shell_split(answer)
+    parse_args!(pp; cli_args)
+    r = NamedTuple(args_pairs(pp))
+    # needhelp = get(r, :help, false)
+    if r.help
+        help(pp)
+        exit()
+    end
+    r.abort &amp;&amp; exit()
+    return r
+end
+
+function main()
+
+    color = &quot;cyan&quot;
+    prompt = &quot;legal age check&gt; &quot;
+
+    ask_full_age  = let
+        pp = ArgumentParser(; 
+            description=&quot;Asking if one is of full age&quot;, 
+            add_help=true, 
+            color = color,
+            interactive=InteractiveUsage(;
+                throw_on_exception = true,
+                introduction=&quot;Are you of full legal age? Please type y[es] or n[o] and press &lt;ENTER&gt;&quot;,
+                prompt=prompt,
+                ),       
+            )
+
+        add_argument!(pp, &quot;-y&quot;, &quot;--yes_no&quot;; 
+            type=String, 
+            positional=true,
+            description=&quot;Asking about legal age&quot;,
+            validator=StrValidator(; upper_case=true, starts_with=true, patterns=[&quot;yes&quot;, &quot;no&quot;]),
+            )
+    
+        add_argument!(pp, &quot;-a&quot;, &quot;--abort&quot;, 
+            type=Bool, 
+            default=false,
+            description=&quot;Abort?&quot;,
+            )   
+        
+        add_example!(pp, &quot;$(pp.interactive.prompt) y&quot;)
+        add_example!(pp, &quot;$(pp.interactive.prompt) --abort&quot;)
+        add_example!(pp, &quot;$(pp.interactive.prompt) --help&quot;)
+        pp
+    end
+
+    check_full_age  = let
+        pp = ArgumentParser(; 
+            description=&quot;Checking if one is of full age&quot;, 
+            add_help=true, 
+            color=color, 
+            interactive=InteractiveUsage(;
+                throw_on_exception = true,
+                introduction=&quot;Please enter your birth date in the yyyy-mm-dd format&quot;,
+                prompt=prompt,
+                ),       
+            )
+
+        add_argument!(pp, &quot;-d&quot;, &quot;--birthdate&quot;; 
+            type=Date, 
+            positional=true,
+            description=&quot;Asking about legal age&quot;,
+            validator=FullAgeValidator(),
+            )
+    
+        add_argument!(pp, &quot;-a&quot;, &quot;--abort&quot;, 
+            type=Bool, 
+            default=false, 
+            description=&quot;Abort?&quot;,
+            )   
+        
+        add_example!(pp, &quot;$(pp.interactive.prompt) 2000-02-29&quot;)
+        add_example!(pp, &quot;$(pp.interactive.prompt) --abort&quot;)
+        add_example!(pp, &quot;$(pp.interactive.prompt) --help&quot;)
+        pp
+    end
+
+    (; yes_no ) = askandget(ask_full_age)
+    yes = yes_no == &quot;YES&quot;
+    yes || return false
+
+    (; birthdate) = askandget(check_full_age )
+    println(&quot;You appear to be of full age.&quot;)
+
+    return true
+end
+
+main()</code></pre><p>See usage examples in the <code>./examples</code> folder as well the testsuite <code>./test/runtests.jl</code> .</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="index.html">« Prefaces</a><a class="docs-footer-nextpage" href="afterword.html">Changelog, Licence »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.4.0 on <span class="colophon-date" title="Friday 10 May 2024 23:43">Friday 10 May 2024</span>. Using Julia version 1.10.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
