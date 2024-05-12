@@ -1,5 +1,6 @@
 module SimpleArgParse
 
+using Compat
 using OrderedCollections: OrderedDict
 import Base.shell_split
 
@@ -11,10 +12,9 @@ export ArgForms, ArgumentParser, ArgumentValues, InteractiveUsage,
 export shell_split, add_argument!, add_example!, args_pairs, colorprint, 
     help, parse_args!, validate
 
-@static if VERSION ≥ v"1.11"
-    # therein declare public identifiers
-    include("public.jl")
-end
+# in effect in Julia ≥ v1.11
+@compat public AbstractValidator # types
+@compat public generate_usage!, get_value, getcolor, parse_arg, set_value! # functions
 
 include("validator.jl")
 include("datastructures.jl")

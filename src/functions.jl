@@ -166,7 +166,7 @@ function help(parser::ArgumentParser; color=nothing)
 end
 
 """
-    update_val!(parser::ArgumentParser, numkey::Integer, val_str::AbstractString) → parser
+    update_val!(parser::ArgumentParser, numkey::Integer, val_str::AbstractString) → ::Union{Nothing, Exception}
 
 See also `set_value!`. Function `update_val!` is internal.
 """
@@ -176,11 +176,11 @@ function update_val!(parser, numkey, val_str)
     (;ok, v, msg) = parse_arg(av.type, val_str, av.validator)
     ok || return _error(throw_on_exception(parser), msg)
 
-    return set_value!(parser, numkey, v)
+    return set_value!(parser, numkey, v) 
 end
 
 """
-    parse_args!(parser::ArgumentParser; cli_args=nothing) → ::Union{ArgumentParser, Exception}
+    parse_args!(parser::ArgumentParser; cli_args=nothing) →  ::Union{Nothing, Exception}
 
 Parses arguments, validates them and stores the updated values in the parser. 
 
@@ -225,9 +225,9 @@ function parse_args!(parser::ArgumentParser; cli_args=nothing)
         end
     end
 
-    for i::Int64 in nextarg:length(cli_args)
-        arg::String = cli_args[i]
-        argkey::String = arg2strkey(arg)
+    for i in nextarg:length(cli_args)
+        arg = cli_args[i]
+        argkey = arg2strkey(arg)
         if startswith(arg, "-")
             !haskey(parser.arg_store, argkey) && return _error(throw_on_exception(parser), "Argument not found: $(arg). Call `add_argument` before parsing.")
             numkey::UInt16 = parser.arg_store[argkey]
@@ -315,8 +315,8 @@ function hyphenate(argname::AbstractString)
 end
 
 """
-    set_value!(parser::ArgumentParser, numkey::Integer, value::Any) → parser
-    set_value!(parser::ArgumentParser, argname::AbstractString, value::Any) → parser
+    set_value!(parser::ArgumentParser, numkey::Integer, value::Any) → ::Union{Nothing, Exception}
+    set_value!(parser::ArgumentParser, argname::AbstractString, value::Any) → ::Union{Nothing, Exception}
 
 Set/update value of argument, validating it, as specified by `numkey` or `argname`, in parser.
 
@@ -336,7 +336,7 @@ function set_value!(parser::ArgumentParser, numkey::Integer, value::Any)
     (ok, value) = validate(value, vld)
     ok || return _error(thr_on_exc, "$value is not a valid value for arg $(canonicalname(vals.args))") 
     parser.kv_store[numkey] = ArgumentValues(vals.args, value, vals.type, vals.positional, vals.description, vals.validator)
-    return parser
+    return nothing
 end
 
 function set_value!(parser::ArgumentParser, argname::AbstractString, value::Any)

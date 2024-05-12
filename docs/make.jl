@@ -15,7 +15,7 @@ makedocs(
     pages = Any[
         "Prefaces" => "index.md", 
         "Usage" => "usage.md", 
-        "Changelog, Licence" => "afterword.md", 
+        "Changelog, Related packages, Licence" => "afterword.md", 
         "Docstrings" => "docstrings.md"
         ],
     checkdocs = :exports, 

@@ -83,7 +83,7 @@ using Test
         p = ArgumentParser()
         add_argument!(p, "-f", "--foo", type=String, default="bar")
         @test "bar" == get_value(p, "--foo")
-        p = set_value!(p, "--foo", "baz")
+        set_value!(p, "--foo", "baz")
         @test "baz" == get_value(p, "--foo")
     end
 
@@ -141,17 +141,41 @@ using Test
         add_argument!(p, "-f", "--foo", type=String, default="fff", description="Fff");
         add_argument!(p, "-g", "--goo", type=String, default="ggg", description="Ggg");
         add_argument!(p, "-i", "--int", type=Int, default=0, description="integer");
-        cli_args = ["-goo", "Gggg", "-f", "Ffff", "-i", "1"];
+        add_argument!(p, "-b", "--bool1", type=Bool, default=false, description="bool 1");
+        add_argument!(p, "-p", "--bool2", type=Bool, default=false, description="bool 2");
+        add_argument!(p, "-r", "--bool3", type=Bool, description="bool 3 required");
+        cli_args = ["-goo", "Gggg", "-b", "-f", "Ffff", "--bool3", "false", "-i", "1", "--bool2"];
+
+        p0 = deepcopy(p)
+
         parse_args!(p; cli_args);
+
         @test get_value(p, "--foo") == "Ffff"
         @test get_value(p, "--goo") == "Gggg"
         @test get_value(p, "--int") == 1
+        @test get_value(p, "-b")
+        @test get_value(p, "-p")
+        @test !get_value(p, "-r")        
         @test_throws ArgumentError get_value(p, "--bar")
         @test_throws ArgumentError parse_args!(p; cli_args=["-i", "1.5"])
+
+        p = deepcopy(p0)
+
+        cli_args = ["-goo", "Gggg", "-b", "-f", "Ffff", "-i", "1", "--bool2"];
+        @test_throws ArgumentError parse_args!(p; cli_args);
+
+        p = deepcopy(p0)
+
+        cli_args = ["-goo", "Gggg", "-b", "-f", "Ffff", "-i"];
+        # parse_args!(p; cli_args);
+        # v=get_value(p, "-i");
+        # @show v
+        @test_throws MethodError parse_args!(p; cli_args);
     end
 
     @testset "Testset return Exception" begin
         p = ArgumentParser(; interactive=InteractiveUsage());
+        p0 = deepcopy(p)
         add_argument!(p, "-f", "--foo", type=String, default="fff", description="Fff");
         add_argument!(p, "-g", "--goo", type=String, default="ggg", description="Ggg")
         add_argument!(p, "-i", "--int", type=Int, default=0, description="integer")
@@ -163,7 +187,12 @@ using Test
         @test get_value(p, "--int") == 1
         @test get_value(p, "-b")
         @test get_value(p, "--bar") isa ArgumentError
+        p = deepcopy(p0)
         @test parse_args!(p; cli_args=["-i", "1.5"]) isa ArgumentError
+
+        p = deepcopy(p0)
+        cli_args = ["-goo", "Gggg", "-f", "Ffff", "-i",]
+        @test parse_args!(p; cli_args) isa ArgumentError       
     end
 
     @testset "nothing is an valid default value" begin

@@ -18,7 +18,7 @@
 - Support for positional arguments [(example)](@ref "Example 4 - positional arguments, custom validator").
 - Support for use from console apps [(example)](@ref "Example 4 - positional arguments, custom validator").
 - The added function [`args_pairs`](@ref SimpleArgParse.args_pairs) returns pairs `argname => argvalue` for all arguments at once.
-- etc?...
+- Anything else?...
 
 
 #### Other changes
@@ -28,11 +28,11 @@
 - Made use of `public` keyword introduced in the coming `Julia v1.11`.
 - Test suite extended and now includes `Aqua.jl` testing, too.
 - Extensive `Documenter.jl`-based documentation you are reading now.
-- 
+- Examples added.
 
 ### Release 1.1.0
 
-Switched the hashmap keys to a simple counter, resulting in faster execution. 
+- Switched the hashmap keys to a simple counter, resulting in faster execution. 
 
 ### Release 1.0.0
 
@@ -47,6 +47,11 @@ Switched the hashmap keys to a simple counter, resulting in faster execution.
 ### Release 0.1.0
 
 - Initial launch :rocket:
+
+## Related packages
+
+- The popular [ArgParse](https://github.com/carlobaldassi/ArgParse.jl) offers much of the same functionality and more.
+- The package [GivEmExel](https://github.com/Eben60/GivEmExel.jl) relies heavily onto `SimpleArgParse` and has been the stimulus for the development of `SimpleArgParse v2`
 
 ## License
 
