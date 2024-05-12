@@ -18,7 +18,7 @@ arg2strkey(arg) = lstrip(arg, '-')
 
 
 """
-    add_argument!(parser::ArgumentParser, arg_short::String="", arg_long::String=""; kwargs...) → parser
+    add_argument!(parser::ArgumentParser, arg_short::String="", arg_long::String=""; kwargs...) → Nothing
 
 # Arguments
 - `parser::ArgumentParser`: ArgumentParser object instance.
@@ -31,6 +31,9 @@ arg2strkey(arg) = lstrip(arg, '-')
 - `positional::Bool=false`
 - `description::String=nothing`
 - `validator::Union{AbstractValidator, Nothing}=nothing` 
+
+# Throws
+- Throws immediately in case of error, e.g. if a key already present.
 
 Function `add_argument!` is exported
 """
@@ -53,17 +56,17 @@ function add_argument!(parser::ArgumentParser, arg_short::String="", arg_long::S
     ok || throw(ArgumentError("invalid default value $default for arg $(canonicalname(args))")) 
     vals::ArgumentValues = ArgumentValues(args, default, type, positional, description, validator)
     parser.kv_store[numkey] = vals
-    return parser
+    return nothing
 end
 
 """
-    add_example!(parser::ArgumentParser, example::AbstractString) → parser
+    add_example!(parser::ArgumentParser, example::AbstractString) → Nothing
 
 Function `add_example!` is exported.
 """
 function add_example!(parser::ArgumentParser, example::AbstractString)
     push!(parser.examples, example)
-    return parser
+    return Nothing
 end
 
 """
@@ -108,7 +111,7 @@ function argument_usage(v)
 end
 
 """
-    generate_usage!(parser::ArgumentParser) → ::String
+    generate_usage!(parser::ArgumentParser) → Nothing
 
 Usage/help message generator. Function `generate_usage!` is public, not exported.
 
@@ -151,7 +154,7 @@ function generate_usage!(parser::ArgumentParser)
     $(examples)
     """
     parser.usage = generated
-    return parser.usage
+    return nothing
 end
 
 """
@@ -176,7 +179,7 @@ function update_val!(parser, numkey, val_str)
     (;ok, v, msg) = parse_arg(av.type, val_str, av.validator)
     ok || return _error(throw_on_exception(parser), msg)
 
-    return set_value!(parser, numkey, v) 
+    return set_value!(parser, numkey, v) # ::Union{Nothing, Exception}
 end
 
 """
@@ -248,13 +251,11 @@ function parse_args!(parser::ArgumentParser; cli_args=nothing)
         uv = update_val!(parser, numkey, value)
         uv isa Exception && return uv
     end
-    (;ok, err) = check_missing_input(parser)
-    ok || return err
-    return parser
+    return check_missing_input(parser) # ::Union{Nothing, Exception}
 end
 
 """
-    check_missing_input(parser::ArgumentParser) → (;ok::Bool, err::Union{Nothing, Exception})
+    check_missing_input(parser::ArgumentParser) → Union{Nothing, Exception}
 
 Checks if all required arguments were supplied. Required is an argument without a default value.  
 
@@ -271,10 +272,10 @@ function check_missing_input(parser)
         if ismissing(x.value) 
             # print help and return an error
             help(parser)
-            return (;ok=false, err=_error(throw_on_exception(parser), "Required argument $(canonicalname(x)) is missing!"))
+            return _error(throw_on_exception(parser), "Required argument $(canonicalname(x)) is missing!")
         end
     end
-    return (;ok=false, err=nothing)
+    return nothing
 end
 
 """

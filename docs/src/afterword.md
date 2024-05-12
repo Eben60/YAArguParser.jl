@@ -6,10 +6,11 @@
 #### Breaking changes
 
 - Renamed exported mutating functions, e.g. `add_example => add_example!`.
+- Mutating functions do not return `ArgumentParser` anymore: They return either `nothing`, or an `Exception`.
 - Limited the number of exported functions.
 - Hashmap keys no more used, therefore `get_key` function removed.
 - Removed `has_key` function - use `haskey` instead.
-- Removed `required` field of ArgumentParser: If a default value provided, then argument is obviously optional, otherwise considered required.
+- Removed `required` field of `ArgumentParser`: If a default value provided, then argument is obviously optional, otherwise considered required.
 - Anything forgotten? - Please open an issue 🙂  
 
 #### New features
@@ -17,7 +18,8 @@
 - Support for (extensible) validators [(example)](@ref "Example 3 - validating arguments").
 - Support for positional arguments [(example)](@ref "Example 4 - positional arguments, custom validator").
 - Support for use from console apps [(example)](@ref "Example 4 - positional arguments, custom validator").
-- The added function [`args_pairs`](@ref SimpleArgParse.args_pairs) returns pairs `argname => argvalue` for all arguments at once.
+- The added function [`args_pairs`](@ref SimpleArgParse.args_pairs) makes it possible get all arguments at once as pairs `[argname => argvalue]`.
+- Depending on value of `throw_on_exception` field, functions processing the input would either throw on erroneous input, or return an `Exception` object for a less disruptive processing downstream.
 - Anything else?...
 
 

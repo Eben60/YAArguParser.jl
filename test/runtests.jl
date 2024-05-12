@@ -256,8 +256,8 @@ using Test
         add_argument!(p1, "", "--pos3", type=Int, default=0, positional=true, description="integer3");
         add_example!(p1, "1 2 3 -f \"string 1\" -int 4");
         add_example!(p1, "4 5 6 -goo \"string 2\" -i 7");
-        pu = generate_usage!(p1);
-        @test pu == generated_usage
+        generate_usage!(p1);
+        @test p1.usage == generated_usage
 
         p = deepcopy(p1)
         cli_args = ["1", "2", "3", "-goo", "Gggg", "-f", "Ffff", "-i", "1"]
