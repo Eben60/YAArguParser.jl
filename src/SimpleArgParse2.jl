@@ -1,4 +1,4 @@
-module SimpleArgParse
+module SimpleArgParse2
 
 using Compat
 using OrderedCollections: OrderedDict
@@ -23,4 +23,4 @@ include("utilities.jl")
 
 include("precompile.jl")
 
-end # module SimpleArgParse
+end # module SimpleArgParse2

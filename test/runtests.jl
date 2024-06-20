@@ -1,17 +1,17 @@
-using SimpleArgParse
+using SimpleArgParse2
 
-using SimpleArgParse: ArgumentParser, add_argument!, add_example!, generate_usage!, help, parse_args!, get_value, set_value! 
+using SimpleArgParse2: ArgumentParser, add_argument!, add_example!, generate_usage!, help, parse_args!, get_value, set_value! 
 
-using SimpleArgParse: StrValidator, validate, RealValidator, positional_args, args_pairs, ArgForms, args2vec, sort_args, canonicalname
+using SimpleArgParse2: StrValidator, validate, RealValidator, positional_args, args_pairs, ArgForms, args2vec, sort_args, canonicalname
 
 using Aqua, Suppressor
 
 alltests = !(isdefined(@__MODULE__, :complete_tests) && !complete_tests)
-alltests && Aqua.test_all(SimpleArgParse)
+alltests && Aqua.test_all(SimpleArgParse2)
 
 using Test
 
-@testset "SimpleArgParse tests" begin
+@testset "SimpleArgParse2 tests" begin
 
     @testset "Testset empty constructor" begin
         p = ArgumentParser()
