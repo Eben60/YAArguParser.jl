@@ -91,3 +91,10 @@ Command-line argument parser with numkey-value stores and attributes. Type `Argu
     color::String = "default"
     interactive::Union{Nothing, InteractiveUsage} = nothing
 end
+
+function argparser(;throw_on_exception=nothing, introduction=nothing, prompt=nothing, kwargs...) 
+    isnothing(throw_on_exception) && isnothing(introduction) && isnothing(prompt) && return ArgumentParser(;kwargs...)
+    return ArgumentParser(;interactive=InteractiveUsage(;throw_on_exception, introduction, prompt), kwargs...)
+end
+
+export argparser

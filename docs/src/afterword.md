@@ -11,6 +11,7 @@
 - Hashmap keys no more used, therefore `get_key` function removed.
 - Removed `has_key` function - use `haskey` instead.
 - Removed `required` field of `ArgumentParser`: If a default value provided, then argument is obviously optional, otherwise considered required.
+- Minimal `Julia` version set to `v1.9`
 - Anything forgotten? - Please open an issue 🙂  
 
 #### New features

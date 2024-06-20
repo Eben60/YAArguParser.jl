@@ -6,7 +6,8 @@ using SimpleArgParse: StrValidator, validate, RealValidator, positional_args, ar
 
 using Aqua, Suppressor
 
-Aqua.test_all(SimpleArgParse)
+alltests = !(isdefined(@__MODULE__, :complete_tests) && !complete_tests)
+alltests && Aqua.test_all(SimpleArgParse)
 
 using Test
 
@@ -375,6 +376,17 @@ using Test
         @test get_value(p, "--str5") == "s5" 
         @test !get_value(p, "-b")            
     end
+
+    # @testset "argparser" begin
+    #     p = ArgumentParser()
+    #     @test isnothing(p.interactive)
+    #     p = argparser()
+    #     @test isnothing(p.interactive)
+    #     p = argparser(; throw_on_exception=false)     
+    #     ia = p.interactive
+    #     @test !ia.throw_on_exception
+    #     @test prompt == "> "
+    # end
 
 end
 

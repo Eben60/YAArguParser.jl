@@ -1,7 +1,6 @@
-# push!(LOAD_PATH,"../src/")
 using Pkg
-
-splitpath(Base.active_project())[end-1] == "docs" || Pkg.activate(@__DIR__)
+Pkg.activate(@__DIR__)
+Pkg.develop(path=(joinpath(@__DIR__, "../") |> normpath))
 
 using Documenter, SimpleArgParse
 
