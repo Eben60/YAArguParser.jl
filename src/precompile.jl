@@ -7,10 +7,6 @@ using PrecompileTools: @setup_workload, @compile_workload
 
     p = ArgumentParser(
         description="test",
-        authors=["first last <first.last@foo.bar>"],
-        documentation="server/docs",
-        repository="server/repo",
-        license="license",
         usage="julia main.jl --arg val",
         add_help=true,
         color = "magenta",

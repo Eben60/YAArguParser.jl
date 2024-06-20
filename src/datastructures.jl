@@ -64,27 +64,20 @@ Command-line argument parser with numkey-value stores and attributes. Type `Argu
 - `arg_store::OrderedDict{String,UInt16} = OrderedDict()`: numkey-value store: `arg => numkey`
 - `lng::UInt16 = 0`: counter of stored args
 ## attributes
-- `filename::String = ""`: file name
 - `description::String = ""`: description
-- `authors::Vector{String} = String[]`: name of author(s): First Last <first.last@email.address>
-- `documentation::String = ""`: URL of documentations
-- `repository::String = ""`: URL of software repository
-- `license::String = ""`: name of license
+- `usage::String = ""`: The script name passed to Julia from the command line.
 - `usage::String = ""`: usage/help message
 - `examples::Vector{String} = String[]`: usage examples
 - `add_help::Bool = false`: flag to automatically generate a help message
+- `color::String = "default"`: output color - see also [`ANSICODES`](@ref)
 - `interactive::Union{Nothing, InteractiveUsage} = nothing`: interactive usage attributes (see `InteractiveUsage`)
 """
 @kwdef mutable struct ArgumentParser
     kv_store::OrderedDict{UInt16,ArgumentValues} = OrderedDict()
     arg_store::OrderedDict{String,UInt16} = OrderedDict()
     lng::UInt16 = 0
-    filename::String = ""
     description::String = ""
-    authors::Vector{String} = String[]
-    documentation::String = ""
-    repository::String = ""
-    license::String = ""
+    filename::String = ""
     usage::String = ""
     examples::Vector{String} = String[]
     add_help::Bool = false

@@ -16,10 +16,6 @@ using Test
     @testset "Testset empty constructor" begin
         p = ArgumentParser()
         @test isempty(p.description)
-        @test isempty(p.authors)
-        @test isempty(p.documentation)
-        @test isempty(p.repository)
-        @test isempty(p.license)
         @test isempty(p.usage)
         @test !p.add_help
     end
@@ -33,10 +29,6 @@ using Test
     
         p = ArgumentParser(
             description="test",
-            authors=["first last <first.last@foo.bar>"],
-            documentation="server/docs",
-            repository="server/repo",
-            license="license",
             usage="julia main.jl --arg val",
             add_help=true,
             color = "magenta",
@@ -44,10 +36,6 @@ using Test
             )
 
         @test "test" == p.description
-        @test ["first last <first.last@foo.bar>"] == p.authors
-        @test "server/docs" == p.documentation
-        @test "server/repo" == p.repository
-        @test "license" == p.license
         @test "julia main.jl --arg val" == p.usage
         @test p.add_help
         @test !p.interactive.throw_on_exception
