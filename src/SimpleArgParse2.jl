@@ -5,7 +5,7 @@ using OrderedCollections: OrderedDict
 import Base.shell_split
 
 # types
-export ArgForms, ArgumentParser, ArgumentValues, InteractiveUsage,
+export ArgForms, AbstractArgumentParser, ArgumentValues, InteractiveUsage,
     RealValidator, StrValidator
 
 # functions
@@ -18,6 +18,7 @@ export shell_split, add_argument!, add_example!, args_pairs, colorprint,
 
 include("validator.jl")
 include("datastructures.jl")
+# include("legacy_parser.jl")
 include("functions.jl")
 include("utilities.jl")
 

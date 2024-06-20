@@ -47,13 +47,13 @@ function colorize(text::AbstractString; color::AbstractString="default", backgro
 end
 
 """
-    getcolor(parser::ArgumentParser, color=nothing)  → color::String
+    getcolor(parser::AbstractArgumentParser, color=nothing)  → color::String
 
 Returns `color` in case second arg is defined, otherwise the color defined in `parser`, or "default".
 
 Function `getcolor` is public, not exported.
 """
-function getcolor(parser::ArgumentParser, color=nothing) 
+function getcolor(parser::AbstractArgumentParser, color=nothing) 
     !isnothing(color) && return color   
     return isnothing(parser.color) ? 
         "default" : parser.color
@@ -61,10 +61,10 @@ end
 
 """
     colorprint(text, color::AbstractString="default", newline=true; background=false, bright=false) → nothing
-    colorprint(text, parser::ArgumentParser, newline=true; background=false, bright=false) → nothing
+    colorprint(text, parser::AbstractArgumentParser, newline=true; background=false, bright=false) → nothing
 
 Print colored text into stdout. For color table, see help to internal `colorize` function. 
-If second arg is an `ArgumentParser`, uses color as defined within, if any, otherwise uses `default`.
+If second arg is an `AbstractArgumentParser`, uses color as defined within, if any, otherwise uses `default`.
 
 Function `colorprint` is exported.
 """
@@ -73,18 +73,18 @@ function colorprint(text, color="default", newline=true; background=false, brigh
     newline && println()
 end
 
-colorprint(text, parser::ArgumentParser, newline=true; background=false, bright=false) = 
+colorprint(text, parser::AbstractArgumentParser, newline=true; background=false, bright=false) = 
     colorprint(text, getcolor(parser), newline; background, bright)
 
 argpair(s, parser) = Symbol(s) => get_value(parser, s)
 
-_keys(parser::ArgumentParser) = [arg2strkey(v.args.long) for v in values(parser.kv_store)]
+_keys(parser::AbstractArgumentParser) = [arg2strkey(v.args.long) for v in values(parser.kv_store)]
 
 canonicalname(argf::ArgForms) = lstrip((isempty(argf.long) ? argf.short : argf.long), '-')
 canonicalname(argvs::ArgumentValues) = canonicalname(argvs.args)
 
 """
-    args_pairs(parser::ArgumentParser; excl::Union{Nothing, Vector{String}}=nothing) → ::Vector{Pair{Symbol, Any}}
+    args_pairs(parser::AbstractArgumentParser; excl::Union{Nothing, Vector{String}}=nothing) → ::Vector{Pair{Symbol, Any}}
 
 Return vector of pairs `argname => argvalue` for all arguments except listed in `excl`.
     If argument has both short and long forms, the long one is used. Returned value can 
@@ -93,7 +93,7 @@ Return vector of pairs `argname => argvalue` for all arguments except listed in 
 
 Function `args_pairs` is exported.
 """
-function args_pairs(parser::ArgumentParser; excl=nothing)
+function args_pairs(parser::AbstractArgumentParser; excl=nothing)
     isnothing(excl) && (excl=[])
     args = collect(values(parser.kv_store))
     filter!(x -> !isnothing(x.value), args)
@@ -101,18 +101,48 @@ function args_pairs(parser::ArgumentParser; excl=nothing)
     return [Symbol(canonicalname(a)) => a.value for a in args]
 end
 
-positional_args(parser::ArgumentParser) = [x for x in values(parser.kv_store) if x.positional]
+positional_args(parser::AbstractArgumentParser) = [x for x in values(parser.kv_store) if x.positional]
 
 throw_on_exception(::Nothing) = true
-throw_on_exception(parser::ArgumentParser) = throw_on_exception(parser.interactive)
+throw_on_exception(parser::AbstractArgumentParser) = throw_on_exception(parser.interactive)
 throw_on_exception(x::InteractiveUsage) = x.throw_on_exception
 
 """
-    haskey(parser::ArgumentParser, key::AbstractString) → ::Bool
-    haskey(parser::ArgumentParser, key::Integer) → ::Bool
+    haskey(parser::AbstractArgumentParser, key::AbstractString) → ::Bool
+    haskey(parser::AbstractArgumentParser, key::Integer) → ::Bool
 """
-Base.haskey(parser::ArgumentParser, key::AbstractString) = haskey(parser.arg_store, arg2strkey(key))   
-Base.haskey(parser::ArgumentParser, key::Integer) = haskey(parser.kv_store, key)
+Base.haskey(parser::AbstractArgumentParser, key::AbstractString) = haskey(parser.arg_store, arg2strkey(key))   
+Base.haskey(parser::AbstractArgumentParser, key::Integer) = haskey(parser.kv_store, key)
+
+getnestedparsers(p::AbstractArgumentParser) = [getfield(p, f) for f in fieldnames(typeof(p)) if getfield(p, f) isa AbstractArgumentParser]
+
+function Base.hasproperty(p::AbstractArgumentParser, s::Symbol)
+    hasfield(typeof(p), s) && return true
+    for np in getnestedparsers(p)
+        hasproperty(np, s) && return true
+    end
+    return false
+end
+
+function Base.getproperty(p::AbstractArgumentParser, s::Symbol)
+    hasfield(typeof(p), s) && return getfield(p, s)
+    for np in getnestedparsers(p)
+        hasproperty(np, s) && return getproperty(np, s)
+    end
+    return error("type $(typeof(p)) has no property $s")
+end
+
+function Base.setproperty!(p::AbstractArgumentParser, s::Symbol, x)
+    if hasfield(typeof(p), s) 
+        T = typeof(getfield(p, s))
+        return setfield!(p, s, convert(T, x))
+    end
+    for np in getnestedparsers(p)
+        hasproperty(np, s) && return setproperty!(np, s, x)
+    end
+    return error("type $(typeof(p)) has no property $s")
+end
+
 
 """
     shell_split(s::AbstractString) → String[]

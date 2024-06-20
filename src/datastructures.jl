@@ -53,10 +53,12 @@ Type `InteractiveUsage` is exported.
     prompt::String = "> "
 end
 
-"""
-    ArgumentParser
+abstract type AbstractArgumentParser end
 
-Command-line argument parser with numkey-value stores and attributes. Type `ArgumentParser` is exported.
+"""
+    ArgumentParser <: AbstractArgumentParser
+
+Command-line argument parser with numkey-value stores and attributes. Type `AbstractArgumentParser` is exported.
 
 # Fields
 ## stores
@@ -72,7 +74,7 @@ Command-line argument parser with numkey-value stores and attributes. Type `Argu
 - `color::String = "default"`: output color - see also [`ANSICODES`](@ref)
 - `interactive::Union{Nothing, InteractiveUsage} = nothing`: interactive usage attributes (see `InteractiveUsage`)
 """
-@kwdef mutable struct ArgumentParser
+@kwdef mutable struct ArgumentParser <: AbstractArgumentParser
     kv_store::OrderedDict{UInt16,ArgumentValues} = OrderedDict()
     arg_store::OrderedDict{String,UInt16} = OrderedDict()
     lng::UInt16 = 0

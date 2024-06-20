@@ -18,10 +18,10 @@ arg2strkey(arg) = lstrip(arg, '-')
 
 
 """
-    add_argument!(parser::ArgumentParser, arg_short::String="", arg_long::String=""; kwargs...) → Nothing
+    add_argument!(parser::AbstractArgumentParser, arg_short::String="", arg_long::String=""; kwargs...) → Nothing
 
 # Arguments
-- `parser::ArgumentParser`: ArgumentParser object instance.
+- `parser::AbstractArgumentParser`: AbstractArgumentParser object instance.
 - `arg_short::String=""`: short argument flag.
 - `arg_long::String=""`: long argument flag.
 
@@ -37,7 +37,7 @@ arg2strkey(arg) = lstrip(arg, '-')
 
 Function `add_argument!` is exported
 """
-function add_argument!(parser::ArgumentParser, arg_short::String="", arg_long::String="";
+function add_argument!(parser::AbstractArgumentParser, arg_short::String="", arg_long::String="";
     type::Type=Any, positional=false, default=missing, description::String="", validator=nothing)
 
     args::ArgForms = ArgForms(arg_short, arg_long)
@@ -60,17 +60,17 @@ function add_argument!(parser::ArgumentParser, arg_short::String="", arg_long::S
 end
 
 """
-    add_example!(parser::ArgumentParser, example::AbstractString) → Nothing
+    add_example!(parser::AbstractArgumentParser, example::AbstractString) → Nothing
 
 Function `add_example!` is exported.
 """
-function add_example!(parser::ArgumentParser, example::AbstractString)
+function add_example!(parser::AbstractArgumentParser, example::AbstractString)
     push!(parser.examples, example)
     return Nothing
 end
 
 """
-    sort_args(parser::ArgumentParser) → (;pos_args, keyed_args, all_args)
+    sort_args(parser::AbstractArgumentParser) → (;pos_args, keyed_args, all_args)
 
 Function `sort_args` is internal.
 """
@@ -111,7 +111,7 @@ function argument_usage(v)
 end
 
 """
-    generate_usage!(parser::ArgumentParser) → Nothing
+    generate_usage!(parser::AbstractArgumentParser) → Nothing
 
 Usage/help message generator. Function `generate_usage!` is public, not exported.
 
@@ -130,7 +130,7 @@ Examples:
   \$ julia main.jl --input dir/file.txt --verbose
   \$ julia main.jl --help
 """
-function generate_usage!(parser::ArgumentParser)
+function generate_usage!(parser::AbstractArgumentParser)
     usage::String = "Usage: $(parser.filename)"
     options::String = "Options:"
 
@@ -158,18 +158,18 @@ function generate_usage!(parser::ArgumentParser)
 end
 
 """
-    help(parser::ArgumentParser; color::Union{AbstractString, Nothing}) → nothing
+    help(parser::AbstractArgumentParser; color::Union{AbstractString, Nothing}) → nothing
 
 Print usage/help message. Function `help` is exported.
 """
-function help(parser::ArgumentParser; color=nothing)
+function help(parser::AbstractArgumentParser; color=nothing)
     color = getcolor(parser, color)
     colorprint(parser.usage, color)
     return nothing
 end
 
 """
-    update_val!(parser::ArgumentParser, numkey::Integer, val_str::AbstractString) → ::Union{Nothing, Exception}
+    update_val!(parser::AbstractArgumentParser, numkey::Integer, val_str::AbstractString) → ::Union{Nothing, Exception}
 
 See also `set_value!`. Function `update_val!` is internal.
 """
@@ -183,7 +183,7 @@ function update_val!(parser, numkey, val_str)
 end
 
 """
-    parse_args!(parser::ArgumentParser; cli_args=nothing) →  ::Union{Nothing, Exception}
+    parse_args!(parser::AbstractArgumentParser; cli_args=nothing) →  ::Union{Nothing, Exception}
 
 Parses arguments, validates them and stores the updated values in the parser. 
 
@@ -199,7 +199,7 @@ Parses arguments, validates them and stores the updated values in the parser.
 
 Function `parse_args!` is exported.
 """
-function parse_args!(parser::ArgumentParser; cli_args=nothing)
+function parse_args!(parser::AbstractArgumentParser; cli_args=nothing)
     isnothing(cli_args) && (cli_args=ARGS)
     if parser.add_help 
         haskey(parser, "help") || 
@@ -255,7 +255,7 @@ function parse_args!(parser::ArgumentParser; cli_args=nothing)
 end
 
 """
-    check_missing_input(parser::ArgumentParser) → Union{Nothing, Exception}
+    check_missing_input(parser::AbstractArgumentParser) → Union{Nothing, Exception}
 
 Checks if all required arguments were supplied. Required is an argument without a default value.  
 
@@ -284,7 +284,7 @@ end
 Get argument value from parser. 
 
 # Arguments
-- `parser::ArgumentParser`: ArgumentParser object instance.
+- `parser::AbstractArgumentParser`: AbstractArgumentParser object instance.
 - `arg::AbstractString=""`: argument name, e.g. `"-f"`, `"--foo"`.
 
 # Throws
@@ -294,7 +294,7 @@ Get argument value from parser.
 
 Function `get_value` is public, not exported.
 """
-function get_value(parser::ArgumentParser, arg::AbstractString)
+function get_value(parser::AbstractArgumentParser, arg::AbstractString)
     argkey::String = arg2strkey(arg)
     !haskey(parser.arg_store, argkey) && return _error(throw_on_exception(parser), "Argument not found: $(arg). Run `add_argument` first.")
     numkey::UInt16 = parser.arg_store[argkey]
@@ -316,8 +316,8 @@ function hyphenate(argname::AbstractString)
 end
 
 """
-    set_value!(parser::ArgumentParser, numkey::Integer, value::Any) → ::Union{Nothing, Exception}
-    set_value!(parser::ArgumentParser, argname::AbstractString, value::Any) → ::Union{Nothing, Exception}
+    set_value!(parser::AbstractArgumentParser, numkey::Integer, value::Any) → ::Union{Nothing, Exception}
+    set_value!(parser::AbstractArgumentParser, argname::AbstractString, value::Any) → ::Union{Nothing, Exception}
 
 Set/update value of argument, validating it, as specified by `numkey` or `argname`, in parser.
 
@@ -328,7 +328,7 @@ Set/update value of argument, validating it, as specified by `numkey` or `argnam
 
 Function `set_value!` is public, not exported.
 """
-function set_value!(parser::ArgumentParser, numkey::Integer, value::Any)
+function set_value!(parser::AbstractArgumentParser, numkey::Integer, value::Any)
     thr_on_exc = throw_on_exception(parser)
     !haskey(parser.kv_store, numkey) && return _error(thr_on_exc, "Key not found in store.")
     vals::ArgumentValues = parser.kv_store[numkey]
@@ -340,7 +340,7 @@ function set_value!(parser::ArgumentParser, numkey::Integer, value::Any)
     return nothing
 end
 
-function set_value!(parser::ArgumentParser, argname::AbstractString, value::Any)
+function set_value!(parser::AbstractArgumentParser, argname::AbstractString, value::Any)
     thr_on_exc =throw_on_exception(parser)
     strkey = arg2strkey(argname)
     !haskey(parser.arg_store, strkey) && return _error(thr_on_exc, "Argument not found in store.")

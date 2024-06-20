@@ -4,6 +4,8 @@ using SimpleArgParse2: ArgumentParser, add_argument!, add_example!, generate_usa
 
 using SimpleArgParse2: StrValidator, validate, RealValidator, positional_args, args_pairs, ArgForms, args2vec, sort_args, canonicalname
 
+using SimpleArgParse2: getnestedparsers
+
 using Aqua, Suppressor
 
 alltests = !(isdefined(@__MODULE__, :complete_tests) && !complete_tests)
@@ -364,6 +366,26 @@ using Test
         @test get_value(p, "--str5") == "s5" 
         @test !get_value(p, "-b")            
     end
+
+    @testset "AbstractArgumentParser" begin
+        include("../src/legacy_parser.jl")
+        ap = ArgumentParser()
+        lp = LegacyArgumentParser(; documentation="bar", ap=ArgumentParser(;description="baz"))
+        @test isempty(getnestedparsers(ap))
+        @test getnestedparsers(lp)[1] isa ArgumentParser
+        @test hasproperty(lp, :documentation)
+        @test hasproperty(lp, :ap)
+        @test hasproperty(lp, :kv_store)
+        @test hasproperty(ap, :kv_store)
+        @test ! hasproperty(lp, :not_a_property)
+        @test lp.documentation == "bar" 
+        @test lp.description == "baz"
+        @test_throws ErrorException lp.not_a_property
+#        @test_throws ErrorException lp.not_a_property = 1
+
+
+    end
+
 
     # @testset "argparser" begin
     #     p = ArgumentParser()
