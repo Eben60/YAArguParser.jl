@@ -47,11 +47,6 @@ Type `InteractiveUsage` is exported.
 - `introduction::String = ""`: explanation or introduction to be shown before prompt on a separate line
 - `prompt::String = "> "`
 """
-@kwdef struct InteractiveUsage
-    throw_on_exception::Bool=false
-    introduction::String = ""
-    prompt::String = "> "
-end
 
 abstract type AbstractArgumentParser end
 
@@ -87,9 +82,17 @@ Command-line argument parser with numkey-value stores and attributes. Type `Abst
     interactive::Union{Nothing, InteractiveUsage} = nothing
 end
 
-function argparser(;throw_on_exception=nothing, introduction=nothing, prompt=nothing, kwargs...) 
-    isnothing(throw_on_exception) && isnothing(introduction) && isnothing(prompt) && return ArgumentParser(;kwargs...)
-    return ArgumentParser(;interactive=InteractiveUsage(;throw_on_exception, introduction, prompt), kwargs...)
+@kwdef mutable struct InteractiveArgumentParser <: AbstractArgumentParser
+    ap::ArgumentParser = ArgumentParser()
+    throw_on_exception::Bool=false
+    introduction::String = ""
+    prompt::String = "> "
 end
 
-export argparser
+
+# function argparser(;throw_on_exception=nothing, introduction=nothing, prompt=nothing, kwargs...) 
+#     isnothing(throw_on_exception) && isnothing(introduction) && isnothing(prompt) && return ArgumentParser(;kwargs...)
+#     return ArgumentParser(;interactive=InteractiveUsage(;throw_on_exception, introduction, prompt), kwargs...)
+# end
+
+# export argparser

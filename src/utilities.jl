@@ -104,8 +104,10 @@ end
 positional_args(parser::AbstractArgumentParser) = [x for x in values(parser.kv_store) if x.positional]
 
 throw_on_exception(::Nothing) = true
-throw_on_exception(parser::AbstractArgumentParser) = throw_on_exception(parser.interactive)
-throw_on_exception(x::InteractiveUsage) = x.throw_on_exception
+function throw_on_exception(p::AbstractArgumentParser)
+    hasproperty(p, :throw_on_exception) && return p.throw_on_exception
+    return true
+end
 
 """
     haskey(parser::AbstractArgumentParser, key::AbstractString) → ::Bool

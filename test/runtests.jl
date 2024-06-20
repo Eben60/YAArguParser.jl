@@ -4,7 +4,7 @@ using SimpleArgParse2: ArgumentParser, add_argument!, add_example!, generate_usa
 
 using SimpleArgParse2: StrValidator, validate, RealValidator, positional_args, args_pairs, ArgForms, args2vec, sort_args, canonicalname
 
-using SimpleArgParse2: getnestedparsers
+using SimpleArgParse2: getnestedparsers, throw_on_exception
 
 using Aqua, Suppressor
 
@@ -23,27 +23,27 @@ using Test
     end
 
     @testset "Testset parameterized constructor" begin
-
-        ia = InteractiveUsage(throw_on_exception = false,
-            introduction = "story to tell",
-            prompt = "--/ ",
-            )
     
-        p = ArgumentParser(
+        ap = ArgumentParser(
             description="test",
             usage="julia main.jl --arg val",
             add_help=true,
             color = "magenta",
-            interactive=ia,
+            )
+
+        p = InteractiveArgumentParser(; ap,
+            throw_on_exception = false,
+            introduction = "story to tell",
+            prompt = "--/ ",
             )
 
         @test "test" == p.description
         @test "julia main.jl --arg val" == p.usage
         @test p.add_help
-        @test !p.interactive.throw_on_exception
+        @test !p.throw_on_exception
         @test p.color == "magenta"
-        @test p.interactive.introduction == "story to tell"
-        @test p.interactive.prompt == "--/ "
+        @test p.introduction == "story to tell"
+        @test p.prompt == "--/ "
     end
 
     @testset "Testset add_argument!" begin
@@ -165,7 +165,7 @@ using Test
     end
 
     @testset "Testset return Exception" begin
-        p = ArgumentParser(; interactive=InteractiveUsage());
+        p = InteractiveArgumentParser();
         p0 = deepcopy(p)
         add_argument!(p, "-f", "--foo", type=String, default="fff", description="Fff");
         add_argument!(p, "-g", "--goo", type=String, default="ggg", description="Ggg")
@@ -177,6 +177,7 @@ using Test
         @test get_value(p, "--goo") == "Gggg"
         @test get_value(p, "--int") == 1
         @test get_value(p, "-b")
+        @test ! throw_on_exception(p)
         @test get_value(p, "--bar") isa ArgumentError
         p = deepcopy(p0)
         @test parse_args!(p; cli_args=["-i", "1.5"]) isa ArgumentError

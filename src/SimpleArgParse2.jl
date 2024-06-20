@@ -6,7 +6,7 @@ import Base.shell_split
 
 # types
 export ArgForms, AbstractArgumentParser, ArgumentValues, InteractiveUsage,
-    RealValidator, StrValidator
+    RealValidator, StrValidator, ArgumentParser, InteractiveArgumentParser
 
 # functions
 export shell_split, add_argument!, add_example!, args_pairs, colorprint, 
