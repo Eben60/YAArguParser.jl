@@ -152,6 +152,7 @@ function Base.propertynames(p::AbstractArgumentParser, private::Bool=false)
         pp = getproperty(p, f)
         pp isa AbstractArgumentParser && append!(pns, propertynames(pp))
     end
+    allunique(pns) || error("$(typeof(p)) has nonunique fields $(symdiff(pns, unique(pns)))")
     return Tuple(pns)
 end
 

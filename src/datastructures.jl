@@ -89,6 +89,7 @@ end
 
 function initparser(AP, strict=true; kwargs...)
     p = AP()
+    propertynames(p) # will check if all AP fields are unique
     for (k, v) in kwargs
         if hasproperty(p, k)
             setproperty!(p, k, v)

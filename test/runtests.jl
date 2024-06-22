@@ -394,6 +394,13 @@ using Test
         @test Set(propertynames(ip)) == Set((:ap, :kv_store, :arg_store, :lng, :description, :filename, 
             :usage, :examples, :add_help, :color, :throw_on_exception, :introduction, :prompt))
 
+        @kwdef struct RedundantParser  <: AbstractArgumentParser
+            ap1::ArgumentParser = ArgumentParser()
+            foo::String = ""
+            ap2::ArgumentParser = ArgumentParser()
+        end
+
+        @test_throws ErrorException initparser(RedundantParser; foo="FOO")
     end
 
 
