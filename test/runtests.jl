@@ -368,7 +368,7 @@ using Test
         @test !get_value(p, "-b")            
     end
 
-    @testset "AbstractArgumentParser" begin
+    @testset "Extendable ArgumentParser" begin
         include("../src/legacy_parser.jl")
         ap = ArgumentParser()
         lp = LegacyArgumentParser(; documentation="bar", ap=ArgumentParser(;description="baz"))
@@ -382,8 +382,17 @@ using Test
         @test lp.documentation == "bar" 
         @test lp.description == "baz"
         @test_throws ErrorException lp.not_a_property
-#        @test_throws ErrorException lp.not_a_property = 1
 
+        @test_throws ErrorException initparser(InteractiveArgumentParser; wrongfield=1)
+        @test initparser(InteractiveArgumentParser, false; wrongfield=1, add_help=true).add_help
+#       
+        ip = initparser(InteractiveArgumentParser; 
+            description="blablabla", color="magenta", add_help=true, throw_on_exception=true)
+        
+        @test ip.throw_on_exception
+        @test ip.ap.description == ip.description == "blablabla"
+        @test Set(propertynames(ip)) == Set((:ap, :kv_store, :arg_store, :lng, :description, :filename, 
+            :usage, :examples, :add_help, :color, :throw_on_exception, :introduction, :prompt))
 
     end
 

@@ -67,7 +67,6 @@ Command-line argument parser with numkey-value stores and attributes. Type `Abst
 - `examples::Vector{String} = String[]`: usage examples
 - `add_help::Bool = false`: flag to automatically generate a help message
 - `color::String = "default"`: output color - see also [`ANSICODES`](@ref)
-- `interactive::Union{Nothing, InteractiveUsage} = nothing`: interactive usage attributes (see `InteractiveUsage`)
 """
 @kwdef mutable struct ArgumentParser <: AbstractArgumentParser
     kv_store::OrderedDict{UInt16,ArgumentValues} = OrderedDict()
@@ -79,7 +78,6 @@ Command-line argument parser with numkey-value stores and attributes. Type `Abst
     examples::Vector{String} = String[]
     add_help::Bool = false
     color::String = "default"
-    interactive::Union{Nothing, InteractiveUsage} = nothing
 end
 
 @kwdef mutable struct InteractiveArgumentParser <: AbstractArgumentParser
@@ -89,6 +87,17 @@ end
     prompt::String = "> "
 end
 
+function initparser(AP, strict=true; kwargs...)
+    p = AP()
+    for (k, v) in kwargs
+        if hasproperty(p, k)
+            setproperty!(p, k, v)
+        elseif strict
+            error("$AP has no property $k")
+        end
+    end
+    return p
+end
 
 # function argparser(;throw_on_exception=nothing, introduction=nothing, prompt=nothing, kwargs...) 
 #     isnothing(throw_on_exception) && isnothing(introduction) && isnothing(prompt) && return ArgumentParser(;kwargs...)

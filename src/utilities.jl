@@ -145,6 +145,16 @@ function Base.setproperty!(p::AbstractArgumentParser, s::Symbol, x)
     return error("type $(typeof(p)) has no property $s")
 end
 
+function Base.propertynames(p::AbstractArgumentParser, private::Bool=false)
+    pns = Symbol[]
+    for f in fieldnames(typeof(p))
+        push!(pns, f)
+        pp = getproperty(p, f)
+        pp isa AbstractArgumentParser && append!(pns, propertynames(pp))
+    end
+    return Tuple(pns)
+end
+
 
 """
     shell_split(s::AbstractString) → String[]

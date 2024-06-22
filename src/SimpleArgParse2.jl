@@ -5,12 +5,12 @@ using OrderedCollections: OrderedDict
 import Base.shell_split
 
 # types
-export ArgForms, AbstractArgumentParser, ArgumentValues, InteractiveUsage,
+export ArgForms, AbstractArgumentParser, ArgumentValues, 
     RealValidator, StrValidator, ArgumentParser, InteractiveArgumentParser
 
 # functions
 export shell_split, add_argument!, add_example!, args_pairs, colorprint, 
-    help, parse_args!, validate
+    help, parse_args!, validate, initparser
 
 # in effect in Julia ≥ v1.11
 @compat public AbstractValidator # types
