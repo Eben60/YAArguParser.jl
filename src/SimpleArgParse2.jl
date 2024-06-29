@@ -5,8 +5,7 @@ using OrderedCollections: OrderedDict
 import Base.shell_split
 
 # types
-export ArgForms, ArgumentValues, 
-    RealValidator, StrValidator, ArgumentParser, InteractiveArgumentParser
+export ArgForms, ArgumentValues, RealValidator, StrValidator, ArgumentParser, InteractiveArgumentParser
 
 # functions
 export shell_split, add_argument!, add_example!, args_pairs, colorprint, 

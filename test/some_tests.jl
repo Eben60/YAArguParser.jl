@@ -1,10 +1,7 @@
 using SimpleArgParse2
 
-using SimpleArgParse2: ArgumentParser, add_argument!, add_example!, generate_usage!, help, parse_args!, get_value, set_value! 
-
-using SimpleArgParse2: StrValidator, validate, RealValidator, positional_args, args_pairs, ArgForms, args2vec, sort_args, canonicalname
-
-using SimpleArgParse2: getnestedparsers, throw_on_exception
+using SimpleArgParse2: AbstractArgumentParser, get_value, set_value!, positional_args, args2vec, 
+    sort_args, canonicalname, getnestedparsers, throw_on_exception, generate_usage!
 
 using Aqua, Suppressor
 
