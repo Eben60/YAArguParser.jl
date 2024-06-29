@@ -1,6 +1,6 @@
 [deps]
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
-SimpleArgParse = "4c739d64-e22d-44e1-ada1-53a1c3c0e953"
+SimpleArgParse2 = "e3fa765b-3027-4ef3-bb12-e639c1e60c6e"
 
 [compat]
 Documenter = "1"

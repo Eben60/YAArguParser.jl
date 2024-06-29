@@ -19,7 +19,7 @@
 - Support for (extensible) validators [(example)](@ref "Example 3 - validating arguments").
 - Support for positional arguments [(example)](@ref "Example 4 - positional arguments, custom validator").
 - Support for use from console apps [(example)](@ref "Example 4 - positional arguments, custom validator").
-- The added function [`args_pairs`](@ref SimpleArgParse.args_pairs) makes it possible get all arguments at once as pairs `[argname => argvalue]`.
+- The added function [`args_pairs`](@ref SimpleArgParse2.args_pairs) makes it possible get all arguments at once as pairs `[argname => argvalue]`.
 - Depending on value of `throw_on_exception` field, functions processing the input would either throw on erroneous input, or return an `Exception` object for a less disruptive processing downstream.
 - Anything else?...
 
@@ -54,7 +54,7 @@
 ## Related packages
 
 - The popular [ArgParse](https://github.com/carlobaldassi/ArgParse.jl) offers much of the same functionality and more.
-- The package [GivEmExel](https://github.com/Eben60/GivEmExel.jl) relies heavily onto `SimpleArgParse` and has been the stimulus for the development of `SimpleArgParse v2`
+- The package [GivEmExel](https://github.com/Eben60/GivEmExel.jl) relies heavily onto `SimpleArgParse2` and has been the stimulus for the development of `SimpleArgParse2 v2`
 
 ## License
 
@@ -63,10 +63,10 @@ MIT License
 [Julia]: http://julialang.org
 
 [docs-img]: https://img.shields.io/badge/docs-stable-blue.svg
-[docs-url]: https://github.com/admercs/SimpleArgParse.jl
+[docs-url]: https://github.com/Eben60/SimpleArgParse2.jl
 
-[codecov-img]: https://codecov.io/gh/admercs/SimpleArgParse.jl/branch/master/graph/badge.svg
-[codecov-url]: https://codecov.io/gh/admercs/SimpleArgParse.jl
+[codecov-img]: https://codecov.io/gh/admercs/SimpleArgParse2.jl/branch/master/graph/badge.svg
+[codecov-url]: https://codecov.io/gh/admercs/SimpleArgParse2.jl
 
-[CI-img]: https://github.com/admercs/SimpleArgParse.jl/actions/workflows/github-actions.yml/badge.svg
-[CI-url]: https://github.com/admercs/SimpleArgParse.jl/actions/workflows/github-actions.yml
+[CI-img]: https://github.com/admercs/SimpleArgParse2.jl/actions/workflows/github-actions.yml/badge.svg
+[CI-url]: https://github.com/admercs/SimpleArgParse2.jl/actions/workflows/github-actions.yml

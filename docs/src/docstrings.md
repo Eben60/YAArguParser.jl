@@ -1,7 +1,7 @@
 ## Types
 
 ```@autodocs
-Modules = [SimpleArgParse]
+Modules = [SimpleArgParse2]
 Order   = [:type, ]
 ```
 
@@ -22,17 +22,17 @@ validate
 
 ### Public functions
 ```@docs
-SimpleArgParse.generate_usage!
-SimpleArgParse.get_value
-SimpleArgParse.getcolor
-SimpleArgParse.parse_arg
-SimpleArgParse.set_value!
+SimpleArgParse2.generate_usage!
+SimpleArgParse2.get_value
+SimpleArgParse2.getcolor
+SimpleArgParse2.parse_arg
+SimpleArgParse2.set_value!
 ```
 
 ### Internal functions
 
 ```@autodocs
-Modules = [SimpleArgParse]
+Modules = [SimpleArgParse2]
 Order   = [:function]
 Filter = t -> !any(occursin.(["add_argument!",
     "add_example!",
@@ -53,7 +53,7 @@ Filter = t -> !any(occursin.(["add_argument!",
 ## Constants
 
 ```@autodocs
-Modules = [SimpleArgParse]
+Modules = [SimpleArgParse2]
 Order   = [:constant, ]
 ```
 

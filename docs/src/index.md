@@ -2,7 +2,7 @@
 
 ## From Preface to v.1
 
-Started hackable, single-file, 320-line Julia package for command-line argument parsing, `SimpleArgParse` offering 95% of the functionality of  `ArgParse` using ~10% of the lines-of-code (LOC).
+Started hackable, single-file, 320-line Julia package for command-line argument parsing, `SimpleArgParse2` offering 95% of the functionality of  `ArgParse` using ~10% of the lines-of-code (LOC).
 
 Does this need to be more complicated?
 

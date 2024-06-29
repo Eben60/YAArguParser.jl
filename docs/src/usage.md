@@ -2,7 +2,7 @@
 
 As usual, e.g.
 ```julia
-] add SimpleArgParse
+] add SimpleArgParse2
 ```
 
 ## Specification
@@ -16,12 +16,12 @@ We approximate the [Microsoft command-line syntax](https://learn.microsoft.com/e
 We first create an `ArgumentParser` object, then add and parse our command-line arguments. We will automagically generate a `usage` string from our key-value store of command-line arguments here, but is also possible to write your own help message instead. 
 
 ```julia
-using SimpleArgParse: ArgumentParser, add_argument!, add_example!, help, parse_args!, args_pairs
+using SimpleArgParse2: ArgumentParser, add_argument!, add_example!, help, parse_args!, args_pairs
 
 fname = splitpath(@__FILE__)[end]
 function main()
 
-    ap = ArgumentParser(description="SimpleArgParse example.", add_help=true)
+    ap = ArgumentParser(description="SimpleArgParse2 example.", add_help=true)
     add_argument!(ap, "-h", "--help", type=Bool, default=false, description="Help switch.")
     add_argument!(ap, "-i", "--input", type=String, default="filename.txt", description="Input file.")
     add_argument!(ap, "-n", "--number", type=Int, default=0, description="Integer number.")
@@ -73,7 +73,7 @@ const usage = raw"""
 
 function main()
 
-    ap = ArgumentParser(description="SimpleArgParse example.", add_help=true, color="cyan")
+    ap = ArgumentParser(description="SimpleArgParse2 example.", add_help=true, color="cyan")
     add_argument!(ap, "-h", "--help", type=Bool, default=false, description="Help switch.")
     add_argument!(ap, "-i", "--input", type=String, default="filename.txt", description="Input file.")
     add_argument!(ap, "-n", "--number", type=Int, default=0, description="Integer number.")
@@ -99,7 +99,7 @@ Now, with validating supplied arguments (read [Types](@ref) Docstrings section f
 
 ```julia
 
-using SimpleArgParse
+using SimpleArgParse2
 
 function main()
 
@@ -138,9 +138,9 @@ main()
 
 ```julia
 using Dates
-using SimpleArgParse
-using SimpleArgParse: AbstractValidator
-import SimpleArgParse: validate
+using SimpleArgParse2
+using SimpleArgParse2: AbstractValidator
+import SimpleArgParse2: validate
 
 @kwdef struct FullAgeValidator <: AbstractValidator
     legal_age::Int = 18
