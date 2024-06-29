@@ -1,4 +1,9 @@
-"Key-value store mapping from colors to ANSI codes. An internal constant."
+"""
+Key-value store mapping from colors to ANSI codes. 
+For color table, see help to internal [`colorize`](@ref) function. 
+    
+An internal constant.
+"""
 ANSICODES::Base.ImmutableDict{String,Int} = Base.ImmutableDict(
     "black"   => 30,
     "red"     => 31,
@@ -16,17 +21,17 @@ ANSICODES::Base.ImmutableDict{String,Int} = Base.ImmutableDict(
 
 Colorize strings or backgrounds using ANSI codes and escape sequences.
 
-| Color    | Example|  Text| Background| Bright text| Bright background |
-| ---------|--------| -----|-----------|------------|-------------------|
-| Black    | Black  |  30  | 40        | 90         | 100               |
-| Red      | Red    |  31  | 41        | 91         | 101               |
-| Green    | Green  |  32  | 42        | 92         | 102               |
-| Yellow   | Yellow |  33  | 43        | 93         | 103               |
-| Blue     | Blue   |  34  | 44        | 94         | 104               |
-| Magenta  | Magenta|  35  | 45        | 95         | 105               |
-| Cyan     | Cyan   |  36  | 46        | 96         | 106               |
-| White    | White  |  37  | 47        | 97         | 107               |
-| Default  |        |  39  | 49        | 99         | 109               |
+| Color    | Text| Background| Bright text| Bright background |
+| ---------|-----|-----------|------------|-------------------|
+| Black    | 30  | 40        | 90         | 100               |
+| Red      | 31  | 41        | 91         | 101               |
+| Green    | 32  | 42        | 92         | 102               |
+| Yellow   | 33  | 43        | 93         | 103               |
+| Blue     | 34  | 44        | 94         | 104               |
+| Magenta  | 35  | 45        | 95         | 105               |
+| Cyan     | 36  | 46        | 96         | 106               |
+| White    | 37  | 47        | 97         | 107               |
+| Default  | 39  | 49        | 99         | 109               |
 
 # Arguments
 - `text::AbstractString`: the UTF-8/ASCII text to colorize.
@@ -63,7 +68,7 @@ end
     colorprint(text, color::AbstractString="default", newline=true; background=false, bright=false) → nothing
     colorprint(text, parser::AbstractArgumentParser, newline=true; background=false, bright=false) → nothing
 
-Print colored text into stdout. For color table, see help to internal `colorize` function. 
+Print colored text into stdout. For color table, see help to internal [`colorize`](@ref) function. 
 If second arg is an `AbstractArgumentParser`, uses color as defined within, if any, otherwise uses `default`.
 
 Function `colorprint` is exported.

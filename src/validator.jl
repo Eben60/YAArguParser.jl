@@ -8,14 +8,15 @@ abstract type AbstractValidator end
 """
     StrValidator <: AbstractValidator
 
-String validator type. Type `StrValidator` is exported.
-
+String validator type. 
 # Fields
 - `upper_case::Bool = false`: If `true`, input and pattern converted to `uppercase`, 
     except for regex comparison
 - `starts_with::Bool = false`: If `true`, validate if one of the words in the `patterns`
     starts with input. Returns the whole matching word.
 - `patterns::Vector{Union{AbstractString, Regex}}`
+
+Type `StrValidator` is exported.
 
 # Examples
 ```julia-repl
@@ -59,13 +60,14 @@ end
 
 Numbers validator type. If no include criteria specified, anything not excluded considered OK. 
 The intervals are evaluated as closed `a ≤ x ≤ b`.
-Type `RealValidator` is exported.
 
 # Fields
 - `excl_vals::Vector{T} = T[]`: list of values to exclude
 - `excl_ivls::Vector{Tuple{T, T}} = Tuple{T, T}[]`: list of intervals to exclude
 - `incl_vals::Vector{T} = T[]`: list of accepted values
 - `incl_ivls::Vector{Tuple{T, T}} = Tuple{T, T}[]`: list of accepted intervals
+
+Type `RealValidator` is exported.
 
 # Examples
 ```julia-repl
@@ -99,7 +101,9 @@ and (possibly canonicalized) input value `v` on success, or `nothing` on validat
 If `nothing` is supplied instead of Validator, validation skipped. The same, if the value `v`
 to be validated is `nothing`.
 For examples and specific information see documentation for the corresponding Validator,
-e.g. `StrValidator` or `RealValidator`. Function `validate` is exported.
+e.g. `StrValidator` or `RealValidator`. 
+
+Function `validate` is exported.
 """
 function validate(v::Real, vl::RealValidator)
     in_interval(v, x) = x[1] <= v <= x[2]
