@@ -2,19 +2,17 @@
 
 # Example for validating arguments
 
-# somehow we have to ensure that SimpleArgParse is installed in the current environment, 
+# somehow we have to ensure that SimpleArgParse2 is installed in the current environment, 
 # otherwise try to switch the environment
 
 using Pkg
 
-if ! haskey(Pkg.dependencies(), "SimpleArgParse")
+if ! haskey(Pkg.dependencies(), "SimpleArgParse2")
     simpleargparse_dir = dirname(@__DIR__)
     Pkg.activate(simpleargparse_dir)
 end
 
-fname = splitpath(@__FILE__)[end]
-
-using SimpleArgParse
+using SimpleArgParse2
 
 function main()
 
@@ -39,9 +37,9 @@ function main()
         validator=RealValidator{Int}(; incl_ivls=[(0, 42)]),
         )
     
-    add_example!(ap, "$fname -n 1 --plotformat NONE")
-    add_example!(ap, "$fname -n 1")
-    add_example!(ap, "$fname --help")
+    add_example!(ap, "$(ap.filename) -n 1 --plotformat NONE")
+    add_example!(ap, "$(ap.filename) -n 1")
+    add_example!(ap, "$(ap.filename) --help")
 
     parse_args!(ap)
 
@@ -54,7 +52,7 @@ function main()
     # display the arguments
     println(args)
 
-    # DO SOMETHING AMAZING
+    # DO SOMETHING with args
 
     return ap
 end

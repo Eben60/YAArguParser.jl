@@ -206,7 +206,6 @@ function parse_args!(parser::AbstractArgumentParser; cli_args=nothing)
             add_argument!(parser, "-h", "--help", type=Bool, default=false, description="Print the help message.")
         generate_usage!(parser)
     end
-    parser.filename = PROGRAM_FILE
     n::Int64 = length(cli_args)
     posargs = positional_args(parser)
 

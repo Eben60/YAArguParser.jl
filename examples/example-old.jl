@@ -1,9 +1,9 @@
-SimpleArgParse: ArgumentParser, add_argument, add_example, generate_usage, help, parse_args, get_value, set_value, has_key, get_key, colorize
+SimpleArgParse2: ArgumentParser, add_argument, add_example, generate_usage, help, parse_args, get_value, set_value, has_key, get_key, colorize
 
 function main()
     :Int
 
-    args::ArgumentParser = ArgumentParser(description="SimpleArgParse example.", add_help=true)
+    args::ArgumentParser = ArgumentParser(description="SimpleArgParse2 example.", add_help=true)
     args = add_argument(args, "-i", "--input", type=String, required=true, default="filename.txt", description="Input file.")
     args = add_argument(args, "-n", "--number", type=UInt8, default=0, description="Integer number.")
     args = add_argument(args, "-v", "--verbose", type=Bool, default=false, description="Verbose mode switch.")

@@ -1,5 +1,5 @@
 
-## Changelog
+## New Features and Changelog
 
 ### Release 2.0.0
 

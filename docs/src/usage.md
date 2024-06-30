@@ -16,9 +16,8 @@ We approximate the [Microsoft command-line syntax](https://learn.microsoft.com/e
 We first create an `ArgumentParser` object, then add and parse our command-line arguments. We will automagically generate a `usage` string from our key-value store of command-line arguments here, but is also possible to write your own help message instead. 
 
 ```julia
-using SimpleArgParse2: ArgumentParser, add_argument!, add_example!, help, parse_args!, args_pairs
+using SimpleArgParse2: ArgumentParser, add_argument!, add_example!, help, parse_args!, args_pairs, generate_usage!
 
-fname = splitpath(@__FILE__)[end]
 function main()
 
     ap = ArgumentParser(description="SimpleArgParse2 example.", add_help=true)
@@ -26,8 +25,8 @@ function main()
     add_argument!(ap, "-i", "--input", type=String, default="filename.txt", description="Input file.")
     add_argument!(ap, "-n", "--number", type=Int, default=0, description="Integer number.")
     add_argument!(ap, "-v", "--verbose", type=Bool, default=false, description="Verbose mode switch.")
-    add_example!(ap, "julia $fname --input dir/file.txt --number 10 --verbose")
-    add_example!(ap, "julia $fname --help")
+    add_example!(ap, "julia $(ap.filename) --input dir/file.txt --number 10 --verbose")
+    add_example!(ap, "julia $(ap.filename) --help")
 
     parse_args!(ap)
 
@@ -55,6 +54,8 @@ That is about as simple as it gets and closely follows Python's [`argparse`](htt
 Now let's define a customized help message:
 
 ```julia
+using SimpleArgParse2
+
 const usage = raw"""
   Usage: main.jl --input <PATH> [--verbose] [--problem] [--help]
 
@@ -78,6 +79,8 @@ function main()
     add_argument!(ap, "-i", "--input", type=String, default="filename.txt", description="Input file.")
     add_argument!(ap, "-n", "--number", type=Int, default=0, description="Integer number.")
     add_argument!(ap, "-v", "--verbose", type=Bool, default=false, description="Verbose mode switch.")
+    add_example!(ap, "julia $(ap.filename) --input dir/file.txt --number 10 --verbose")
+    add_example!(ap, "julia $(ap.filename) --help")
 
     # add usage/help text from above
     ap.usage = usage
@@ -87,10 +90,12 @@ function main()
     # print the usage/help message in color defined in ap
     help(ap)
 
+    # DO SOMETHING ELSE
+
     return 0
 end
 
-main();
+main()
 ```
 
 ### Example 3 - validating arguments
@@ -98,7 +103,6 @@ main();
 Now, with validating supplied arguments (read [Types](@ref) Docstrings section for Validator details):
 
 ```julia
-
 using SimpleArgParse2
 
 function main()
@@ -118,17 +122,30 @@ function main()
 
     add_argument!(ap, "-n", "--number"; 
         type=Int, 
+        # an argument with a default value is optional, without - required 
+        # default=nothing,
         description="an integer value ranging from 0 to 42", 
         validator=RealValidator{Int}(; incl_ivls=[(0, 42)]),
         )
+    
+    add_example!(ap, "$(ap.filename) -n 1 --plotformat NONE")
+    add_example!(ap, "$(ap.filename) -n 1")
+    add_example!(ap, "$(ap.filename) --help")
 
     parse_args!(ap)
 
+    # get all arguments as NamedTuple
     args = NamedTuple(args_pairs(ap))
 
-    # DO SOMETHING AMAZING with args
+    # print the usage/help message in color defined during initialization, if asked for help
+    args.help && help(ap)
 
-    return nothing
+    # display the arguments
+    println(args)
+
+    # DO SOMETHING with args
+
+    return ap
 end
 
 main()
@@ -139,7 +156,7 @@ main()
 ```julia
 using Dates
 using SimpleArgParse2
-using SimpleArgParse2: AbstractValidator
+using SimpleArgParse2: AbstractValidator, warn_and_return
 import SimpleArgParse2: validate
 
 @kwdef struct FullAgeValidator <: AbstractValidator
@@ -151,21 +168,21 @@ function validate(v::Union{AbstractString, Date}, vl::FullAgeValidator)
     try
         birthdate = Date(v)
     catch
-        return (; ok=false, v=nothing)
+        return warn_and_return(v)
     end
 
     d = day(birthdate)
     m = month(birthdate)
     fullageyear = year(birthdate) + vl.legal_age
 
-    Date(fullageyear, m, d) > today() && return (; ok=false, v=nothing)
+    Date(fullageyear, m, d) > today() && return warn_and_return(v)
 
     return (; ok=true, v=birthdate)
 end
 
 function askandget(pp; color=pp.color)
-    colorprint(pp.interactive.introduction, color)
-    colorprint(pp.interactive.prompt, color, false)
+    colorprint(pp.introduction, color)
+    colorprint(pp.prompt, color, false)
     answer = readline()
     cli_args = Base.shell_split(answer)
     parse_args!(pp; cli_args)
@@ -185,15 +202,13 @@ function main()
     prompt = "legal age check> "
 
     ask_full_age  = let
-        pp = ArgumentParser(; 
+        pp = initparser(InteractiveArgumentParser;  
             description="Asking if one is of full age", 
             add_help=true, 
             color = color,
-            interactive=InteractiveUsage(;
-                throw_on_exception = true,
-                introduction="Are you of full legal age? Please type y[es] or n[o] and press <ENTER>",
-                prompt=prompt,
-                ),       
+            introduction="Are you of full legal age? Please type y[es] or n[o] and press <ENTER>",
+            throw_on_exception = true,
+            prompt=prompt,
             )
 
         add_argument!(pp, "-y", "--yes_no"; 
@@ -209,22 +224,20 @@ function main()
             description="Abort?",
             )   
         
-        add_example!(pp, "$(pp.interactive.prompt) y")
-        add_example!(pp, "$(pp.interactive.prompt) --abort")
-        add_example!(pp, "$(pp.interactive.prompt) --help")
+        add_example!(pp, "$(pp.prompt) y")
+        add_example!(pp, "$(pp.prompt) --abort")
+        add_example!(pp, "$(pp.prompt) --help")
         pp
     end
 
     check_full_age  = let
-        pp = ArgumentParser(; 
+        pp = initparser(InteractiveArgumentParser; 
             description="Checking if one is of full age", 
             add_help=true, 
             color=color, 
-            interactive=InteractiveUsage(;
-                throw_on_exception = true,
-                introduction="Please enter your birth date in the yyyy-mm-dd format",
-                prompt=prompt,
-                ),       
+            throw_on_exception = true,
+            introduction="Please enter your birth date in the yyyy-mm-dd format",
+            prompt=prompt,
             )
 
         add_argument!(pp, "-d", "--birthdate"; 
@@ -240,9 +253,9 @@ function main()
             description="Abort?",
             )   
         
-        add_example!(pp, "$(pp.interactive.prompt) 2000-02-29")
-        add_example!(pp, "$(pp.interactive.prompt) --abort")
-        add_example!(pp, "$(pp.interactive.prompt) --help")
+        add_example!(pp, "$(pp.prompt) 2000-02-29")
+        add_example!(pp, "$(pp.prompt) --abort")
+        add_example!(pp, "$(pp.prompt) --help")
         pp
     end
 

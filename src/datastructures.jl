@@ -94,7 +94,7 @@ Type `ArgumentParser` is exported
     arg_store::OrderedDict{String,UInt16} = OrderedDict()
     lng::UInt16 = 0
     description::String = ""
-    filename::String = ""
+    filename::String = PROGRAM_FILE
     usage::String = ""
     examples::Vector{String} = String[]
     add_help::Bool = false

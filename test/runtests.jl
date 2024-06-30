@@ -1,7 +1,7 @@
 using SimpleArgParse2
 
 using SimpleArgParse2: AbstractArgumentParser, get_value, set_value!, positional_args, args2vec, 
-    sort_args, canonicalname, getnestedparsers, throw_on_exception, generate_usage!
+    sort_args, canonicalname, getnestedparsers, throw_on_exception, generate_usage!, validate
 
 using Aqua, Suppressor
 
@@ -76,51 +76,57 @@ using Test
     end
 
     @testset "StrValidator" begin
-        v1 = StrValidator(; upper_case=true, patterns=["aaa", "BBB"])
-        v1c = StrValidator(;  patterns=["aaa", "BBB"])
-        v2 = StrValidator(; upper_case=true, starts_with=true, patterns=["yes", "no"])
-        v3 = StrValidator(; patterns=[r"^ab[cd]$"])
+        @suppress_out begin
+            v1 = StrValidator(; upper_case=true, patterns=["aaa", "BBB"])
+            v1c = StrValidator(;  patterns=["aaa", "BBB"])
+            v2 = StrValidator(; upper_case=true, starts_with=true, patterns=["yes", "no"])
+            v3 = StrValidator(; patterns=[r"^ab[cd]$"])
 
-        @test validate("Aaa", v1) == (; ok=true, v="AAA")
-        @test validate("Aaa", v1c) == (; ok=false, v=nothing) 
-        @test validate("ye", v2) == (; ok=true, v="YES")
-        @test validate("abc", v3) == (; ok=true, v="abc")
-        @test validate("Abc", v3) == (; ok=false, v=nothing)
+            @test validate("Aaa", v1) == (; ok=true, v="AAA")
+            @test validate("Aaa", v1c) == (; ok=false, v=nothing) 
+            @test validate("ye", v2) == (; ok=true, v="YES")
+            @test validate("abc", v3) == (; ok=true, v="abc")
+            @test validate("Abc", v3) == (; ok=false, v=nothing)
 
-        p = ArgumentParser()
-        @test_throws ArgumentError add_argument!(p, "-f", "--foo", type=String, default="bar", validator=v1)
-        p = ArgumentParser()
-        add_argument!(p, "-f", "--foo", type=String, validator=v1)
-        set_value!(p, "--foo", "aaa")
-        @test get_value(p, "--foo") == "AAA"
-        @test_throws ArgumentError set_value!(p, "--foo", "abc")
+            p = ArgumentParser()
+            @test_throws ArgumentError add_argument!(p, "-f", "--foo", type=String, default="bar", validator=v1)
+            p = ArgumentParser()
+            add_argument!(p, "-f", "--foo", type=String, validator=v1)
+            set_value!(p, "--foo", "aaa")
+            @test get_value(p, "--foo") == "AAA"
+            @test_throws ArgumentError set_value!(p, "--foo", "abc")
+        end # suppress  
     end
 
     @testset "RealValidator" begin
-        @test_throws ErrorException RealValidator{Int}()
-        rvl = RealValidator{Int}(;excl_vals=[1, 2], excl_ivls=[(10, 15), (20, 25)], incl_vals=[3, 4, 11], incl_ivls=[(100, typemax(Int))])
-        @test !validate(1, rvl).ok # == (; ok=false, v=nothing) 
-        @test validate(11, rvl) == (; ok=false, v=nothing) 
-        @test validate(50, rvl) == (; ok=false, v=nothing) 
-        @test validate(3, rvl) == (; ok=true, v=3)  
-        @test validate(111, rvl) == (; ok=true, v=111) 
-        rv1 = RealValidator{Float64}(;incl_ivls=[(10, 20), (30, 40), (100, Inf)])
-        @test validate(111, rv1) == (; ok=true, v=111)
-        @test validate(15, rv1) == (; ok=true, v=15)
-        @test validate(25, rv1) == (; ok=false, v=nothing) 
-        @test_throws ErrorException validate("25", rv1)
+        @suppress_out begin
 
-        p = ArgumentParser()
-        @test_throws ArgumentError add_argument!(p, "-i", "--int", type=Int, default=1, validator=rvl)
-        p = ArgumentParser()
-        add_argument!(p, "-i", "--int", type=Int, validator=rvl)
-        set_value!(p, "-i", 3)
-        @test get_value(p, "--int") == 3
-        @test_throws ArgumentError set_value!(p, "--foo", "abc")
+            @test_throws ErrorException RealValidator{Int}()
+            rvl = RealValidator{Int}(;excl_vals=[1, 2], excl_ivls=[(10, 15), (20, 25)], incl_vals=[3, 4, 11], incl_ivls=[(100, typemax(Int))])
+            @test !validate(1, rvl).ok # == (; ok=false, v=nothing) 
+            @test validate(11, rvl) == (; ok=false, v=nothing) 
+            @test validate(50, rvl) == (; ok=false, v=nothing) 
+            @test validate(3, rvl) == (; ok=true, v=3)  
+            @test validate(111, rvl) == (; ok=true, v=111) 
+            rv1 = RealValidator{Float64}(;incl_ivls=[(10, 20), (30, 40), (100, Inf)])
+            @test validate(111, rv1) == (; ok=true, v=111)
+            @test validate(15, rv1) == (; ok=true, v=15)
+            @test validate(25, rv1) == (; ok=false, v=nothing) 
+            @test_throws ErrorException validate("25", rv1)
 
-        rvl1 = RealValidator{Int}(;excl_vals=[1, 2])
-        @test validate(11, rvl1) == (; ok=true, v=11)        
-        @test validate(1, rvl1) == (; ok=false, v=nothing)    
+            p = ArgumentParser()
+            @test_throws ArgumentError add_argument!(p, "-i", "--int", type=Int, default=1, validator=rvl)
+            p = ArgumentParser()
+            add_argument!(p, "-i", "--int", type=Int, validator=rvl)
+            set_value!(p, "-i", 3)
+            @test get_value(p, "--int") == 3
+            @test_throws ArgumentError set_value!(p, "--foo", "abc")
+
+            rvl1 = RealValidator{Int}(;excl_vals=[1, 2])
+            @test validate(11, rvl1) == (; ok=true, v=11)        
+            @test validate(1, rvl1) == (; ok=false, v=nothing) 
+
+        end # suppress  
     end
 
 
@@ -201,7 +207,7 @@ using Test
         @test_throws ArgumentError parse_args!(p; cli_args=[]) 
     end
 @testset "Positional args" begin
-        generated_usage = "\nUsage:  [ <Int64>] [ <Int64>] [ <Int64>] [-f|--foo <String>] [-g|--goo <String>] [-i|--int <Int64>] [-a|--abort]\n\n\n\nOptions:\n  --pos1 <Int64>\tinteger1\t (positional arg)\n  --pos2 <Int64>\tinteger2\t (positional arg)\n  --pos3 <Int64>\tinteger3\t (positional arg)\n  -f, --foo <String>\tFff\n  -g, --goo <String>\tGgg\n  -i, --int <Int64>\tinteger\n  -a, --abort\t\tabort\n\nExamples:\n  \$ 1 2 3 -f \"string 1\" -int 4\n  \$ 4 5 6 -goo \"string 2\" -i 7\n"
+        generated_usage = "\nUsage: $PROGRAM_FILE [ <Int64>] [ <Int64>] [ <Int64>] [-f|--foo <String>] [-g|--goo <String>] [-i|--int <Int64>] [-a|--abort]\n\n\n\nOptions:\n  --pos1 <Int64>\tinteger1\t (positional arg)\n  --pos2 <Int64>\tinteger2\t (positional arg)\n  --pos3 <Int64>\tinteger3\t (positional arg)\n  -f, --foo <String>\tFff\n  -g, --goo <String>\tGgg\n  -i, --int <Int64>\tinteger\n  -a, --abort\t\tabort\n\nExamples:\n  \$ 1 2 3 -f \"string 1\" -int 4\n  \$ 4 5 6 -goo \"string 2\" -i 7\n"
         
         p0 = ArgumentParser();
         add_argument!(p0, "-f", "--foo", type=String, default="fff", description="Fff");

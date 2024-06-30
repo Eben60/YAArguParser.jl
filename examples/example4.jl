@@ -9,20 +9,20 @@
 # Start this example from terminal: 
 # it wouldn't work from REPL
 
-# Somehow we have to ensure that SimpleArgParse is installed in the current environment, 
+# Somehow we have to ensure that SimpleArgParse2 is installed in the current environment, 
 # otherwise try to switch the environment
 
 using Pkg
 
-if ! haskey(Pkg.dependencies(), "SimpleArgParse")
+if ! haskey(Pkg.dependencies(), "SimpleArgParse2")
     simpleargparse_dir = dirname(@__DIR__)
     Pkg.activate(simpleargparse_dir)
 end
 
 using Dates
-using SimpleArgParse
-using SimpleArgParse: AbstractValidator
-import SimpleArgParse: validate
+using SimpleArgParse2
+using SimpleArgParse2: AbstractValidator, warn_and_return
+import SimpleArgParse2: validate
 
 @kwdef struct FullAgeValidator <: AbstractValidator
     legal_age::Int = 18
@@ -33,21 +33,21 @@ function validate(v::Union{AbstractString, Date}, vl::FullAgeValidator)
     try
         birthdate = Date(v)
     catch
-        return (; ok=false, v=nothing)
+        return warn_and_return(v)
     end
 
     d = day(birthdate)
     m = month(birthdate)
     fullageyear = year(birthdate) + vl.legal_age
 
-    Date(fullageyear, m, d) > today() && return (; ok=false, v=nothing)
+    Date(fullageyear, m, d) > today() && return warn_and_return(v)
 
     return (; ok=true, v=birthdate)
 end
 
 function askandget(pp; color=pp.color)
-    colorprint(pp.interactive.introduction, color)
-    colorprint(pp.interactive.prompt, color, false)
+    colorprint(pp.introduction, color)
+    colorprint(pp.prompt, color, false)
     answer = readline()
     cli_args = Base.shell_split(answer)
     parse_args!(pp; cli_args)
@@ -67,15 +67,13 @@ function main()
     prompt = "legal age check> "
 
     ask_full_age  = let
-        pp = ArgumentParser(; 
+        pp = initparser(InteractiveArgumentParser;  
             description="Asking if one is of full age", 
             add_help=true, 
             color = color,
-            interactive=InteractiveUsage(;
-                throw_on_exception = true,
-                introduction="Are you of full legal age? Please type y[es] or n[o] and press <ENTER>",
-                prompt=prompt,
-                ),       
+            introduction="Are you of full legal age? Please type y[es] or n[o] and press <ENTER>",
+            throw_on_exception = true,
+            prompt=prompt,
             )
 
         add_argument!(pp, "-y", "--yes_no"; 
@@ -91,22 +89,20 @@ function main()
             description="Abort?",
             )   
         
-        add_example!(pp, "$(pp.interactive.prompt) y")
-        add_example!(pp, "$(pp.interactive.prompt) --abort")
-        add_example!(pp, "$(pp.interactive.prompt) --help")
+        add_example!(pp, "$(pp.prompt) y")
+        add_example!(pp, "$(pp.prompt) --abort")
+        add_example!(pp, "$(pp.prompt) --help")
         pp
     end
 
     check_full_age  = let
-        pp = ArgumentParser(; 
+        pp = initparser(InteractiveArgumentParser; 
             description="Checking if one is of full age", 
             add_help=true, 
             color=color, 
-            interactive=InteractiveUsage(;
-                throw_on_exception = true,
-                introduction="Please enter your birth date in the yyyy-mm-dd format",
-                prompt=prompt,
-                ),       
+            throw_on_exception = true,
+            introduction="Please enter your birth date in the yyyy-mm-dd format",
+            prompt=prompt,
             )
 
         add_argument!(pp, "-d", "--birthdate"; 
@@ -122,9 +118,9 @@ function main()
             description="Abort?",
             )   
         
-        add_example!(pp, "$(pp.interactive.prompt) 2000-02-29")
-        add_example!(pp, "$(pp.interactive.prompt) --abort")
-        add_example!(pp, "$(pp.interactive.prompt) --help")
+        add_example!(pp, "$(pp.prompt) 2000-02-29")
+        add_example!(pp, "$(pp.prompt) --abort")
+        add_example!(pp, "$(pp.prompt) --help")
         pp
     end
 
@@ -139,3 +135,4 @@ function main()
 end
 
 main()
+;

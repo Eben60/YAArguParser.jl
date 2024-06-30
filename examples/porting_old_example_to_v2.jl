@@ -1,10 +1,10 @@
-using SimpleArgParse
-using SimpleArgParse: get_value, set_value!
+using SimpleArgParse2
+using SimpleArgParse2: get_value, set_value!
 
 function main()
     :Int
 
-    args::ArgumentParser = ArgumentParser(description="SimpleArgParse example.", add_help=true)
+    args::ArgumentParser = ArgumentParser(description="SimpleArgParse2 example.", add_help=true)
     add_argument!(args, "-i", "--input", type=String, default="filename.txt", description="Input file.") # required=true, 
     add_argument!(args, "-n", "--number", type=UInt8, default=0, description="Integer number.")
     add_argument!(args, "-v", "--verbose", type=Bool, default=false, description="Verbose mode switch.")

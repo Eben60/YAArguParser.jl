@@ -6,6 +6,19 @@ The supertype for validators. Type `AbstractValidator` is public, but not export
 abstract type AbstractValidator end
 
 """
+    warn_and_return(v) → (; ok=false, v=nothing)
+
+Prints a warning message and returns a tuple signalling invalid input. Used by the methods 
+of [`validate`](@ref) function.
+
+Function `validate` is public, not exported.
+"""
+function warn_and_return(v) 
+    println("$v is not a valid value")
+    return (; ok=false, v=nothing)
+end
+
+"""
     StrValidator <: AbstractValidator
 
 String validator type. 
@@ -53,7 +66,7 @@ function validate(v::AbstractString, vl::StrValidator)
             end
         end
     end
-    return (; ok=false, v=nothing)
+    return warn_and_return(v)
 end
 """
     RealValidator{T} <: AbstractValidator
@@ -108,9 +121,8 @@ Function `validate` is exported.
 function validate(v::Real, vl::RealValidator)
     in_interval(v, x) = x[1] <= v <= x[2]
 
-    ok = false
-    any([isapprox(v, x) for x in vl.excl_vals]) && return (; ok, v=nothing)
-    any(in_interval.(v, vl.excl_ivls)) && return (; ok, v=nothing)
+    any([isapprox(v, x) for x in vl.excl_vals]) && return warn_and_return(v)
+    any(in_interval.(v, vl.excl_ivls)) && return warn_and_return(v)
 
     ok = true
     # if no include criteria specified, anything not excluded considered OK
@@ -119,7 +131,7 @@ function validate(v::Real, vl::RealValidator)
     any([isapprox(v, x) for x in vl.incl_vals]) && return (; ok, v)
     any(in_interval.(v, vl.incl_ivls)) && return (; ok, v) 
     
-    return (; ok=false, v=nothing)
+    return return warn_and_return(v)
 end
 
 validate(v, vl) = error("no method defined for validate($(typeof(v)), $(typeof(vl)))") 
