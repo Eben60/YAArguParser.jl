@@ -12,9 +12,9 @@ makedocs(
     authors = "Adam Erickson <adam.michael.erickson@gmail.com>, Eben60",
     sitename = "SimpleArgParse2.jl",
     pages = Any[
-        "Prefaces" => "index.md", 
+        "Preface" => "index.md", 
         "Usage" => "usage.md", 
-        "Changelog, Related packages, Licence" => "afterword.md", 
+        "Changelog, Related packages, License" => "finally.md", 
         "Docstrings" => "docstrings.md"
         ],
     checkdocs = :exports, 

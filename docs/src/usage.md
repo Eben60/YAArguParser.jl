@@ -7,9 +7,11 @@ As usual, e.g.
 
 ## Specification
 
-We approximate the [Microsoft command-line syntax](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/command-line-syntax-key). Optional arguments are surrounded by square brackets, values are surrounded by angle brackets (chevrons), and mutually exclusive items are separated by a vertical bar. Simple!
+We approximate the [Microsoft command-line syntax](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/command-line-syntax-key). Optional arguments are surrounded by square brackets, values are surrounded by angle brackets (chevrons), and mutually exclusive items are separated by a vertical bar. 
 
 ## Usage
+
+Apart from these usage examples (you find the complete sources in the`./examples` folder), we suggest you also check the the testsuite `./test/runtests.jl` .
 
 ### Example 1 - common usage
 
@@ -151,7 +153,30 @@ end
 main()
 ```
 
-### Example 4 - positional arguments, custom validator
+### Example 4 - custom parser, `initparser`
+
+This example shows how to create a customized parser. Here, we create `LegacyArgumentParser` type which is equivalent to `ArgumentParser` 
+of [`SimpleArgParse`](https://github.com/admercs/SimpleArgParse.jl). You see that by making our type a subtype of 
+[`AbstractArgumentParser`](@ref SimpleArgParse2.AbstractArgumentParser) we achieve a flattened access to the `struct` properties.
+This is used by [`initparser`](@ref SimpleArgParse2.initparser) function, which simplifies initilalization of nested structs.
+
+```julia
+using SimpleArgParse2
+using SimpleArgParse2: AbstractArgumentParser
+
+@kwdef mutable struct LegacyArgumentParser <: AbstractArgumentParser
+    ap::ArgumentParser = ArgumentParser()
+    authors::Vector{String} = String[]
+    documentation::String = ""
+    repository::String = ""
+    license::String = ""
+end
+
+lp = initparser(LegacyArgumentParser; license="MIT", authors=["Eben60"], description="Example how to extend an argument parser")
+@assert lp.ap.description == lp.description
+```
+
+### Example 5 - positional arguments, custom validator, `initparser`
 
 ```julia
 using Dates
@@ -187,7 +212,6 @@ function askandget(pp; color=pp.color)
     cli_args = Base.shell_split(answer)
     parse_args!(pp; cli_args)
     r = NamedTuple(args_pairs(pp))
-    # needhelp = get(r, :help, false)
     if r.help
         help(pp)
         exit()
@@ -201,7 +225,7 @@ function main()
     color = "cyan"
     prompt = "legal age check> "
 
-    ask_full_age  = let
+    ask_full_age = let
         pp = initparser(InteractiveArgumentParser;  
             description="Asking if one is of full age", 
             add_help=true, 
@@ -230,7 +254,7 @@ function main()
         pp
     end
 
-    check_full_age  = let
+    check_full_age = let
         pp = initparser(InteractiveArgumentParser; 
             description="Checking if one is of full age", 
             add_help=true, 
@@ -272,5 +296,3 @@ end
 main()
 ```
 
-
-See usage examples in the `./examples` folder as well the testsuite `./test/runtests.jl` .

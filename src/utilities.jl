@@ -167,7 +167,8 @@ end
 
 Split a string into a vector of args.
 
-`shell_split` is in internal function of `Base`. It is re-exported.
+`shell_split` is in internal function of `Base`, accessible as a public function of `SimpleArgParse2` e.g. 
+by `using SimpleArgParse2: shell_split`.
 
 # Examples
 ```julia-repl

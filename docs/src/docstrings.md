@@ -16,8 +16,6 @@ colorprint
 haskey
 help
 parse_args!
-shell_split
-validate
 ```
 
 ### Public functions
@@ -27,6 +25,8 @@ SimpleArgParse2.get_value
 SimpleArgParse2.getcolor
 SimpleArgParse2.parse_arg
 SimpleArgParse2.set_value!
+SimpleArgParse2.shell_split
+SimpleArgParse2.validate
 ```
 
 ### Internal functions

@@ -8,12 +8,12 @@ import Base.shell_split
 export ArgumentParser, InteractiveArgumentParser, ArgForms, ArgumentValues, RealValidator, StrValidator
 
 # functions
-export shell_split, add_argument!, add_example!, args_pairs, colorprint, 
+export add_argument!, add_example!, args_pairs, colorprint, 
     help, parse_args!, initparser
 
 # in effect in Julia ≥ v1.11
 @compat public AbstractValidator, AbstractArgumentParser # types
-@compat public generate_usage!, get_value, getcolor, parse_arg, set_value!, validate, warn_and_return # functions
+@compat public generate_usage!, get_value, getcolor, parse_arg, set_value!, shell_split, validate, warn_and_return # functions
 
 include("validator.jl")
 include("datastructures.jl")
