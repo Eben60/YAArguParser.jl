@@ -1,7 +1,8 @@
 using SimpleArgParse2
 
-using SimpleArgParse2: AbstractArgumentParser, get_value, set_value!, positional_args, args2vec, 
-    sort_args, canonicalname, getnestedparsers, throw_on_exception, generate_usage!, validate
+using SimpleArgParse2: AbstractArgumentParser, get_value, set_value!, 
+    positional_args, args2vec, sort_args, canonicalname, getnestedparsers, 
+    throw_on_exception, generate_usage!, validate, shell_split
 
 using Aqua, Suppressor
 

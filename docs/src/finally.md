@@ -3,6 +3,8 @@
 
 ### Release 1.0.0 - changes as compared to [`SimpleArgParse`](https://github.com/admercs/SimpleArgParse.jl)
 
+xx.07.2024
+
 #### Breaking changes
 
 - Renamed exported mutating functions, e.g. `add_example => add_example!`.
