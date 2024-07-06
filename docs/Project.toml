@@ -1,6 +1,6 @@
 [deps]
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
-YAArgParser = "e3fa765b-3027-4ef3-bb12-e639c1e60c6e"
+YAArgParser = "bcbd4c87-030e-4da8-a7f0-f342a29caad3"
 
 [compat]
 Documenter = "1"

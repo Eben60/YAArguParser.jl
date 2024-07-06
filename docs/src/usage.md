@@ -41,7 +41,7 @@ function main()
     # display the arguments
     println(args)
 
-    # DO SOMETHING AMAZING
+    # DO SOMETHING ELSE
 
     return 0
 end
@@ -102,10 +102,11 @@ main()
 
 ### Example 3 - validating arguments
 
-Now, with validating supplied arguments (read [Types](@ref) Docstrings section for Validator details):
+For Validator details, read Docstrings sections for [`RealValidator`](@ref YAArgParser.RealValidator), [`StrValidator`](@ref YAArgParser.StrValidator) and [`validate`](@ref YAArgParser.validate).
 
 ```julia
 using YAArgParser
+using YAArgParser: shell_split
 
 function main()
 
@@ -134,7 +135,11 @@ function main()
     add_example!(ap, "$(ap.filename) -n 1")
     add_example!(ap, "$(ap.filename) --help")
 
-    parse_args!(ap)
+    # simulate supplied args
+    str = "-p SVG -n 33 --help"
+    args = shell_split(str)
+
+    parse_args!(ap; cli_args=args)
 
     # get all arguments as NamedTuple
     args = NamedTuple(args_pairs(ap))
@@ -284,7 +289,7 @@ function main()
     end
 
     (; yes_no ) = askandget(ask_full_age)
-    yes = yes_no == "YES"
+    yes = (yes_no == "YES")
     yes || return false
 
     (; birthdate) = askandget(check_full_age )

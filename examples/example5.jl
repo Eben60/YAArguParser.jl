@@ -134,7 +134,7 @@ function main()
     end
 
     (; yes_no ) = askandget(ask_full_age)
-    yes = yes_no == "YES"
+    yes = (yes_no == "YES")
     yes || return false
 
     (; birthdate) = askandget(check_full_age )
