@@ -4,14 +4,14 @@
 
 ################
 
-# We check if SimpleArgParse2 is installed in the current environment, 
+# We check if YAArgParser is installed in the current environment, 
 # otherwise we try to switch the environment.
 
 using Pkg
 
 using Pkg, UUIDs
 
-pkg_name = "SimpleArgParse2"
+pkg_name = "YAArgParser"
 pkg_uuid = UUID("e3fa765b-3027-4ef3-bb12-e639c1e60c6e")
 
 pkg_available = ! isnothing(Pkg.Types.Context().env.pkg) && Pkg.Types.Context().env.pkg.name == pkg_name
@@ -24,11 +24,11 @@ end
 
 ################
 
-using SimpleArgParse2: ArgumentParser, add_argument!, add_example!, help, parse_args!, args_pairs, generate_usage!
+using YAArgParser: ArgumentParser, add_argument!, add_example!, help, parse_args!, args_pairs, generate_usage!
 
 function main()
 
-    ap = ArgumentParser(description="SimpleArgParse2 example.", add_help=true)
+    ap = ArgumentParser(description="YAArgParser example.", add_help=true)
     add_argument!(ap, "-h", "--help", type=Bool, default=false, description="Help switch.")
     add_argument!(ap, "-i", "--input", type=String, default="filename.txt", description="Input file.")
     add_argument!(ap, "-n", "--number", type=Int, default=0, description="Integer number.")

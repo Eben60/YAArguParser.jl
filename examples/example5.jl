@@ -11,12 +11,12 @@
 
 ################
 
-# We check if SimpleArgParse2 is installed in the current environment, 
+# We check if YAArgParser is installed in the current environment, 
 # otherwise we try to switch the environment.
 
 using Pkg, UUIDs
 
-pkg_name = "SimpleArgParse2"
+pkg_name = "YAArgParser"
 pkg_uuid = UUID("e3fa765b-3027-4ef3-bb12-e639c1e60c6e")
 
 pkg_available = ! isnothing(Pkg.Types.Context().env.pkg) && Pkg.Types.Context().env.pkg.name == pkg_name
@@ -30,9 +30,9 @@ end
 ################
 
 using Dates
-using SimpleArgParse2
-using SimpleArgParse2: AbstractValidator, warn_and_return
-import SimpleArgParse2: validate
+using YAArgParser
+using YAArgParser: AbstractValidator, warn_and_return
+import YAArgParser: validate
 
 @kwdef struct FullAgeValidator <: AbstractValidator
     legal_age::Int = 18

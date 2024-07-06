@@ -1,5 +1,5 @@
-name = "SimpleArgParse2"
-uuid = "e3fa765b-3027-4ef3-bb12-e639c1e60c6e"
+name = "YAArgParser"
+uuid = "bcbd4c87-030e-4da8-a7f0-f342a29caad3"
 authors = ["Adam Erickson <adam.michael.erickson@gmail.com>", "Eben60"]
 version = "1.0.0"
 

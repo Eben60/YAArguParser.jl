@@ -1,6 +1,6 @@
-using SimpleArgParse2
+using YAArgParser
 
-using SimpleArgParse2: AbstractArgumentParser, get_value, set_value!, positional_args, args2vec, 
+using YAArgParser: AbstractArgumentParser, get_value, set_value!, positional_args, args2vec, 
     sort_args, canonicalname, getnestedparsers, throw_on_exception, generate_usage!
 
 using Aqua, Suppressor

@@ -1,4 +1,4 @@
-module SimpleArgParse2
+module YAArgParser
 
 using Compat
 using OrderedCollections: OrderedDict
@@ -24,4 +24,4 @@ include("utilities.jl")
 
 include("precompile.jl")
 
-end # module SimpleArgParse2
+end # module YAArgParser

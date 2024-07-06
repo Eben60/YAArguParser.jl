@@ -2,15 +2,15 @@ using Pkg
 Pkg.activate(@__DIR__)
 Pkg.develop(path=(joinpath(@__DIR__, "../") |> normpath))
 
-using Documenter, SimpleArgParse2
+using Documenter, YAArgParser
 
 # generate documentation locally. 
 # keep in mind .gitignore - deps/deps.jl
 makedocs(
-    modules = [SimpleArgParse2],
+    modules = [YAArgParser],
     format = Documenter.HTML(; prettyurls = (get(ENV, "CI", nothing) == "true")),
     authors = "Adam Erickson <adam.michael.erickson@gmail.com>, Eben60",
-    sitename = "SimpleArgParse2.jl",
+    sitename = "YAArgParser.jl",
     pages = Any[
         "Preface" => "index.md", 
         "Usage" => "usage.md", 
@@ -27,7 +27,7 @@ makedocs(
 # deployment done on the server anyway
 # don't normally run deploydocs here
 # deploydocs(
-#     repo = "github.com/Eben60/SimpleArgParse2.jl.git",
+#     repo = "github.com/Eben60/YAArgParser.jl.git",
 #     versions = nothing,
 #     push_preview = true
 # )

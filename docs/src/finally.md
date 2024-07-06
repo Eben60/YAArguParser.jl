@@ -24,8 +24,8 @@ xx.07.2024
 - Support for extensible parsers [(example)](@ref "Example 4 - custom parser, initparser").
 - Support for positional arguments [(example)](@ref "Example 5 - positional arguments, custom validator, initparser").
 - Support for use from console apps [(example)](@ref "Example 5 - positional arguments, custom validator, initparser").
-- The added function [`initparser`](@ref SimpleArgParse2.initparser) simplifies initilalization of nested structs.
-- The added function [`args_pairs`](@ref SimpleArgParse2.args_pairs) makes it possible get all arguments at once as pairs `[argname => argvalue]`.
+- The added function [`initparser`](@ref YAArgParser.initparser) simplifies initilalization of nested structs.
+- The added function [`args_pairs`](@ref YAArgParser.args_pairs) makes it possible get all arguments at once as pairs `[argname => argvalue]`.
 - Depending on value of `throw_on_exception` field, functions processing the input would either throw on erroneous input, or return an `Exception` object for a less disruptive processing downstream.
 - Anything forgotten?..
 
@@ -46,7 +46,7 @@ xx.07.2024
 - [`Fire`](https://github.com/ylxdzsw/Fire.jl) is a library for creating simple CLI from julia function definitions.
 - [`mce`](https://github.com/diversable/maurice) (Maurice) CLI - The Julia Language project manager,
     with useful functionality for beginners and advanced programmers ... currently in the 'Alpha' phase.
-- The package [GivEmExel](https://github.com/Eben60/GivEmExel.jl) relies heavily onto `SimpleArgParse2` and has been the stimulus for it's development.
+- The package [GivEmExel](https://github.com/Eben60/GivEmExel.jl) relies heavily onto `YAArgParser` and has been the stimulus for it's development.
 
 ## Likes & dislikes?
 

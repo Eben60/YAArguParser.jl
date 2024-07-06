@@ -2,7 +2,7 @@
 
 As usual, e.g.
 ```julia
-] add SimpleArgParse2
+] add YAArgParser
 ```
 
 ## Specification
@@ -18,11 +18,11 @@ Apart from these usage examples (you find the complete sources in the`./examples
 We first create an `ArgumentParser` object, then add and parse our command-line arguments. We will automagically generate a `usage` string from our key-value store of command-line arguments here, but is also possible to write your own help message instead. 
 
 ```julia
-using SimpleArgParse2: ArgumentParser, add_argument!, add_example!, help, parse_args!, args_pairs, generate_usage!
+using YAArgParser: ArgumentParser, add_argument!, add_example!, help, parse_args!, args_pairs, generate_usage!
 
 function main()
 
-    ap = ArgumentParser(description="SimpleArgParse2 example.", add_help=true)
+    ap = ArgumentParser(description="YAArgParser example.", add_help=true)
     add_argument!(ap, "-h", "--help", type=Bool, default=false, description="Help switch.")
     add_argument!(ap, "-i", "--input", type=String, default="filename.txt", description="Input file.")
     add_argument!(ap, "-n", "--number", type=Int, default=0, description="Integer number.")
@@ -56,7 +56,7 @@ That is about as simple as it gets and closely follows Python's [`argparse`](htt
 Now let's define a customized help message:
 
 ```julia
-using SimpleArgParse2
+using YAArgParser
 
 const usage = raw"""
   Usage: main.jl --input <PATH> [--verbose] [--problem] [--help]
@@ -76,7 +76,7 @@ const usage = raw"""
 
 function main()
 
-    ap = ArgumentParser(description="SimpleArgParse2 example.", add_help=true, color="cyan")
+    ap = ArgumentParser(description="YAArgParser example.", add_help=true, color="cyan")
     add_argument!(ap, "-h", "--help", type=Bool, default=false, description="Help switch.")
     add_argument!(ap, "-i", "--input", type=String, default="filename.txt", description="Input file.")
     add_argument!(ap, "-n", "--number", type=Int, default=0, description="Integer number.")
@@ -105,7 +105,7 @@ main()
 Now, with validating supplied arguments (read [Types](@ref) Docstrings section for Validator details):
 
 ```julia
-using SimpleArgParse2
+using YAArgParser
 
 function main()
 
@@ -157,12 +157,12 @@ main()
 
 This example shows how to create a customized parser. Here, we create `LegacyArgumentParser` type which is equivalent to `ArgumentParser` 
 of [`SimpleArgParse`](https://github.com/admercs/SimpleArgParse.jl). You see that by making our type a subtype of 
-[`AbstractArgumentParser`](@ref SimpleArgParse2.AbstractArgumentParser) we achieve a flattened access to the `struct` properties.
-This is used by [`initparser`](@ref SimpleArgParse2.initparser) function, which simplifies initilalization of nested structs.
+[`AbstractArgumentParser`](@ref YAArgParser.AbstractArgumentParser) we achieve a flattened access to the `struct` properties.
+This is used by [`initparser`](@ref YAArgParser.initparser) function, which simplifies initilalization of nested structs.
 
 ```julia
-using SimpleArgParse2
-using SimpleArgParse2: AbstractArgumentParser
+using YAArgParser
+using YAArgParser: AbstractArgumentParser
 
 @kwdef mutable struct LegacyArgumentParser <: AbstractArgumentParser
     ap::ArgumentParser = ArgumentParser()
@@ -180,9 +180,9 @@ lp = initparser(LegacyArgumentParser; license="MIT", authors=["Eben60"], descrip
 
 ```julia
 using Dates
-using SimpleArgParse2
-using SimpleArgParse2: AbstractValidator, warn_and_return
-import SimpleArgParse2: validate
+using YAArgParser
+using YAArgParser: AbstractValidator, warn_and_return
+import YAArgParser: validate
 
 @kwdef struct FullAgeValidator <: AbstractValidator
     legal_age::Int = 18
