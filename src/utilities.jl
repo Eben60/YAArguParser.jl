@@ -167,8 +167,8 @@ end
 
 Split a string into a vector of args.
 
-`shell_split` is in internal function of `Base`, accessible as a public function of `YAArgParser` e.g. 
-by `using YAArgParser: shell_split`.
+`shell_split` is in internal function of `Base`, accessible as a public function of `YAArguParser` e.g. 
+by `using YAArguParser: shell_split`.
 
 # Examples
 ```julia-repl

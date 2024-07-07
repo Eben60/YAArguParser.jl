@@ -4,12 +4,12 @@
 
 ################
 
-# We check if YAArgParser is installed in the current environment, 
+# We check if YAArguParser is installed in the current environment, 
 # otherwise we try to switch the environment.
 
 using Pkg, UUIDs
 
-pkg_name = "YAArgParser"
+pkg_name = "YAArguParser"
 pkg_uuid = UUID("e3fa765b-3027-4ef3-bb12-e639c1e60c6e")
 
 pkg_available = ! isnothing(Pkg.Types.Context().env.pkg) && Pkg.Types.Context().env.pkg.name == pkg_name
@@ -22,8 +22,8 @@ end
 
 ################
 
-using YAArgParser
-using YAArgParser: AbstractArgumentParser
+using YAArguParser
+using YAArguParser: AbstractArgumentParser
 
 @kwdef mutable struct LegacyArgumentParser <: AbstractArgumentParser
     ap::ArgumentParser = ArgumentParser()

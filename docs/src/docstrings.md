@@ -1,7 +1,7 @@
 ## Types
 
 ```@autodocs
-Modules = [YAArgParser]
+Modules = [YAArguParser]
 Order   = [:type, ]
 ```
 
@@ -20,19 +20,19 @@ parse_args!
 
 ### Public functions
 ```@docs
-YAArgParser.generate_usage!
-YAArgParser.get_value
-YAArgParser.getcolor
-YAArgParser.parse_arg
-YAArgParser.set_value!
-YAArgParser.shell_split
-YAArgParser.validate
+YAArguParser.generate_usage!
+YAArguParser.get_value
+YAArguParser.getcolor
+YAArguParser.parse_arg
+YAArguParser.set_value!
+YAArguParser.shell_split
+YAArguParser.validate
 ```
 
 ### Internal functions
 
 ```@autodocs
-Modules = [YAArgParser]
+Modules = [YAArguParser]
 Order   = [:function]
 Filter = t -> !any(occursin.(["add_argument!",
     "add_example!",
@@ -53,7 +53,7 @@ Filter = t -> !any(occursin.(["add_argument!",
 ## Constants
 
 ```@autodocs
-Modules = [YAArgParser]
+Modules = [YAArguParser]
 Order   = [:constant, ]
 ```
 

@@ -1,13 +1,13 @@
-using YAArgParser
+using YAArguParser
 
-using YAArgParser: AbstractArgumentParser, get_value, set_value!, 
+using YAArguParser: AbstractArgumentParser, get_value, set_value!, 
     positional_args, args2vec, sort_args, canonicalname, getnestedparsers, 
     throw_on_exception, generate_usage!, validate, shell_split
 
 using Aqua, Suppressor
 
 alltests = !(isdefined(@__MODULE__, :complete_tests) && !complete_tests)
-alltests && Aqua.test_all(YAArgParser)
+alltests && Aqua.test_all(YAArguParser)
 
 using Test
 

@@ -1,4 +1,4 @@
-using YAArgParser
+using YAArguParser
 
 @kwdef mutable struct LegacyArgumentParser <: AbstractArgumentParser
     ap::ArgumentParser = ArgumentParser()

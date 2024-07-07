@@ -1,4 +1,4 @@
-name = "YAArgParser"
+name = "YAArguParser"
 uuid = "bcbd4c87-030e-4da8-a7f0-f342a29caad3"
 authors = ["Adam Erickson <adam.michael.erickson@gmail.com>", "Eben60"]
 version = "1.0.0"

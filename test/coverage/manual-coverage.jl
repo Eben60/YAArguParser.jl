@@ -1,5 +1,5 @@
 using Pkg, Coverage
-Pkg.test("YAArgParser"; coverage=true)
+Pkg.test("YAArguParser"; coverage=true)
 
 srcfolder = normpath(@__DIR__, "../../src")
 coverage = process_folder(srcfolder)
