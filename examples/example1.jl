@@ -18,8 +18,8 @@ pkg_available = ! isnothing(Pkg.Types.Context().env.pkg) && Pkg.Types.Context().
 pkg_available = pkg_available || haskey(Pkg.dependencies(), pkg_uuid)
 
 if ! pkg_available
-    simpleargparse_dir = dirname(@__DIR__)
-    Pkg.activate(simpleargparse_dir)
+    yaarguparser_dir = dirname(@__DIR__)
+    Pkg.activate(yaarguparser_dir)
 end
 
 ################
