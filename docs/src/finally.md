@@ -3,11 +3,11 @@
 
 ### Release 1.0.0 - changes as compared to [`SimpleArgParse`](https://github.com/admercs/SimpleArgParse.jl)
 
-xx.07.2024
+13.07.2024
 
 #### Breaking changes
 
-- Renamed exported mutating functions, e.g. `add_example => add_example!`.
+- Renamed exported/public mutating functions, e.g. `add_example => add_example!`.
 - Mutating functions do not return `ArgumentParser` anymore: They return either `nothing`, or an `Exception`.
 - Limited the number of exported functions.
 - Hashmap keys no more used, therefore `get_key` function removed.
