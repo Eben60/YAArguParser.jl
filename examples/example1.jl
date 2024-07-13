@@ -7,8 +7,6 @@
 # We check if YAArguParser is installed in the current environment, 
 # otherwise we try to switch the environment.
 
-using Pkg
-
 using Pkg, UUIDs
 
 pkg_name = "YAArguParser"
