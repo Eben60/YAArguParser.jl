@@ -12,19 +12,22 @@
 ################
 
 # We check if YAArguParser is installed in the current environment, 
-# otherwise we try to switch the environment.
+# otherwise we try to switch the environment, or install it into a 
+# temporary environment.
 
-using Pkg, UUIDs
-
-pkg_name = "YAArguParser"
-pkg_uuid = UUID("e3fa765b-3027-4ef3-bb12-e639c1e60c6e")
-
-pkg_available = ! isnothing(Pkg.Types.Context().env.pkg) && Pkg.Types.Context().env.pkg.name == pkg_name
-pkg_available = pkg_available || haskey(Pkg.dependencies(), pkg_uuid)
-
-if ! pkg_available
-    yaarguparser_dir = dirname(@__DIR__)
-    Pkg.activate(yaarguparser_dir)
+try
+    using YAArguParser
+catch
+    using Pkg
+    parentdir = (dirname(@__DIR__)) 
+    parentdir_name = parentdir |> basename
+    if parentdir_name == "YAArguParser.jl"
+        println("activating parent dir")
+        Pkg.activate(parentdir)
+    else
+        Pkg.activate(; temp=true)
+        Pkg.add("YAArguParser")
+    end
 end
 
 ################
