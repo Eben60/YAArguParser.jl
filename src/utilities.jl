@@ -1,54 +1,10 @@
-"""
-Key-value store mapping from colors to ANSI codes. 
-For color table, see help to internal [`colorize`](@ref) function. 
-    
-An internal constant.
-"""
-ANSICODES::Base.ImmutableDict{String,Int} = Base.ImmutableDict(
-    "black"   => 30,
-    "red"     => 31,
-    "green"   => 32,
-    "yellow"  => 33,
-    "blue"    => 34,
-    "magenta" => 35,
-    "cyan"    => 36,
-    "white"   => 37,
-    "default" => 39
-)
+const COLORS = ["black","red","green","yellow","blue","magenta","cyan","white"]
 
-"""
-    colorize(text; color, background, bright) → ::String
-
-Colorize strings or backgrounds using ANSI codes and escape sequences.
-
-| Color    | Text| Background| Bright text| Bright background |
-| ---------|-----|-----------|------------|-------------------|
-| Black    | 30  | 40        | 90         | 100               |
-| Red      | 31  | 41        | 91         | 101               |
-| Green    | 32  | 42        | 92         | 102               |
-| Yellow   | 33  | 43        | 93         | 103               |
-| Blue     | 34  | 44        | 94         | 104               |
-| Magenta  | 35  | 45        | 95         | 105               |
-| Cyan     | 36  | 46        | 96         | 106               |
-| White    | 37  | 47        | 97         | 107               |
-| Default  | 39  | 49        | 99         | 109               |
-
-# Arguments
-- `text::AbstractString`: the UTF-8/ASCII text to colorize.
-
-# Keywords
-- `color::AbstractString="default"`: the standard ANSI name of the color.
-- `background::Bool=false`: flag to select foreground or background color.
-- `bright::Bool=false`: flag to select normal or bright text.
-
-Function `colorize` is internal.
-"""
-function colorize(text::AbstractString; color::AbstractString="default", background::Bool=false, bright::Bool=false)
-    code::Int8 = ANSICODES[color]
-    background && (code += 10)
-    bright && (code += 60)
-    code_string::String = string(code)
-    return "\033[" * code_string * "m" * text * "\033[0m"
+function colorsymbol(color; bright=false)
+    cs = string(color)
+    cs in ["normal", "default"] && return Symbol(cs)
+    cs in COLORS || error("Color $cs not available. Available colors are $COLORS and \"default\"")
+    return bright ? Symbol("light_$cs") : Symbol(cs)
 end
 
 """
@@ -65,21 +21,25 @@ function getcolor(parser::AbstractArgumentParser, color=nothing)
 end
 
 """
-    colorprint(text, color::AbstractString="default", newline=true; background=false, bright=false) → nothing
-    colorprint(text, parser::AbstractArgumentParser, newline=true; background=false, bright=false) → nothing
+    colorprint(text, color::Union{AbstractString, Symbol}="default", newline=true; background=false, 
+        bright=false, bold=false, italic=false, underline=false, blink=false) → nothing
+    colorprint(text, parser::AbstractArgumentParser, newline=true; kwargs...) → nothing
 
-Print colored text into stdout. For color table, see help to internal [`colorize`](@ref) function. 
-If second arg is an `AbstractArgumentParser`, uses color as defined within, if any, otherwise uses `default`.
+Print colored/styled text into stdout, provided the terminal supports it. Available colors are 
+`"black"`, `"red"`, `"green"`, `"yellow"`, `"blue"`, `"magenta"`, `"cyan"`, `"white"`, and `"default"`.
+If second arg is an `AbstractArgumentParser`, uses color as defined within, if any, otherwise uses `"default"`.
 
 Function `colorprint` is exported.
 """
-function colorprint(text, color="default", newline=true; background=false, bright=false) 
-    print(colorize(text; color, background, bright))
+function colorprint(text, color="default", newline=true; background=false, 
+    bright=false, bold=false, italic=false, underline=false, blink=false) 
+    cs = colorsymbol(color; bright)
+    printstyled(text; color=cs, bold, italic, underline, blink, reverse=background)
     newline && println()
 end
 
-colorprint(text, parser::AbstractArgumentParser, newline=true; background=false, bright=false) = 
-    colorprint(text, getcolor(parser), newline; background, bright)
+colorprint(text, parser::AbstractArgumentParser, newline=true; kwargs...) = 
+    colorprint(text, getcolor(parser), newline; kwargs...)
 
 argpair(s, parser) = Symbol(s) => get_value(parser, s)
 
@@ -115,8 +75,8 @@ function throw_on_exception(p::AbstractArgumentParser)
 end
 
 """
-    haskey(parser::AbstractArgumentParser, key::AbstractString) → ::Bool
-    haskey(parser::AbstractArgumentParser, key::Integer) → ::Bool
+    haskey(parser::AbstractArgumentParser, key::AbstractString) → 
+    haskey(parser::AbstractArgumentParser, key::Integer) → 
 """
 Base.haskey(parser::AbstractArgumentParser, key::AbstractString) = haskey(parser.arg_store, arg2strkey(key))   
 Base.haskey(parser::AbstractArgumentParser, key::Integer) = haskey(parser.kv_store, key)
@@ -150,7 +110,7 @@ function Base.setproperty!(p::AbstractArgumentParser, s::Symbol, x)
     return error("type $(typeof(p)) has no property $s")
 end
 
-function Base.propertynames(p::AbstractArgumentParser, private::Bool=false)
+function Base.propertynames(p::AbstractArgumentParser, private=false)
     pns = Symbol[]
     for f in fieldnames(typeof(p))
         push!(pns, f)
