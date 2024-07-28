@@ -60,7 +60,7 @@ end
 
 function askandget(pp; color=pp.color)
     colorprint(pp.introduction, color)
-    colorprint(pp.prompt, color, false)
+    colorprint(pp.prompt, color, false; bold=true)
     answer = readline()
     cli_args = Base.shell_split(answer)
     parse_args!(pp; cli_args)

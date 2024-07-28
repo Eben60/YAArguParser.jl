@@ -1,6 +1,16 @@
 
 ## New Features and Changelog
 
+### Release 1.1.0
+
+28.07.2024
+
+#### New features
+
+- Function [`colorprint`](@ref YAArguParser.colorprint) now supports keywords `bold`, `italic`, 
+    `underline` and `blink`, and accepts both `String` and `Symbol` as its `color` arg.
+
+
 ### Release 1.0.0 - changes as compared to [`SimpleArgParse`](https://github.com/admercs/SimpleArgParse.jl)
 
 13.07.2024

@@ -85,7 +85,7 @@ Command-line argument parser with numkey-value stores and attributes.
 - `usage::String = ""`: usage/help message
 - `examples::Vector{String} = String[]`: usage examples
 - `add_help::Bool = false`: flag to automatically generate a help message
-- `color::String = "default"`: output color - for color table, see help to internal [`colorize`](@ref) function.
+- `color::String = "default"`: output color - for color table, see help to [`colorprint`](@ref) function.
 
 Type `ArgumentParser` is exported
 """
