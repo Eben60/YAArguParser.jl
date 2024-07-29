@@ -21,7 +21,7 @@ jobs:
         version:
           # - '1.10' # as soon as it is LTS
           - '1' # automatically expands to the latest stable 1.x release of Julia
-          - 'pre' 
+          # - 'pre' 
           # - 'nightly'
         os:
           - ubuntu-latest
