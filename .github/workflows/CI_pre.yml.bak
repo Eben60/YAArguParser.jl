@@ -1,9 +1,9 @@
 name: CI_pre
 on:
-  push:
-    branches:
-      - master
-    tags: ['*']
+  # push:
+  #   branches:
+  #     - master
+  #   tags: ['*']
   workflow_dispatch:
 concurrency:
   # Skip intermediate builds: always.
@@ -36,3 +36,11 @@ jobs:
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
           
+
+# Run julia-actions/setup-julia@v1
+#   with:
+#     version: pre
+#     arch: x64
+#     include-all-prereleases: false
+#     show-versioninfo: false
+# Error: Could not find a Julia version that matches pre
