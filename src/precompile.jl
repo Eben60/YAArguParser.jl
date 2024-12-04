@@ -19,7 +19,7 @@ using PrecompileTools: @setup_workload, @compile_workload
     set_value!(p, "--foo", "aaa")
     set_value!(p, "-i", 3)
     set_value!(p, "-s", "aaa")
-    parse_args!(p; cli_args=["posarg", "-f", "fff", "-int", "111", "-soo", "bbb"])
+    parse_args!(p; cli_args=["posarg", "-f", "fff", "--int", "111", "--soo", "bbb"])
     get_value(p, "-i")
     args_pairs(p)
 

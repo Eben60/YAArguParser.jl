@@ -227,7 +227,9 @@ function parse_args!(parser::AbstractArgumentParser; cli_args=nothing)
         end
     end
 
+    skipnext = false
     for i in nextarg:length(cli_args)
+        skipnext && (skipnext = false; continue)
         arg = cli_args[i]
         argkey = arg2strkey(arg)
         if startswith(arg, "-")
@@ -237,13 +239,15 @@ function parse_args!(parser::AbstractArgumentParser; cli_args=nothing)
         else
             continue
         end
+        argtype = parser.kv_store[numkey].type
+        isnum = argtype <: Union{AbstractFloat, Signed}
         # if next iteration is at the end or is an argument, treat current argument as flag/boolean
-        # otherwise, capture the value and skip iterating over it for efficiency
-        if (i + 1 > n) || startswith(cli_args[i+1], "-")
+        # otherwise, capture the value and skip next iteration
+        if (i + 1 > n) || (startswith(cli_args[i+1], "-") && !isnum)
             value = true
         elseif (i + 1 <= n)
             value = cli_args[i+1]
-            i += 1
+            skipnext = true
         else
             return _error(throw_on_exception(parser), "Value failed to parse for arg: $(arg)")
         end

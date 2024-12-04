@@ -1,6 +1,14 @@
 
 ## New Features and Changelog
 
+### Release 1.1.1
+
+04.12.2024
+
+#### Fixes
+
+- Now correctly accepts negative values for numerical arguments.
+
 ### Release 1.1.0
 
 28.07.2024

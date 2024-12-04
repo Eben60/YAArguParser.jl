@@ -135,10 +135,11 @@ end
     add_argument!(p, "-f", "--foo", type=String, default="fff", description="Fff");
     add_argument!(p, "-g", "--goo", type=String, default="ggg", description="Ggg");
     add_argument!(p, "-i", "--int", type=Int, default=0, description="integer");
+    add_argument!(p, "-j", "--negint", type=Int, default=0, description="integer why not negative");
     add_argument!(p, "-b", "--bool1", type=Bool, default=false, description="bool 1");
     add_argument!(p, "-p", "--bool2", type=Bool, default=false, description="bool 2");
     add_argument!(p, "-r", "--bool3", type=Bool, description="bool 3 required");
-    cli_args = ["-goo", "Gggg", "-b", "-f", "Ffff", "--bool3", "false", "-i", "1", "--bool2"];
+    cli_args = ["-goo", "Gggg", "-b", "-f", "Ffff", "--bool3", "false", "-i", "1", "--negint", "-13", "--bool2"];
 
     p0 = deepcopy(p)
 
@@ -147,6 +148,7 @@ end
     @test get_value(p, "--foo") == "Ffff"
     @test get_value(p, "--goo") == "Gggg"
     @test get_value(p, "--int") == 1
+    @test get_value(p, "--negint") == -13
     @test get_value(p, "-b")
     @test get_value(p, "-p")
     @test !get_value(p, "-r")        
