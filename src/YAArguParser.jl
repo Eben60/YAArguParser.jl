@@ -1,4 +1,4 @@
-$(get(ENV, "CI", false) ? "" : ("Source code at" * pathof(YAArguParser)) )
+# $(get(ENV, "CI", false) ? "" : ("Source code at" * pathof(YAArguParser)) )
 
 """
     Package YAArguParser v$(pkgversion(YAArguParser))
@@ -6,6 +6,8 @@ $(get(ENV, "CI", false) ? "" : ("Source code at" * pathof(YAArguParser)) )
 A parser of command line arguments.
 
 Docs under https://eben60.github.io/YAArguParser.jl/
+
+$(get(ENV, "CI", false))
 """
 module YAArguParser
 
