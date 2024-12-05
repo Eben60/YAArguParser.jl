@@ -1,6 +1,14 @@
 
 ## New Features and Changelog
 
+### Release 1.1.2
+
+05.12.2024
+
+#### Changes
+
+- Added package docstring.
+
 ### Release 1.1.1
 
 04.12.2024

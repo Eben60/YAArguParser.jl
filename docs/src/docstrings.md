@@ -54,7 +54,7 @@ Filter = t -> !any(occursin.(["add_argument!",
 
 ```@autodocs
 Modules = [YAArguParser]
-Order   = [:constant, ]
+Order   = [:module, :constant, ]
 ```
 
 ## Index
