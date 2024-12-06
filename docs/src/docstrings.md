@@ -50,11 +50,11 @@ Filter = t -> !any(occursin.(["add_argument!",
     "set_value!",], Ref(string(nameof(t)))))
 ```
 
-## Constants
+## Modules
 
 ```@autodocs
 Modules = [YAArguParser]
-Order   = [:module, :constant, ]
+Order   = [:module, ]
 ```
 
 ## Index
