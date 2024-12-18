@@ -382,3 +382,41 @@ end
 # other arguments passed as Strings
 parse_arg(::Type{Bool}, v::Bool, ::Any) = (; ok=true, v, msg=nothing)
 parse_arg(::Type{String},   v::AbstractString, ::Any)  = (; ok=true, v, msg=nothing)
+
+function tryparse_datetime(type, v, format=nothing)
+    isnothing(format) && return tryparse(type, v)
+    return tryparse(type, v, DateFormat(format))
+end
+
+function parse_datetime(v::AbstractString)
+    formats = OrderedDict(
+        Date => [nothing],
+        Time => [nothing],
+        DateTime => [nothing],
+        DateTime => [
+        "yyyy-mm-ddTHH:MM:SS",
+        "yyyy-mm-ddTHH:MM:SS.s",
+        "yyyy-mm-dd HH:MM:SS",
+        "yyyy-mm-dd HH:MM:SS.s",
+        "yyyy-mm-ddTHH:MM",
+        "yyyy-mm-dd_HH:MM",
+    ],
+    Date => [
+        "yyyy-mm-dd",
+        "dd.mm.yyyy",
+    ],
+    Time => [
+        "HH:MM:SS",
+        "HH:MM:SS.s",
+        "HH:MM",
+    ])
+
+    for (k, ar) in pairs(formats)
+        for f in ar
+            x = tryparse_datetime(k, v, f)
+            isnothing(x) || return (; ok=true, v=x, msg=nothing)
+        end
+    end
+
+end
+export parse_datetime
