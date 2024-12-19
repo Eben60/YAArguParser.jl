@@ -169,14 +169,14 @@ function help(parser::AbstractArgumentParser; color=nothing)
 end
 
 """
-    update_val!(parser::AbstractArgumentParser, numkey::Integer, val_str::AbstractString) → ::Union{Nothing, Exception}
+    update_val!(parser::AbstractArgumentParser, numkey::Integer, value_str::AbstractString) → ::Union{Nothing, Exception}
 
 See also `set_value!`. Function `update_val!` is internal.
 """
-function update_val!(parser, numkey, val_str)
+function update_val!(parser, numkey, value_str)
     av::ArgumentValues = parser.kv_store[numkey]
 
-    (;ok, v, msg) = parse_arg(av.type, val_str, av.validator)
+    (;ok, v, msg) = parse_arg(av.type, value_str, av.validator)
     ok || return _error(throw_on_exception(parser), msg)
 
     return set_value!(parser, numkey, v) # ::Union{Nothing, Exception}
@@ -362,17 +362,17 @@ Function `_error` is internal.
 _error(thr_on_exc, msg; excp=ArgumentError) = thr_on_exc ? throw(excp(msg)) : excp(msg) 
 
 """
-    parse_arg(t::Type, val_str::Union{AbstractString, Bool}, ::Union{Nothing, AbstractValidator}) → (; ok, v=parsed_value, msg=nothing)
+    parse_arg(t::Type, value_str::Union{AbstractString, Bool}, ::Union{Nothing, AbstractValidator}) → (; ok, v=parsed_value, msg=nothing)
 
-Tries to parse `val_str` to type `t`. For your custom types or custom parsing, provide your own methods.
+Tries to parse `value_str` to type `t`. For your custom types or custom parsing, provide your own methods.
 
 Function `parse_arg` is public, but not exported.
 """
-function parse_arg(t::Type, val_str::AbstractString, ::Any) 
+function parse_arg(t::Type, value_str::AbstractString, ::Any) 
     v = try
-        parse(t, val_str)
+        parse(t, value_str)
     catch e
-        return (; ok=false, v=nothing, msg="cannot parse $val_str into $t")
+        return (; ok=false, v=nothing, msg="cannot parse $value_str into $t")
     end
     return (; ok=true, v, msg=nothing)
 end
@@ -382,41 +382,3 @@ end
 # other arguments passed as Strings
 parse_arg(::Type{Bool}, v::Bool, ::Any) = (; ok=true, v, msg=nothing)
 parse_arg(::Type{String},   v::AbstractString, ::Any)  = (; ok=true, v, msg=nothing)
-
-function tryparse_datetime(type, v, format=nothing)
-    isnothing(format) && return tryparse(type, v)
-    return tryparse(type, v, DateFormat(format))
-end
-
-function parse_datetime(v::AbstractString)
-    formats = OrderedDict(
-        Date => [nothing],
-        Time => [nothing],
-        DateTime => [nothing],
-        DateTime => [
-        "yyyy-mm-ddTHH:MM:SS",
-        "yyyy-mm-ddTHH:MM:SS.s",
-        "yyyy-mm-dd HH:MM:SS",
-        "yyyy-mm-dd HH:MM:SS.s",
-        "yyyy-mm-ddTHH:MM",
-        "yyyy-mm-dd_HH:MM",
-    ],
-    Date => [
-        "yyyy-mm-dd",
-        "dd.mm.yyyy",
-    ],
-    Time => [
-        "HH:MM:SS",
-        "HH:MM:SS.s",
-        "HH:MM",
-    ])
-
-    for (k, ar) in pairs(formats)
-        for f in ar
-            x = tryparse_datetime(k, v, f)
-            isnothing(x) || return (; ok=true, v=x, msg=nothing)
-        end
-    end
-
-end
-export parse_datetime

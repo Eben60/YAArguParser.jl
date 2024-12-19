@@ -409,4 +409,18 @@ end
 
     @test_throws ErrorException initparser(RedundantParser; foo="FOO")
 end
+
+using YAArguParser: parse_arg
+using Dates
+
+@testset "ParseDates" begin
+    @test parse_arg(DateTime, "2024-12-31T15:06:48", nothing) == (ok = true, v = DateTime("2024-12-31T15:06:48"), msg = nothing)
+    @test parse_arg(DateTime, "2024-12-31 15:06:48.000", nothing) == (ok = true, v = DateTime("2024-12-31T15:06:48"), msg = nothing) 
+    @test parse_arg(DateTime, "2024-12-31", nothing) == (ok = true, v = Date("2024-12-31"), msg = nothing)
+    @test parse_arg(DateTime, "31.12.2024", nothing) == (ok = true, v = Date("2024-12-31"), msg = nothing)
+    @test parse_arg(DateTime, "15:06:48", nothing) == (ok = true, v = Time("15:06:48"), msg = nothing)
+    @test parse_arg(DateTime, "15:06:48.000", nothing) == (ok = true, v = Time("15:06:48"), msg = nothing)
+    (;ok, v, msg) = parse_arg(DateTime, "01.01.01 15:06", nothing) 
+    @test !ok && isnothing(v) && !isempty(msg)
+end
 ;

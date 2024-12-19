@@ -1,9 +1,21 @@
 
 ## New Features and Changelog
 
+### Release 1.2.0
+
+_2024-12-19_ 
+
+#### New features
+
+- Added a package extension for parsing some common Date and Time representations
+
+#### Other changes
+
+- Set the minimal supported Julia version to `v1.10` (current LTS).
+
 ### Release 1.1.2
 
-05.12.2024
+_05.12.2024_
 
 #### Changes
 
@@ -11,7 +23,7 @@
 
 ### Release 1.1.1
 
-04.12.2024
+_04.12.2024_
 
 #### Fixes
 
@@ -19,7 +31,7 @@
 
 ### Release 1.1.0
 
-28.07.2024
+_28.07.2024_
 
 #### New features
 
@@ -29,7 +41,7 @@
 
 ### Release 1.0.0 - changes as compared to [`SimpleArgParse`](https://github.com/admercs/SimpleArgParse.jl)
 
-13.07.2024
+_13.07.2024_
 
 #### Breaking changes
 

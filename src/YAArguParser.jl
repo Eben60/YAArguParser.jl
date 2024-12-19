@@ -9,7 +9,6 @@ $(isnothing(get(ENV, "CI", nothing)) ? ("\n" * "Package local path: " * pathof(Y
 """
 module YAArguParser
 
-using Dates
 using Compat
 using OrderedCollections: OrderedDict
 import Base.shell_split
