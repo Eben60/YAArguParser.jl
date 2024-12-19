@@ -331,24 +331,37 @@ Set/update value of argument, validating it, as specified by `numkey` or `argnam
 
 Function `set_value!` is public, not exported.
 """
+# function set_value!(parser::AbstractArgumentParser, numkey::Integer, value::Any)
+#     thr_on_exc = throw_on_exception(parser)
+#     !haskey(parser.kv_store, numkey) && return _error(thr_on_exc, "Key not found in store.")
+#     vals::ArgumentValues = parser.kv_store[numkey]
+#     vld = vals.validator
+#     value = convert(vals.type, value)
+#     (ok, value) = validate(value, vld)
+#     ok || return _error(thr_on_exc, "$value is not a valid value for arg $(canonicalname(vals.args))") 
+#     parser.kv_store[numkey] = ArgumentValues(vals.args, value, vals.type, vals.positional, vals.description, vals.validator)
+#     return nothing
+# end
+
 function set_value!(parser::AbstractArgumentParser, numkey::Integer, value::Any)
     thr_on_exc = throw_on_exception(parser)
     !haskey(parser.kv_store, numkey) && return _error(thr_on_exc, "Key not found in store.")
     vals::ArgumentValues = parser.kv_store[numkey]
+    type = vals.type
 
-    vv = validate_value(vals) # either true, of Exception, or throws
-    vv == true || return vv
+    (; ok, value, err) = validate_value(type, vals, thr_on_exc, value)
+    ok || return err
 
     parser.kv_store[numkey] = ArgumentValues(vals.args, value, vals.type, vals.positional, vals.description, vals.validator)
     return nothing
 end
 
-function validate_value(vals)
+function validate_value(::Any, vals, thr_on_exc, value)
     vld = vals.validator
     value = convert(vals.type, value)
     (ok, value) = validate(value, vld)
-    ok || return _error(thr_on_exc, "$value is not a valid value for arg $(canonicalname(vals.args))")
-    return ok
+    ok || return (; ok, value, err = _error(thr_on_exc, "$value is not a valid value for arg $(canonicalname(vals.args))"))
+    return (; ok, value, err = nothing)
 end
 
 function set_value!(parser::AbstractArgumentParser, argname::AbstractString, value::Any)

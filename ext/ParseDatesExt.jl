@@ -4,7 +4,7 @@ using YAArguParser
 using Dates
 using OrderedCollections: OrderedDict
 
-import YAArguParser: parse_arg
+import YAArguParser: parse_arg, validate_value
 
 
 function tryparse_datetime(type, v, format=nothing)
@@ -72,6 +72,16 @@ julia> parse_arg(DateTime, "31.12.2024 17:18", nothing)
 (ok = true, v = DateTime("2024-12-31T17:18:00"), msg = nothing)
 ```
 """
-parse_arg(::Type{DateTime},   v::AbstractString, ::Any)  = parse_datetime(v)
+parse_arg(::Type{DateTime}, v::AbstractString, ::Any)  = parse_datetime(v)
+
+
+function validate_value(::Type{DateTime}, vals, thr_on_exc, value)
+    vld = vals.validator
+    (; ok, v, msg) = parse_datetime(value)
+    ok || return (; ok, value=v, err = _error(thr_on_exc, "msg"))
+    return (; ok, value=v, err = nothing)
+end
+
+#    value = convert(vals.type, value)
 
 end # module ParseDatesExt

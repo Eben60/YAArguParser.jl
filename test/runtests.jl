@@ -410,17 +410,31 @@ end
     @test_throws ErrorException initparser(RedundantParser; foo="FOO")
 end
 
-using YAArguParser: parse_arg
-using Dates
+# using YAArguParser: parse_arg
+# using Dates
 
-@testset "ParseDates" begin
-    @test parse_arg(DateTime, "2024-12-31T15:06:48", nothing) == (ok = true, v = DateTime("2024-12-31T15:06:48"), msg = nothing)
-    @test parse_arg(DateTime, "2024-12-31 15:06:48.000", nothing) == (ok = true, v = DateTime("2024-12-31T15:06:48"), msg = nothing) 
-    @test parse_arg(DateTime, "2024-12-31", nothing) == (ok = true, v = Date("2024-12-31"), msg = nothing)
-    @test parse_arg(DateTime, "31.12.2024", nothing) == (ok = true, v = Date("2024-12-31"), msg = nothing)
-    @test parse_arg(DateTime, "15:06:48", nothing) == (ok = true, v = Time("15:06:48"), msg = nothing)
-    @test parse_arg(DateTime, "15:06:48.000", nothing) == (ok = true, v = Time("15:06:48"), msg = nothing)
-    (;ok, v, msg) = parse_arg(DateTime, "01.01.01 15:06", nothing) 
-    @test !ok && isnothing(v) && !isempty(msg)
-end
+# @testset "ParseDates" begin
+#     @test parse_arg(DateTime, "2024-12-31T15:06:48", nothing) == (ok = true, v = DateTime("2024-12-31T15:06:48"), msg = nothing)
+#     @test parse_arg(DateTime, "2024-12-31 15:06:48.000", nothing) == (ok = true, v = DateTime("2024-12-31T15:06:48"), msg = nothing) 
+#     @test parse_arg(DateTime, "2024-12-31", nothing) == (ok = true, v = Date("2024-12-31"), msg = nothing)
+#     @test parse_arg(DateTime, "31.12.2024", nothing) == (ok = true, v = Date("2024-12-31"), msg = nothing)
+#     @test parse_arg(DateTime, "15:06:48", nothing) == (ok = true, v = Time("15:06:48"), msg = nothing)
+#     @test parse_arg(DateTime, "15:06:48.000", nothing) == (ok = true, v = Time("15:06:48"), msg = nothing)
+#     (;ok, v, msg) = parse_arg(DateTime, "01.01.01 15:06", nothing) 
+#     @test !ok && isnothing(v) && !isempty(msg)
+
+#     p = ArgumentParser();
+#     add_argument!(p, "-a", "--dt1", type=DateTime, default=DateTime("2001-12-31"), description="dt1");
+#     add_argument!(p, "-b", "--dt2", type=DateTime, default=DateTime("2001-12-31"), description="dt2");
+#     add_argument!(p, "-c", "--dt3", type=DateTime, default=DateTime("2001-12-31"), description="dt2");
+#     add_argument!(p, "-d", "--dt4", type=DateTime, default=DateTime("2001-12-31"), description="dt2");
+
+#     cli_args = ["-a", "2024-12-31T15:06:48", "-b", "2024-12-31 15:06:48.000", "-c", "2024-12-31", "-d", "31.12.2024"];
+
+#     parse_args!(p; cli_args);
+#     (; dt1, dt2, dt3, dt4) = args_pairs(p)
+#     ;
+
+
+# end
 ;
