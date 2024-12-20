@@ -5,7 +5,6 @@ Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 Suppressor = "fd094767-a336-5f1f-9728-57cf17d0bbfb"
 TOML = "fa267f1f-6049-4f14-aa54-33bafae1ed76"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
-YAArguParser = "bcbd4c87-030e-4da8-a7f0-f342a29caad3"
 
 [compat]
 Aqua = ">= 0.8"

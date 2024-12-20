@@ -337,22 +337,11 @@ function set_value!(parser::AbstractArgumentParser, numkey::Integer, value::Any)
     thr_on_exc = throw_on_exception(parser)
     !haskey(parser.kv_store, numkey) && return _error(thr_on_exc, "Key not found in store.")
     vals::ArgumentValues = parser.kv_store[numkey]
-    type = vals.type
-
-    (; ok, v, err) = validate_value(type, vals, thr_on_exc, value)
-    ok || return err
-
-    vals.value = v
-    parser.kv_store[numkey] = vals
-    return nothing
-end
-
-function validate_value(::Any, vals::ArgumentValues, thr_on_exc, value)
     vld = vals.validator
-    value = convert(vals.type, value)
     (ok, value) = validate(value, vld)
-    ok || return (; ok, value, err = _error(thr_on_exc, "$value is not a valid value for arg $(canonicalname(vals.args))"))
-    return (; ok, v = value, err = nothing)
+    ok || return _error(thr_on_exc, "$value is not a valid value for arg $(canonicalname(vals.args))") 
+    parser.kv_store[numkey].value = value
+    return nothing
 end
 
 function set_value!(parser::AbstractArgumentParser, argname::AbstractString, value::Any)
@@ -381,11 +370,8 @@ Tries to parse `value_str` to type `t`. For your custom types or custom parsing,
 Function `parse_arg` is public, but not exported.
 """
 function parse_arg(t::Type, value_str::AbstractString, ::Any) 
-    v = try
-        parse(t, value_str)
-    catch e
-        return (; ok=false, v=nothing, msg="cannot parse $value_str into $t")
-    end
+    v = tryparse(t, value_str)
+    isnothing(v) && return (; ok=false, v, msg="cannot parse $value_str into $t")
     return (; ok=true, v, msg=nothing)
 end
 

@@ -22,3 +22,9 @@ include("runtests.jl")
 Pkg.rm(parent_proj_name)
 Pkg.activate(prev_proj)
 end
+
+# if it errors, it will leave entry for 
+# YAArguParser = "bcbd4c87-030e-4da8-a7f0-f342a29caad3"
+# in the Project.toml.
+# it doesn't actually belong there
+# don't check in this change!
