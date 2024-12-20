@@ -169,15 +169,15 @@ function help(parser::AbstractArgumentParser; color=nothing)
 end
 
 """
-    update_val!(parser::AbstractArgumentParser, numkey::Integer, value_str::AbstractString) → ::Union{Nothing, Exception}
+    update_val!(parser::AbstractArgumentParser, numkey::Integer, cli_val::AbstractString) → ::Union{Nothing, Exception}
 
 See also `set_value!`. Function `update_val!` is internal.
 """
-function update_val!(parser, numkey, value_str)
+function update_val!(parser, numkey, cli_val)
     av::ArgumentValues = parser.kv_store[numkey]
-    av.value_str = string(value_str)
+    av.cli_val = string(cli_val)
 
-    (;ok, v, msg) = parse_arg(av.type, value_str, av.validator)
+    (;ok, v, msg) = parse_arg(av.type, av, av.validator)
     ok || return _error(throw_on_exception(parser), msg)
 
     return set_value!(parser, numkey, v) # ::Union{Nothing, Exception}
@@ -363,15 +363,20 @@ Function `_error` is internal.
 _error(thr_on_exc, msg; excp=ArgumentError) = thr_on_exc ? throw(excp(msg)) : excp(msg) 
 
 """
-    parse_arg(t::Type, value_str::Union{AbstractString, Bool}, ::Union{Nothing, AbstractValidator}) → (; ok, v=parsed_value, msg=nothing)
+    parse_arg(t::Type, val::Union{ArgumentValues, AbstractString, Bool}, ::Union{Nothing, AbstractValidator}) → (; ok, v=parsed_value, msg=nothing)
 
-Tries to parse `value_str` to type `t`. For your custom types or custom parsing, provide your own methods.
+Tries to parse `cli_val` to type `t`. For your custom types or custom parsing, provide your own methods.
 
 Function `parse_arg` is public, but not exported.
 """
-function parse_arg(t::Type, value_str::AbstractString, ::Any) 
-    v = tryparse(t, value_str)
-    isnothing(v) && return (; ok=false, v, msg="cannot parse $value_str into $t")
+function parse_arg(t::Type, av::ArgumentValues, vld::Any)
+    cli_val = av.cli_val
+    return parse_arg(t, cli_val, vld)
+end
+
+function parse_arg(t::Type, cli_val::AbstractString, ::Any) 
+    v = tryparse(t, cli_val)
+    isnothing(v) && return (; ok=false, v, msg="cannot parse $cli_val into $t")
     return (; ok=true, v, msg=nothing)
 end
 

@@ -25,6 +25,11 @@ export add_argument!, add_example!, args_pairs, colorprint,
 @compat public generate_usage!, get_value, getcolor, parse_arg, set_value!, 
     shell_split, validate, warn_and_return # functions
 
+# breaking changes:
+# parse_arg change arguments
+# ArgumentValues add field
+
+
 include("validator.jl")
 include("datastructures.jl")
 # include("legacy_parser.jl")

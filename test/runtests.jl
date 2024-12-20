@@ -163,10 +163,7 @@ end
     p = deepcopy(p0)
 
     cli_args = ["-goo", "Gggg", "-b", "-f", "Ffff", "-i"];
-    # parse_args!(p; cli_args);
-    # v=get_value(p, "-i");
-    # @show v
-    @test_throws MethodError parse_args!(p; cli_args);
+    @test_throws ArgumentError parse_args!(p; cli_args);
 end
 
 @testset "Testset return Exception" begin
@@ -428,16 +425,12 @@ using Dates
     add_argument!(p, "-b", "--dt2", type=DateTime, default=DateTime("2001-12-31"), description="dt2");
     add_argument!(p, "-c", "--dt3", type=DateTime, default=DateTime("2001-12-31"), description="dt2");
     add_argument!(p, "-d", "--dt4", type=DateTime, default=DateTime("2001-12-31"), description="dt2");
+    add_argument!(p, "-e", "--dt5", type=DateTime, default=DateTime("2001-12-31"), description="dt2");
 
-    cli_args = ["-a", "2024-12-31T15:06:48"]
-    # , "-b", "2024-12-31 15:06:48.000", "-c", "2024-12-31", "-d", "31.12.2024"];
-
-    pa = parse_args!(p; cli_args);
-#    @show pa
-    # cli_args = ["-a", "2024-12-31T15:06:48", "-b", "2024-12-31 15:06:48.000", "-c", "2024-12-31", "-d", "31.12.2024"];
-    # (; dt1, dt2, dt3, dt4) = args_pairs(p)
-    ;
-
-
+    cli_args = ["-a", "2024-12-31T15:06:48", "-b", "2024-12-31 15:06:48.000", "-c", "2024-12-31", "-d", "31.12.2024", "-e", "23:55:59"];
+    parse_args!(p; cli_args);
+    ap = args_pairs(p) |> NamedTuple
+    @test ap == (dt1 = DateTime("2024-12-31T15:06:48"), dt2 = DateTime("2024-12-31T15:06:48"), dt3 = Date("2024-12-31"), dt4 = Date("2024-12-31"), dt5 = Time(23, 55, 59))
+    
 end
 ;
