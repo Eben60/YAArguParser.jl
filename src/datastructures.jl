@@ -22,6 +22,7 @@ Command-line argument values.
 
 # Fields
 - `const args::ArgForms`
+- `value_str::String = ""`
 - `value::Any`
 - `const type::Type = Any`
 - `const positional::Bool = false`
@@ -32,12 +33,15 @@ Type `ArgumentValues` is exported.
 """
 @kwdef mutable struct ArgumentValues
     const args::ArgForms
+    value_str::String = ""
     value::Any = missing
     const type::Type = Any
     const positional::Bool = false
     const description::String = ""
     const validator::Union{AbstractValidator, Nothing} = nothing
 end
+
+# (; args, value_str, value, type, positional, description, validator)
 
 """
     abstract type AbstractArgumentParser

@@ -1,6 +1,8 @@
 module ParseDatesExt
 
 using YAArguParser
+using YAArguParser: _error
+
 using Dates
 using OrderedCollections: OrderedDict
 
@@ -75,11 +77,10 @@ julia> parse_arg(DateTime, "31.12.2024 17:18", nothing)
 parse_arg(::Type{DateTime}, v::AbstractString, ::Any)  = parse_datetime(v)
 
 
-function validate_value(::Type{DateTime}, vals, thr_on_exc, value)
-    vld = vals.validator
-    (; ok, v, msg) = parse_datetime(value)
-    ok || return (; ok, value=v, err = _error(thr_on_exc, "msg"))
-    return (; ok, value=v, err = nothing)
+function validate_value(::Type{DateTime}, vals::ArgumentValues, thr_on_exc, value)
+    (; ok, v, msg) = parse_datetime(vals.value_str)
+    ok || return (; ok, value=v, err = _error(thr_on_exc, msg))
+    return (; ok, v, err = nothing)
 end
 
 #    value = convert(vals.type, value)
