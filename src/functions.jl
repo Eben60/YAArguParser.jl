@@ -175,11 +175,12 @@ See also `set_value!`. Function `update_val!` is internal.
 """
 function update_val!(parser, numkey, value_str)
     av::ArgumentValues = parser.kv_store[numkey]
+    av.value_str = string(value_str)
 
     (;ok, v, msg) = parse_arg(av.type, value_str, av.validator)
     ok || return _error(throw_on_exception(parser), msg)
 
-    return set_value!(parser, numkey, v, value_str) # ::Union{Nothing, Exception}
+    return set_value!(parser, numkey, v) # ::Union{Nothing, Exception}
 end
 
 """
@@ -251,9 +252,6 @@ function parse_args!(parser::AbstractArgumentParser; cli_args=nothing)
         else
             return _error(throw_on_exception(parser), "Value failed to parse for arg: $(arg)")
         end
-
-        # TODO check why?!
- #       parser.kv_store[numkey].value_str = string(value)
 
         uv = update_val!(parser, numkey, value)
         uv isa Exception && return uv
@@ -348,15 +346,6 @@ function set_value!(parser::AbstractArgumentParser, numkey::Integer, value::Any)
     parser.kv_store[numkey] = vals
     return nothing
 end
-
-function set_value!(parser::AbstractArgumentParser, numkey::Integer, value::Any, value_str::AbstractString)
-    parser.kv_store[numkey].value_str = value_str
-    v = set_value!(parser, numkey, value)
-    isnothing(v) || return v # if not nothing, then Exception
-    return nothing
-end
-
-set_value!(parser::AbstractArgumentParser, numkey::Integer, value::Any, b::Bool) = set_value!(parser, numkey, value, string(b))
 
 function validate_value(::Any, vals::ArgumentValues, thr_on_exc, value)
     vld = vals.validator
