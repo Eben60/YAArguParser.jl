@@ -177,7 +177,7 @@ function update_val!(parser, numkey, cli_val)
     av::ArgumentValues = parser.kv_store[numkey]
     av.cli_val = string(cli_val)
 
-    (;ok, v, msg) = parse_arg(av.type, av, av.validator)
+    (;ok, v, msg) = parse_arg(av) 
     ok || return _error(throw_on_exception(parser), msg)
 
     return set_value!(parser, numkey, v) # ::Union{Nothing, Exception}
@@ -369,8 +369,12 @@ Tries to parse `cli_val` to type `t`. For your custom types or custom parsing, p
 
 Function `parse_arg` is public, but not exported.
 """
-function parse_arg(t::Type, av::ArgumentValues, vld::Any)
+parse_arg(av::ArgumentValues) = parse_arg(av.type, av)
+# now we can dispatch on type
+
+function parse_arg(t::Type, av::ArgumentValues)
     cli_val = av.cli_val
+    vld = av.validator
     return parse_arg(t, cli_val, vld)
 end
 

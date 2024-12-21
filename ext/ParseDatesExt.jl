@@ -1,12 +1,12 @@
 module ParseDatesExt
 
 using YAArguParser
-using YAArguParser: _error
+using YAArguParser: _error, AbstractValidator
 
 using Dates
 using OrderedCollections: OrderedDict
 
-import YAArguParser: parse_arg # , validate_value
+import YAArguParser: parse_arg
 
 
 function tryparse_datetime(type, v, format=nothing)
@@ -14,7 +14,16 @@ function tryparse_datetime(type, v, format=nothing)
     return tryparse(type, v, DateFormat(format))
 end
 
-function parse_datetime(v::AbstractString)
+"""
+    parse_datetime(av::ArgumentValues, validator::AbstractValidator)
+
+Parses `v` to `DateTime`, `Date`, or `Time`, depending on `v`. Works for many common formats of date and time representation.
+
+This function is public, not exported, and can be specialized on `validator`, if desired.
+"""
+parse_datetime(av::ArgumentValues, ::Union{AbstractValidator, Nothing}) = parse_datetime(av.cli_val)
+
+function parse_datetime(v::AbstractString) # 
     formats = OrderedDict(
         Date => [nothing],
         Time => [nothing],
@@ -56,9 +65,8 @@ function parse_datetime(v::AbstractString)
     return (; ok=false, v=nothing, msg="cannot parse $v into Date or Time")
 end
 
-
 """
-    parse_arg(t::Type{DateTime}, v::AbstractString, ::Any) → (; ok, v::Union{DateTime, Date, Time}=parsed_value, msg=nothing)
+    parse_arg(t::Type{DateTime}, av::ArgumentValues) → (; ok, v::Union{DateTime, Date, Time}=parsed_value, msg=nothing)
 
 Parses `v` to `DateTime`, `Date`, or `Time`, depending on `v`. Works for many common formats of date and time representation.
 
@@ -74,16 +82,7 @@ julia> parse_arg(DateTime, "31.12.2024 17:18", nothing)
 (ok = true, v = DateTime("2024-12-31T17:18:00"), msg = nothing)
 ```
 """
-parse_arg(t::Type{DateTime}, av::ArgumentValues, vld::Any) = parse_arg(t, av.cli_val, vld) 
-parse_arg(::Type{DateTime}, cli_val::AbstractString, ::Any) = parse_datetime(cli_val)
-
-
-# function validate_value(::Type{DateTime}, vals::ArgumentValues, thr_on_exc, value)
-#     (; ok, v, msg) = parse_datetime(vals.value_str)
-#     ok || return (; ok, value=v, err = _error(thr_on_exc, msg))
-#     return (; ok, v, err = nothing)
-# end
-
-#    value = convert(vals.type, value)
+parse_arg(t::Type{DateTime}, av::ArgumentValues) = parse_datetime(av, av.validator) 
+parse_arg(t::Type{DateTime}, v::AbstractString, ::Any) = parse_datetime(v) # this is just for testing
 
 end # module ParseDatesExt

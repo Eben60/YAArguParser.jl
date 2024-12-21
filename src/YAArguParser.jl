@@ -25,6 +25,13 @@ export add_argument!, add_example!, args_pairs, colorprint,
 @compat public generate_usage!, get_value, getcolor, parse_arg, set_value!, 
     shell_split, validate, warn_and_return # functions
 
+# # # function definitions for package extensions
+
+function parse_datetime end
+@compat public parse_datetime
+
+# # # # # 
+
 # breaking changes:
 # parse_arg change arguments
 # ArgumentValues add field
