@@ -6,15 +6,17 @@ using YAArguParser: _error, AbstractValidator
 using Dates
 using OrderedCollections: OrderedDict
 
-import YAArguParser: parse_arg
+import YAArguParser: parse_arg, specify_datetime_fmts, validate
 
 DateTimeType = Union{DateTime, Date, Time} # shortcut 
+
+validate(v::T, ::Nothing) where T <: DateTimeType = (; ok=true, v)
+validate(v::T, ::Any) where T <: DateTimeType = (; ok=true, v)
 
 function tryparse_datetime(type, v, format=nothing)
     isnothing(format) && return tryparse(type, v)
     return tryparse(type, v, DateFormat(format))
 end
-
 
 """
     specify_datetime_fmts(::Nothing)
@@ -23,11 +25,11 @@ Provides the lists of date & time formats to be accepted and rejected. For
 
 This function is public, not exported, and is intended to be specialized on `validator`, if desired.
 """
-function specify_datetime_fmts(::Nothing)
+function specify_datetime_fmts(::Any) # Nothing)
     formats = OrderedDict(
         Date => [nothing],
         Time => [nothing],
-        DateTime => [nothing],
+        DateTime => [nothing], # check default formats first
         DateTime => [
         "yyyy-mm-ddTHH:MM:SS",
         "yyyy-mm-ddTHH:MM:SS.s",
