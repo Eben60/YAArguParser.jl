@@ -28,7 +28,8 @@ export add_argument!, add_example!, args_pairs, colorprint,
 # # # function definitions for package extensions
 
 function parse_datetime end
-@compat public parse_datetime
+function specify_datetime_fmts end
+@compat public parse_datetime, specify_datetime_fmts
 
 # # # # # 
 

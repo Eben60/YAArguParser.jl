@@ -8,22 +8,22 @@ using OrderedCollections: OrderedDict
 
 import YAArguParser: parse_arg
 
+DateTimeType = Union{DateTime, Date, Time} # shortcut 
 
 function tryparse_datetime(type, v, format=nothing)
     isnothing(format) && return tryparse(type, v)
     return tryparse(type, v, DateFormat(format))
 end
 
+
 """
-    parse_datetime(av::ArgumentValues, validator::AbstractValidator)
+    specify_datetime_fmts(::Nothing)
 
-Parses `v` to `DateTime`, `Date`, or `Time`, depending on `v`. Works for many common formats of date and time representation.
+Provides the lists of date & time formats to be accepted and rejected. For 
 
-This function is public, not exported, and can be specialized on `validator`, if desired.
+This function is public, not exported, and is intended to be specialized on `validator`, if desired.
 """
-parse_datetime(av::ArgumentValues, ::Union{AbstractValidator, Nothing}) = parse_datetime(av.cli_val)
-
-function parse_datetime(v::AbstractString) # 
+function specify_datetime_fmts(::Nothing)
     formats = OrderedDict(
         Date => [nothing],
         Time => [nothing],
@@ -50,6 +50,23 @@ function parse_datetime(v::AbstractString) #
 
     wrong_formats = [r"^\d{1,2}\.\d{1,2}\.\d{1,2}(?: |$)"]
 
+    return (;formats, wrong_formats)
+
+end
+
+"""
+    parse_datetime(av::ArgumentValues, validator::AbstractValidator)
+
+Parses `v` to `DateTime`, `Date`, or `Time`, depending on `v`. Works for many common formats of date and time representation.
+
+This function is public, not exported, and can be specialized on `validator`, if desired.
+"""
+parse_datetime(t::Type{<:DateTimeType}, av::ArgumentValues, validator::Union{AbstractValidator, Nothing}) = parse_datetime(t, av.cli_val, validator)
+
+function parse_datetime(t::Type{<:DateTimeType}, v::AbstractString, validator::Union{AbstractValidator, Nothing}) # 
+
+    (;formats, wrong_formats) = specify_datetime_fmts(validator)
+
     for f in wrong_formats
         isnothing(match(f, v)) ||
             return (; ok=false, v=nothing, msg="cannot parse $v into Date or Time: Check if year has four digits")
@@ -57,8 +74,10 @@ function parse_datetime(v::AbstractString) #
 
     for (k, ar) in pairs(formats)
         for f in ar
-            x = tryparse_datetime(k, v, f)
-            isnothing(x) || return (; ok=true, v=x, msg=nothing)
+            if (t == DateTime) || (k == t) # DateTime takes date and time formats as well, whereas Date or Time are strikt
+                x = tryparse_datetime(k, v, f)
+                isnothing(x) || return (; ok=true, v=x, msg=nothing)
+            end
         end
     end
 
@@ -82,7 +101,9 @@ julia> parse_arg(DateTime, "31.12.2024 17:18", nothing)
 (ok = true, v = DateTime("2024-12-31T17:18:00"), msg = nothing)
 ```
 """
-parse_arg(t::Type{DateTime}, av::ArgumentValues) = parse_datetime(av, av.validator) 
-parse_arg(t::Type{DateTime}, v::AbstractString, ::Any) = parse_datetime(v) # this is just for testing
+
+
+parse_arg(t::Type{<:DateTimeType}, av::ArgumentValues) = parse_datetime(t, av, av.validator) 
+parse_arg(t::Type{<:DateTimeType}, v::AbstractString, validator::Any) = parse_datetime(t,v, validator) # this is just for testing
 
 end # module ParseDatesExt
