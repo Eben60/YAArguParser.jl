@@ -301,3 +301,10 @@ end
 main()
 ```
 
+### `Dates` package extension
+
+This is to parse various date and time formats. By default it will return different type (`DateTime`, `Date`, or `Time`), depending on the user's input, e.g. `"2024-12-31"` will be returned as `Date`, and `"2024-12-31 23:59"` as `DateTime` for the same argument. 
+
+For formats supported out of the box, see the source code of [`specify_datetime_fmts`](@ref YAArguParser.specify_datetime_fmts) function in `ext/ParseDatesExt.jl`. For usage, see also file `test/test_datetime.jl`.
+
+You also can add or redefine accepted formats - see file `test/test_owndateformat.jl`.

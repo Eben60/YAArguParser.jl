@@ -1,54 +1,46 @@
 ## Types
 
+### Exported types
+
 ```@autodocs
 Modules = [YAArguParser]
 Order   = [:type, ]
+Filter = t -> Base.isexported(YAArguParser, Symbol(t))
+```
+
+### Public types
+
+```@docs
+YAArguParser.AbstractArgumentParser
+YAArguParser.AbstractValidator
 ```
 
 ## Functions
 
 ### Exported functions
-```@docs
-add_argument!
-add_example!
-args_pairs
-colorprint
-haskey
-help
-parse_args!
+
+```@autodocs
+Modules = [YAArguParser, Base.get_extension(YAArguParser, :ParseDatesExt)]
+Order   = [:function]
+Filter = t -> Base.isexported(YAArguParser, Symbol(t))
 ```
 
 ### Public functions
-```@docs
-YAArguParser.generate_usage!
-YAArguParser.get_value
-YAArguParser.getcolor
-YAArguParser.parse_arg
-YAArguParser.set_value!
-YAArguParser.shell_split
-YAArguParser.validate
+
+```@autodocs
+Modules = [YAArguParser, Base.get_extension(YAArguParser, :ParseDatesExt)]
+Order   = [:function]
+Filter = t -> (! Base.isexported(YAArguParser, Symbol(t)) && Base.ispublic(YAArguParser, Symbol(t)))
 ```
 
 ### Internal functions
 
 ```@autodocs
-Modules = [YAArguParser]
+Modules = [YAArguParser, Base.get_extension(YAArguParser, :ParseDatesExt)]
 Order   = [:function]
-Filter = t -> !any(occursin.(["add_argument!",
-    "add_example!",
-    "args_pairs",
-    "colorprint",
-    "haskey",
-    "help",
-    "parse_args!",
-    "shell_split",
-    "validate",
-    "generate_usage!",
-    "get_value",
-    "getcolor",
-    "parse_arg",
-    "set_value!",], Ref(string(nameof(t)))))
+Filter = t -> ! Base.ispublic(YAArguParser, Symbol(t))
 ```
+
 
 ## Index
 

@@ -1,5 +1,5 @@
-using YAArguParser
 using Documenter, Dates
+using YAArguParser
 
 makedocs(
     modules = [YAArguParser, Base.get_extension(YAArguParser, :ParseDatesExt)],

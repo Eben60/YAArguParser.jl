@@ -9,7 +9,6 @@ $(isnothing(get(ENV, "CI", nothing)) ? ("\n" * "Package local path: " * pathof(Y
 """
 module YAArguParser
 
-using Compat
 using OrderedCollections: OrderedDict
 import Base.shell_split
 
@@ -20,23 +19,15 @@ export ArgumentParser, InteractiveArgumentParser, ArgForms, ArgumentValues, Real
 export add_argument!, add_example!, args_pairs, colorprint, 
     help, parse_args!, initparser
 
-# in effect in Julia ≥ v1.11
-@compat public AbstractValidator, AbstractArgumentParser # types
-@compat public generate_usage!, get_value, getcolor, parse_arg, set_value!, 
-    shell_split, validate, warn_and_return # functions
+# public declarations - in effect in Julia ≥ v1.11
+include("public.julia")
 
 # # # function definitions for package extensions
 
 function parse_datetime end
 function specify_datetime_fmts end
-@compat public parse_datetime, specify_datetime_fmts
 
 # # # # # 
-
-# breaking changes:
-# parse_arg change arguments
-# ArgumentValues add field
-
 
 include("validator.jl")
 include("datastructures.jl")
