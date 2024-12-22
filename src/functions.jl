@@ -169,9 +169,9 @@ function help(parser::AbstractArgumentParser; color=nothing)
 end
 
 """
-    update_val!(parser::AbstractArgumentParser, numkey::Integer, cli_val::AbstractString) → ::Union{Nothing, Exception}
+    update_val!(parser::AbstractArgumentParser, numkey::Integer, cli_val::Union{AbstractString, Bool}) → ::Union{Nothing, Exception}
 
-See also `set_value!`. Function `update_val!` is internal.
+See also [`set_value!`](@ref). Function `update_val!` is internal.
 """
 function update_val!(parser, numkey, cli_val)
     av::ArgumentValues = parser.kv_store[numkey]
@@ -324,7 +324,7 @@ end
     set_value!(parser::AbstractArgumentParser, numkey::Integer, value::Any) → ::Union{Nothing, Exception}
     set_value!(parser::AbstractArgumentParser, argname::AbstractString, value::Any) → ::Union{Nothing, Exception}
 
-Set/update value of argument, validating it, as specified by `numkey` or `argname`, in parser.
+Set/update value of argument (which is specified by `numkey` or `argname`), validating it, in parser.
 
 # Throws
 - `Exception`: depending on the value of `throw_on_exception` , if the argument not 
@@ -363,9 +363,11 @@ Function `_error` is internal.
 _error(thr_on_exc, msg; excp=ArgumentError) = thr_on_exc ? throw(excp(msg)) : excp(msg) 
 
 """
-    parse_arg(t::Type, val::Union{ArgumentValues, AbstractString, Bool}, ::Union{Nothing, AbstractValidator}) → (; ok, v=parsed_value, msg=nothing)
+    parse_arg(av::ArgumentValues) → (; ok, v=parsed_value, msg=nothing)
+    parse_arg(t::Type, av::ArgumentValues)
+    parse_arg(t::Type, val::Union{AbstractString, Bool}, ::Union{Nothing, AbstractValidator})
 
-Tries to parse `cli_val` to type `t`. For your custom types or custom parsing, provide your own methods.
+Tries to parse `cli_val` to type `t`. For your custom types or custom parsing, provide your own methods. Returns a `NamedTuple` as above.
 
 Function `parse_arg` is public, but not exported.
 """
@@ -384,8 +386,8 @@ function parse_arg(t::Type, cli_val::AbstractString, ::Any)
     return (; ok=true, v, msg=nothing)
 end
 
-# keyword Bool args do not have the "argument body" and converted explicitely. 
-# therefore this is a special case.
-# other arguments passed as Strings
+# Keyword cli args of Bool type is a special case, 
+# as they do not necessary have the "argument body", and then converted explicitely. 
+# All other arguments passed as Strings
 parse_arg(::Type{Bool}, v::Bool, ::Any) = (; ok=true, v, msg=nothing)
 parse_arg(::Type{String},   v::AbstractString, ::Any)  = (; ok=true, v, msg=nothing)

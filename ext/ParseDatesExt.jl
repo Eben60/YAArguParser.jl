@@ -103,8 +103,6 @@ julia> parse_arg(DateTime, "31.12.2024 17:18", nothing)
 (ok = true, v = DateTime("2024-12-31T17:18:00"), msg = nothing)
 ```
 """
-
-
 parse_arg(t::Type{<:DateTimeType}, av::ArgumentValues) = parse_datetime(t, av, av.validator) 
 parse_arg(t::Type{<:DateTimeType}, v::AbstractString, validator::Any) = parse_datetime(t,v, validator) # this is just for testing
 
