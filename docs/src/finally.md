@@ -7,7 +7,7 @@ _2024-12-22_
 
 #### Breaking change
 
-- Added the field `cli_val` to the public type [`ArgumentValues`](@ref).
+- Added the field `cli_val` to the exported type [`ArgumentValues`](@ref).
 
 #### New features
 
