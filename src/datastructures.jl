@@ -22,12 +22,12 @@ Command-line argument values.
 
 # Fields
 - `const args::ArgForms`
-- `cli_val::String = ""`
-- `value::Any`
+- `cli_val::Union{String, Bool, Nothing} = nothing`: the "raw" value as received from the command line
+- `value::Any`: the processed and validated value
 - `const type::Type = Any`
 - `const positional::Bool = false`
 - `const description::String = ""`
-- `const validator::Union{AbstractValidator, Nothing} = nothing`
+- `const validator::Union{<:AbstractValidator, Nothing} = nothing`
 
 Type `ArgumentValues` is exported.
 """
@@ -40,8 +40,6 @@ Type `ArgumentValues` is exported.
     const description::String = ""
     const validator::Union{<:AbstractValidator, Nothing} = nothing
 end
-
-# (; args, cli_val, value, type, positional, description, validator)
 
 """
     abstract type AbstractArgumentParser

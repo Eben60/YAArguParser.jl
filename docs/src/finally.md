@@ -1,9 +1,25 @@
 
 ## New Features and Changelog
 
+### Release 2.0.0
+
+_2024-12-22_ 
+
+#### Breaking change
+
+- Added the field `cli_val` to the public type [`ArgumentValues`](@ref).
+
+#### New features
+
+- Support for (extensible) parsing of `Dates` types in a package extension.
+
 ### Release 1.2.0
 
 _2024-12-19_ 
+
+#### Warning
+
+- The package extension for `Dates` was not properly tested, therefore this version is not recommended. Use `v2.0` instead, or `v1.1.2`. Sorry.
 
 #### New features
 
