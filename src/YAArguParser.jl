@@ -20,7 +20,9 @@ export add_argument!, add_example!, args_pairs, colorprint,
     help, parse_args!, initparser
 
 # public declarations - in effect in Julia ≥ v1.11
-include("public.julia")
+if VERSION >= v"1.11.0-DEV.469"
+    include("public.julia")
+end
 
 # # # function definitions for package extensions
 
