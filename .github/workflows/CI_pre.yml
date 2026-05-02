@@ -1,10 +1,8 @@
 name: CI_pre
 on:
-  # push:
-  #   branches:
-  #     - master
-  #   tags: ['*']
   workflow_dispatch:
+  schedule:
+    - cron: '30 3 15 * *'
 concurrency:
   # Skip intermediate builds: always.
   # Cancel intermediate builds: only if it is a pull request build.
@@ -12,7 +10,7 @@ concurrency:
   cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
 jobs:
   test:
-    name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }} - ${{ github.event_name }}
+    name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ github.event_name }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: true
@@ -23,24 +21,12 @@ jobs:
         os:
           - ubuntu-latest
           - windows-latest
-        arch:
-          - x64
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: julia-actions/setup-julia@v2
+      - uses: actions/checkout@v6
+      - uses: julia-actions/setup-julia@v3
         with:
           version: ${{ matrix.version }}
-          arch: ${{ matrix.arch }}
-      - uses: julia-actions/cache@v2
+      - uses: julia-actions/cache@v3
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
-          
-
-# Run julia-actions/setup-julia@v1
-#   with:
-#     version: pre
-#     arch: x64
-#     include-all-prereleases: false
-#     show-versioninfo: false
-# Error: Could not find a Julia version that matches pre
