@@ -1,5 +1,7 @@
-name: CI_pre
+name: CI_monthly
 on:
+  push:
+    tags: ['*']
   workflow_dispatch:
   schedule:
     - cron: '30 3 15 * *'
@@ -13,9 +15,11 @@ jobs:
     name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ github.event_name }}
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: true
+      fail-fast: false 
       matrix:
         version:
+          - 'lts'
+          - '1'
           - 'pre'
         os:
           - ubuntu-latest
